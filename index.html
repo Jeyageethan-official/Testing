@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+
 
     <title>Daily Budget Tracker</title>
     <style>
@@ -1376,22 +1378,45 @@ function triggerDatePicker() {
     document.getElementById('historyDatePicker').click();
 }
 
-function openScanBillModal() {
-  document.getElementById("scanBillModal").style.display = "block";
-}
 
-let scannedAmount = null;
 
-// ⚡ Dummy OCR (later replace with Tesseract.js or API)
-function processBillImage(event) {
+
+async function processBillImage(event) {
   const file = event.target.files[0];
   if (!file) return;
 
-  // Simulate scanning
-  setTimeout(() => {
-    scannedAmount = (Math.random() * 5000 + 100).toFixed(2); // demo value
-    document.getElementById("scanResult").textContent = "✅ Scanned Total: " + scannedAmount + " LKR";
-  }, 1500);
+  document.getElementById("scanResult").textContent = "⏳ Scanning bill, please wait...";
+
+  // Run OCR with Tesseract.js
+  const { data: { text } } = await Tesseract.recognize(file, 'eng');
+
+  // Split text into lines
+  const lines = text.split("\n").map(l => l.trim()).filter(l => l);
+
+  // ✅ Find possible shop/bill heading (first non-empty line, usually at top)
+  let shopName = lines[0] || "Unknown Shop";
+
+  // ✅ Find total / subtotal line
+  let totalLine = lines.find(l => /total|subtotal|amount/i.test(l));
+  let amount = null;
+
+  if (totalLine) {
+    // Extract the last number in the line
+    const matches = totalLine.match(/(\d+(\.\d{1,2})?)/g);
+    if (matches) {
+      amount = matches[matches.length - 1];
+    }
+  }
+
+  // Save for later
+  scannedAmount = amount;
+  scannedShop = shopName;
+
+  // Show preview
+  document.getElementById("scanResult").innerHTML = `
+    🏪 Shop: <b>${shopName}</b><br>
+    💰 Amount: <b>${amount ? amount + " LKR" : "Not found"}</b>
+  `;
 }
 
 function useScannedAmount() {
@@ -1399,9 +1424,21 @@ function useScannedAmount() {
     alert("No amount detected yet!");
     return;
   }
+  // Fill Quick Expense form automatically
   document.getElementById("quickExpenseAmount").value = scannedAmount;
+  document.getElementById("quickExpenseDesc").value = scannedShop;
   closeModal("scanBillModal");
 }
+
+let scannedAmount = null;
+let scannedShop = null;
+
+
+
+
+
+
+
 
 
 
