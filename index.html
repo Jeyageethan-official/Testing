@@ -1227,21 +1227,21 @@ body {
   </div>
   
   <div id="scanBillModal" class="modal">
-    <div class="modal-content">
-      <span class="close" onclick="closeModal('scanBillModal')">&times;</span>
-      <h2>📷 Scan Bill</h2>
-      
-      <div class="input-group">
-        <label>Upload Bill Image</label>
-        <input type="file" id="billImageInput" accept="image/*" onchange="processBillImage(event)">
-      </div>
-  
-      <p id="scanResult" style="color: #ccc; margin-top: 10px;">Total will appear here after scanning...</p>
-      
-      <button class="btn success" onclick="useScannedAmount()">Use Amount</button>
+  <div class="modal-content">
+    <span class="close" onclick="closeModal('scanBillModal')">&times;</span>
+    <h2>📷 Scan Bill</h2>
+    
+    <div class="input-group">
+      <label>Upload Bill Image</label>
+      <input type="file" id="billImageInput" accept="image/*" onchange="processBillImage(event)">
     </div>
+
+    <p id="scanResult" style="color: #ccc; margin-top: 10px;">Total will appear here after scanning...</p>
+    
+    <button class="btn success" onclick="useScannedAmount()">Use Amount</button>
   </div>
-  
+</div>
+
     
 
     <!-- Quick Income Modal -->
@@ -1376,6 +1376,32 @@ function triggerDatePicker() {
     document.getElementById('historyDatePicker').click();
 }
 
+function openScanBillModal() {
+  document.getElementById("scanBillModal").style.display = "block";
+}
+
+let scannedAmount = null;
+
+// ⚡ Dummy OCR (later replace with Tesseract.js or API)
+function processBillImage(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  // Simulate scanning
+  setTimeout(() => {
+    scannedAmount = (Math.random() * 5000 + 100).toFixed(2); // demo value
+    document.getElementById("scanResult").textContent = "✅ Scanned Total: " + scannedAmount + " LKR";
+  }, 1500);
+}
+
+function useScannedAmount() {
+  if (!scannedAmount) {
+    alert("No amount detected yet!");
+    return;
+  }
+  document.getElementById("quickExpenseAmount").value = scannedAmount;
+  closeModal("scanBillModal");
+}
 
 
 
