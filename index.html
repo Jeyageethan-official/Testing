@@ -1229,20 +1229,23 @@ body {
   </div>
   
   <div id="scanBillModal" class="modal">
-  <div class="modal-content">
-    <span class="close" onclick="closeModal('scanBillModal')">&times;</span>
-    <h2>📷 Scan Bill</h2>
-    
-    <div class="input-group">
-      <label>Upload Bill Image</label>
-      <input type="file" id="billImageInput" accept="image/*" onchange="processBillImage(event)">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('scanBillModal')">&times;</span>
+      <h2>📷 Scan Bill</h2>
+  
+      <div class="input-group">
+        <label>Upload Bill Image</label>
+        <input type="file" id="billImageInput" accept="image/*" onchange="processBillImage(event)">
+      </div>
+  
+      <p id="scanResult" style="color: #ccc; margin-top: 10px;">
+        Total will appear here after scanning...
+      </p>
+  
+      <button class="btn success" onclick="useScannedAmount()">Use Amount</button>
     </div>
-
-    <p id="scanResult" style="color: #ccc; margin-top: 10px;">Total will appear here after scanning...</p>
-    
-    <button class="btn success" onclick="useScannedAmount()">Use Amount</button>
   </div>
-</div>
+  
 
     
 
@@ -1381,42 +1384,51 @@ function triggerDatePicker() {
 
 
 
+let scannedAmount = null;
+let scannedShop = null;
+
+function openScanBillModal() {
+  document.getElementById("scanBillModal").style.display = "block";
+}
+
 async function processBillImage(event) {
   const file = event.target.files[0];
   if (!file) return;
 
   document.getElementById("scanResult").textContent = "⏳ Scanning bill, please wait...";
 
-  // Run OCR with Tesseract.js
-  const { data: { text } } = await Tesseract.recognize(file, 'eng');
+  try {
+    // OCR with Tesseract.js
+    const { data: { text } } = await Tesseract.recognize(file, 'eng');
 
-  // Split text into lines
-  const lines = text.split("\n").map(l => l.trim()).filter(l => l);
+    // Split into lines
+    const lines = text.split("\n").map(l => l.trim()).filter(l => l);
 
-  // ✅ Find possible shop/bill heading (first non-empty line, usually at top)
-  let shopName = lines[0] || "Unknown Shop";
+    // Guess shop name → first non-empty line
+    let shopName = lines[0] || "Unknown Shop";
 
-  // ✅ Find total / subtotal line
-  let totalLine = lines.find(l => /total|subtotal|amount/i.test(l));
-  let amount = null;
+    // Find line with "total" / "subtotal" / "amount"
+    let totalLine = lines.find(l => /total|subtotal|amount/i.test(l));
+    let amount = null;
 
-  if (totalLine) {
-    // Extract the last number in the line
-    const matches = totalLine.match(/(\d+(\.\d{1,2})?)/g);
-    if (matches) {
-      amount = matches[matches.length - 1];
+    if (totalLine) {
+      const matches = totalLine.match(/(\d+(\.\d{1,2})?)/g);
+      if (matches) {
+        // Pick biggest number if multiple
+        amount = matches.map(Number).sort((a, b) => b - a)[0];
+      }
     }
+
+    scannedAmount = amount;
+    scannedShop = shopName;
+
+    document.getElementById("scanResult").innerHTML = `
+      🏪 Shop: <b>${shopName}</b><br>
+      💰 Amount: <b>${amount ? amount + " LKR" : "Not found"}</b>
+    `;
+  } catch (err) {
+    document.getElementById("scanResult").textContent = "❌ Failed to scan: " + err.message;
   }
-
-  // Save for later
-  scannedAmount = amount;
-  scannedShop = shopName;
-
-  // Show preview
-  document.getElementById("scanResult").innerHTML = `
-    🏪 Shop: <b>${shopName}</b><br>
-    💰 Amount: <b>${amount ? amount + " LKR" : "Not found"}</b>
-  `;
 }
 
 function useScannedAmount() {
@@ -1424,14 +1436,13 @@ function useScannedAmount() {
     alert("No amount detected yet!");
     return;
   }
-  // Fill Quick Expense form automatically
+
+  // Auto-fill Quick Expense fields
   document.getElementById("quickExpenseAmount").value = scannedAmount;
   document.getElementById("quickExpenseDesc").value = scannedShop;
+
   closeModal("scanBillModal");
 }
-
-let scannedAmount = null;
-let scannedShop = null;
 
 
 
