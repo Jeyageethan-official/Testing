@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sign Up | Work Report Tracker</title>
+    <meta name="description" content="Create an account for Work Report Tracker.">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="login-container">
+    <div class="login-form-container">
+      <div class="form-wrapper">
+        <div id="signup-view">
+            <h1>Create an Account</h1>
+            <p class="subtitle">Get started with your work report tracker.</p>
+            
+            <form id="signup-form" novalidate>
+              <div class="input-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required placeholder="Enter your email">
+              </div>
+              <div class="input-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required placeholder="Create a password (min. 6 characters)">
+              </div>
+              <button type="submit" class="login-button">Create Account</button>
+            </form>
+
+            <div id="error-message" class="error-message"></div>
+
+            <p class="signup-link">
+              Already have an account? <a href="index.html">Sign in</a>
+            </p>
+        </div>
+        <div id="success-view" class="success-message hidden">
+            <h2>Check your email!</h2>
+            <p>We've sent a confirmation link to your email address. Please click the link to activate your account.</p>
+        </div>
+      </div>
+    </div>
+    <div class="login-image">
+      <img src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?q=80&w=2000" alt="A team of professionals collaborating in a modern office setting.">
+    </div>
+  </div>
+  <script type="module" src="signup.js"></script>
+</body>
+</html>

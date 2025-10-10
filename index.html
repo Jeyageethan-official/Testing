@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login | Work Report Tracker</title>
+    <meta name="description" content="Login to access your Work Report Tracker dashboard.">
+    <meta property="og:title" content="Login | Work Report Tracker">
+    <meta property="og:description" content="Login to access your Work Report Tracker dashboard.">
+    <meta property="og:image" content="https://d33wubrfki0l68.cloudfront.net/68e89a01395d7c92baa101e6/screenshot_2025-10-10-05-30-53-0000.webp">
+    <meta property="og:image:alt" content="A team collaborating in a modern office environment.">
+    <meta name="twitter:title" content="Login | Work Report Tracker">
+    <meta name="twitter:description" content="Login to access your Work Report Tracker dashboard.">
+    <link rel="stylesheet" href="style.css">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Work Report Tracker",
+      "url": "https://abase-login-page-rauq-dualite.netlify.app"
+    }
+    </script>
+</head>
+<body>
+  <div class="login-container">
+    <div class="login-form-container">
+      <div class="form-wrapper">
+        <h1>Login to your Account</h1>
+        <p class="subtitle">Welcome back! Please enter your details.</p>
+        
+        <form id="login-form" novalidate>
+          <div class="input-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required placeholder="Enter your email">
+          </div>
+          <div class="input-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required placeholder="••••••••">
+          </div>
+          <div class="form-options">
+            <a href="#" class="forgot-password">Forgot password?</a>
+          </div>
+          <button type="submit" class="login-button">Sign In</button>
+        </form>
+
+        <div id="error-message" class="error-message"></div>
+
+        <p class="signup-link">
+          Don't have an account? <a href="signup.html">Sign up</a>
+        </p>
+      </div>
+    </div>
+    <div class="login-image">
+      <img src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?q=80&w=2000" alt="A team of professionals collaborating in a modern office setting.">
+    </div>
+  </div>
+  <script type="module" src="main.js"></script>
+</body>
+</html>
