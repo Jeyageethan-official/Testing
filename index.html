@@ -2482,92 +2482,81 @@ const app = firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
 
 
+  const modal = document.getElementById('loginModal');
+const openLogin = document.getElementById('openLogin');
+const logoutBtn = document.getElementById('logoutBtn');
+const closeLogin = document.getElementById('closeLogin');
 
-  const loginModal = document.getElementById('loginModal');
-  const openLogin = document.getElementById('openLogin');
-  const closeLogin = document.getElementById('closeLogin');
-  const logoutBtn = document.getElementById('logoutBtn');
+openLogin.onclick = () => modal.style.display = 'flex';
+closeLogin.onclick = () => modal.style.display = 'none';
 
-  openLogin.onclick = () => loginModal.style.display = 'flex';
-  closeLogin.onclick = () => loginModal.style.display = 'none';
+// Email/Password login
+document.getElementById('loginSubmit').onclick = async () => {
+  const email = document.getElementById('email').value;
+  const pass = document.getElementById('password').value;
+  try {
+    await auth.signInWithEmailAndPassword(email, pass);
+  } catch (e) {
+    if (e.code === 'auth/user-not-found') {
+      await auth.createUserWithEmailAndPassword(email, pass);
+    } else alert(e.message);
+  }
+};
 
-  // Email login
-  document.getElementById('loginSubmit').onclick = async () => {
-    const email = document.getElementById('email').value;
-    const pass = document.getElementById('password').value;
+// Forgot password
+document.getElementById('forgotPassword').onclick = async (e) => {
+  e.preventDefault();
+  const email = document.getElementById('email').value;
+  if (!email) return alert("Enter email first!");
+  try {
+    await auth.sendPasswordResetEmail(email);
+    alert("Password reset email sent!");
+  } catch (e) {
+    alert(e.message);
+  }
+};
 
-    try {
-      await auth.signInWithEmailAndPassword(email, pass);
-      alert("Login success!");
-      loginModal.style.display = 'none';
-    } catch (e) {
-      if (e.code === 'auth/user-not-found') {
-        await auth.createUserWithEmailAndPassword(email, pass);
-        alert("Account created!");
-        loginModal.style.display = 'none';
-      } else {
-        alert(e.message);
-      }
-    }
-  };
+// Google login
+document.getElementById('googleLogin').onclick = async () => {
+  const provider = new firebase.auth.GoogleAuthProvider();
+  await auth.signInWithPopup(provider);
+};
 
-  // Forgot password
-  document.getElementById('forgotPassword').onclick = async (e) => {
-    e.preventDefault();
-    const email = document.getElementById('email').value;
-    if (!email) return alert("Enter email first!");
-    try {
-      await auth.sendPasswordResetEmail(email);
-      alert("Password reset email sent!");
-    } catch (e) {
-      alert(e.message);
-    }
-  };
+// Logout
+logoutBtn.onclick = () => auth.signOut();
 
-  // Google sign-in
-  document.getElementById('googleLogin').onclick = async () => {
-    const provider = new firebase.auth.GoogleAuthProvider();
-    try {
-      await auth.signInWithPopup(provider);
-      alert("Google login success!");
-      loginModal.style.display = 'none';
-    } catch (e) {
-      alert(e.message);
-    }
-  };
+// Auth state
+auth.onAuthStateChanged(user => {
+  if (user) {
+    openLogin.style.display = 'none';
+    logoutBtn.style.display = 'inline';
+    modal.style.display = 'none';
+    localStorage.setItem('userEmail', user.email);
+    loadUserData(user.email);
+  } else {
+    openLogin.style.display = 'inline';
+    logoutBtn.style.display = 'none';
+    localStorage.clear();
+  }
+});
 
-  // Logout
-  logoutBtn.onclick = () => auth.signOut();
+// 🔥 Sync + restore functions
+function syncToFirebase(data) {
+  const email = localStorage.getItem('userEmail');
+  if (!email) return;
+  db.collection('users').doc(email).set({ workData: JSON.parse(data) }, { merge: true });
+}
 
-  // State change
-  auth.onAuthStateChanged(async user => {
-    if (user) {
-      openLogin.style.display = 'none';
-      logoutBtn.style.display = 'inline-block';
-      localStorage.setItem('userEmail', user.email);
-
-      // Load Firestore data
-      const ref = db.collection('users').doc(user.email);
-      ref.onSnapshot(doc => {
-        if (doc.exists) {
-          localStorage.setItem('workData', JSON.stringify(doc.data().workData || []));
-          // TODO: call your update UI function here if needed
-        }
-      });
-    } else {
-      openLogin.style.display = 'inline-block';
-      logoutBtn.style.display = 'none';
-      localStorage.clear();
+function loadUserData(email) {
+  const ref = db.collection('users').doc(email);
+  ref.onSnapshot(doc => {
+    if (doc.exists) {
+      const data = doc.data().workData || [];
+      localStorage.setItem('workData', JSON.stringify(data));
+      // TODO: update your UI here (like refresh table/list)
     }
   });
-
-  // Sync function
-  function syncToFirebase(data) {
-    const email = localStorage.getItem('userEmail');
-    if (!email) return;
-    db.collection('users').doc(email).set({ workData: data }, { merge: true });
-  }
-
+}
 
 
 
