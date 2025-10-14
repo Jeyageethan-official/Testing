@@ -1,59 +1,2578 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login | Work Report Tracker</title>
-    <meta name="description" content="Login to access your Work Report Tracker dashboard.">
-    <meta property="og:title" content="Login | Work Report Tracker">
-    <meta property="og:description" content="Login to access your Work Report Tracker dashboard.">
-    <meta property="og:image" content="https://d33wubrfki0l68.cloudfront.net/68e89a01395d7c92baa101e6/screenshot_2025-10-10-05-30-53-0000.webp">
-    <meta property="og:image:alt" content="A team collaborating in a modern office environment.">
-    <meta name="twitter:title" content="Login | Work Report Tracker">
-    <meta name="twitter:description" content="Login to access your Work Report Tracker dashboard.">
-    <link rel="stylesheet" href="style.css">
-    <script type="module">
-    {
-      "@context": "https://schema.org",
-      "@type": "WebSite",
-      "name": "Work Report Tracker",
-      "url": "https://abase-login-page-rauq-dualite.netlify.app"
-    }
-    </script>
-</head>
-<body>
-  <div class="login-container">
-    <div class="login-form-container">
-      <div class="form-wrapper">
-        <h1>Login to your Account</h1>
-        <p class="subtitle">Welcome back! Please enter your details.</p>
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Work Report</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+  
+
+<!-- Firebase Core + Services (Compat versions) -->
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
+
+
+
+    <style>
+
+
+
+/* Dark Mode Base Theme */
+.theme-dark {
+  background: #000000 !important;
+  color: #ffffff;
+}
+
+/* Dark Mode Container */
+.theme-dark .max-w-7xl {
+  background-color: #000000 !important;
+}
+
+/* Dark Mode Headers */
+.theme-dark h1,
+.theme-dark h2,
+.theme-dark h3,
+.theme-dark .text-black {
+  color: #ffffff !important;
+}
+
+/* Dark Mode Dropdowns */
+.theme-dark select#monthDropdown,
+.theme-dark select#yearDropdown {
+  color: #ffffff !important;
+  background: #000000 !important;
+  border: 1px solid #333333;
+}
+
+/* Dark Mode Day Box */
+.theme-dark .day-box {
+  background: rgba(18, 18, 18, 0.7) !important;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(75, 85, 99, 0.2);
+  border-top: 3px solid #1a365d;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.theme-dark .day-box:hover {
+  background: rgba(28, 28, 28, 0.8) !important;
+  border-top-color: #1559b3;
+}
+
+/* Dark Mode Buttons */
+.theme-dark button:not(.btn-premium) {
+  background: #1559b3 !important;
+  color: white !important;
+}
+
+.theme-dark button:not(.btn-premium):hover {
+  background: #1a365d !important;
+}
+
+/* Dark Mode Input Fields */
+.theme-dark input,
+.theme-dark select,
+.theme-dark textarea {
+  background: #121212 !important;
+  color: #ffffff !important;
+  border: 1px solid #333333;
+}
+
+.theme-dark input:focus,
+.theme-dark select:focus,
+.theme-dark textarea:focus {
+  border-color: #1559b3;
+  box-shadow: 0 0 0 2px rgba(30, 64, 175, 0.2);
+}
+
+/* Dark Mode Navigation Buttons */
+.theme-dark #prevMonth,
+.theme-dark #nextMonth {
+  color: #ffffff;
+}
+
+/* Dark Mode Modal */
+.theme-dark .modal-container {
+  background: rgba(0, 0, 0, 0.9);
+}
+
+.theme-dark .modal-glass {
+  background: #121212;
+  border: 1px solid #333333;
+}
+
+/* Dark Mode Text Colors */
+.theme-dark .text-gray-600,
+.theme-dark .text-gray-700,
+.theme-dark .text-gray-800,
+.theme-dark .text-gray-900 {
+  color: #ffffff !important;
+}
+
+/* Dark Mode Border Colors */
+.theme-dark .border,
+.theme-dark .border-t,
+.theme-dark .border-b,
+.theme-dark .border-l,
+.theme-dark .border-r {
+  border-color: #333333 !important;
+}
+
+/* Dark Mode Hover States */
+.theme-dark .hover\:bg-gray-100:hover {
+  background-color: #1a1a1a !important;
+}
+
+/* Professional Glass Effect for Modals */
+.modal-container {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(10px);
+}
+
+.modal-glass {
+  background: linear-gradient(145deg, rgba(17, 17, 17, 0.95), rgba(28, 28, 28, 0.95));
+  border: 1px solid rgba(75, 85, 99, 0.3);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  border-radius: 16px;
+  padding: 2rem;
+  max-width: 90%;
+  width: 500px;
+  position: relative;
+  overflow: hidden;
+}
+
+.modal-glass::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #1559b3, transparent);
+}
+
+/* Premium Modal Content Styling */
+.theme-dark .modal-glass h2,
+.theme-dark .modal-glass h3 {
+  color: #fff;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+}
+
+.theme-dark .modal-glass p {
+  color: #94a3b8;
+  margin-bottom: 1.5rem;
+}
+
+/* Premium Button Styling */
+.theme-dark .modal-glass button {
+  background: linear-gradient(145deg, #165ebd, #1559b3);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  border: none;
+  box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+}
+
+.theme-dark .modal-glass button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 12px -1px rgba(37, 99, 235, 0.3);
+  background: linear-gradient(145deg, #165ebd, #1559b3);
+}
+
+/* Cancel Button Styling */
+.theme-dark .modal-glass button.cancel-btn {
+  background: linear-gradient(145deg, #374151, #1f2937);
+  color: #e2e8f0;
+}
+
+.theme-dark .modal-glass button.cancel-btn:hover {
+  background: linear-gradient(145deg, #1f2937, #111827);
+}
+
+/* Modal Close Button */
+.theme-dark .modal-glass .close-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(75, 85, 99, 0.2);
+  color: #e2e8f0;
+  transition: all 0.2s ease;
+}
+
+.theme-dark .modal-glass .close-btn:hover {
+  background: rgba(75, 85, 99, 0.4);
+  transform: rotate(90deg);
+}
+
+/* Dark Mode Input Fields */
+.theme-dark input,
+.theme-dark select,
+.theme-dark textarea {
+  background: #1a1a1a !important;
+  border: 1px solid rgba(75, 85, 99, 0.3);
+  color: #e2e8f0;
+}
+
+.theme-dark input:focus,
+.theme-dark select:focus,
+.theme-dark textarea:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+/* Fixed Position Elements */
+.fixed-date-search,
+.scroll-button {
+  background: var(--glass-bg);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--premium-shadow);
+}
+
+/* Mobile Responsive Slide Menu Styles */
+        #mobileMenu {
+            position: fixed;
+            top: 0;
+            left: -300px;
+            width: 300px;
+            height: 100%;
+            background-color: #f8f9fa;
+            transition: 0.3s;
+            z-index: 1000;
+            padding-top: 60px;
+        }
+
+        #mobileMenu.open {
+            left: 0;
+        }
+
+        #menuOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            z-index: 999;
+        }
+
+        #menuOverlay.active {
+            display: block;
+        }
+
+        #hamburgerMenu {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            #hamburgerMenu {
+                display: block;
+                position: fixed;
+                top: 15px;
+                left: 15px;
+                z-index: 1100;
+                cursor: pointer;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+        }
+
+        /* Authentication Styles */
+        #authContainer {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            z-index: 1100;
+        }
+    </style>
+    <style>
+
         
-        <form id="login-form" novalidate>
-          <div class="input-group">
-            <label for="email">Email</label>
-            <input type="email" id="email" name="email" required placeholder="Enter your email">
-          </div>
-          <div class="input-group">
-            <label for="password">Password</label>
-            <input type="password" id="password" name="password" required placeholder="••••••••">
-          </div>
-          <div class="form-options">
-            <a href="#" class="forgot-password">Forgot password?</a>
-          </div>
-          <button type="submit" class="login-button">Sign In</button>
-        </form>
+    .hidden {
+        display: none;
+    }
+    .scroll-button {
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    z-index: 50;
+    width: 60px;  /* Increased width */
+    height: 60px; /* Increased height */
+    background-color: #1a1a1a; /* Darker background */
+    color: white;
+    border-radius: 50%; /* Circular shape */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2); /* Added shadow */
+    transition: all 0.3s ease;
+}
 
-        <div id="error-message" class="error-message"></div>
+.scroll-button:hover {
+    transform: scale(1.1); /* Slight enlargement on hover */
+    background-color: #333; /* Slightly lighter on hover */
+}
 
-        <p class="signup-link">
-          Don't have an account? <a href="signup.html">Sign up</a>
-        </p>
-      </div>
-    </div>
-    <div class="login-image">
-      <img src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?q=80&w=2000" alt="A team of professionals collaborating in a modern office setting.">
+/* Specific adjustments for up and down buttons */
+#scrollUpButton, #scrollDownButton {
+    font-size: 24px; /* Larger arrow text */
+    font-weight: bold;
+}
+
+    /* Only change input fields to blue, exclude select elements for title */
+    input[type="text"], input[type="number"], input[type="time"], textarea {
+        color: #e16c29; /* Change text color to blue */
+    }
+
+    /* Exclude dropdowns (select elements) specifically for title */
+    select#monthDropdown, select#yearDropdown {
+        color: #000000; /* Ensure dropdown title stays black */
+    }      
+
+    /* General select element styling, if needed */
+    select:not(#monthDropdown):not(#yearDropdown) {
+        color: #e16c29; /* Apply blue to other select elements */
+    }
+    
+    .day-box {
+    
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1); /* Enhanced shadow */
+    padding: 20px; /* Add padding for spacing */
+    margin: 15px 10px; /* Add margin to create space between boxes */
+    transition: all 0.3s ease; /* Smooth transition for hover effects */
+    
+    overflow: hidden; /* Ensures content stays within rounded corners */
+}
+
+
+
+.day-box {
+    border-top: 3px solid #1559b3;
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(8px);
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin: 15px 10px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.day-box:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.day-box::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background-color: #1559b3; /* Remove previous gradient */
+    display: none; /* Hide the previous pseudo-element */
+}
+
+/* Ensure input fields and buttons have consistent styling within day-box */
+.day-box input, 
+.day-box select, 
+.day-box button {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.day-box input:focus, 
+.day-box select:focus {
+    border-color: #1559b3;
+    box-shadow: 0 0 0 3px rgba(47, 109, 247, 0.1);
+}
+.custom-time-picker::-webkit-date-and-time-value {
+  text-align: left !important;
+}
+
+
+
+    .hidden {
+            display: none;
+        }
+        
+        /* Reminder Modal Styles */
+        
+        
+        #reminderContent {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 0.75rem;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80%;
+            overflow-y: auto;
+        }
+        
+        .reminder-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            padding: 0.5rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+        }
+
+
+        .edit-pencil {
+    border: 1px solid black;
+    border-radius: 50%;
+    padding: 5px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    background: none; /* Remove background */
+    transition: transform 0.2s ease-in-out; /* Add hover animation */
+}
+
+.edit-pencil:hover {
+    transform: scale(1.1); /* Slight zoom on hover */
+    border-color: #ca0505; /* Change border color on hover */
+}
+
+.edit-pencil svg {
+    stroke: black; /* Ensure the pencil icon is black */
+    width: 16px;
+    height: 16px;
+}
+
+
+#reminderList {
+    max-height: 400px; /* Adjust height to fit around 5 reminders */
+    overflow-y: auto; /* Enable vertical scrolling */
+    padding-right: 10px; /* Space for scrollbar */
+    scrollbar-width: thin; /* Thin scrollbar for Firefox */
+    scrollbar-color: #cbd5e0 transparent; /* Colors for scrollbar */
+}
+
+/* Scrollbar styles for WebKit-based browsers */
+#reminderList::-webkit-scrollbar {
+    width: 8px;
+}
+
+#reminderList::-webkit-scrollbar-thumb {
+    background-color: #cbd5e0; /* Scrollbar thumb color */
+    border-radius: 4px; /* Rounded edges for thumb */
+}
+
+#reminderList::-webkit-scrollbar-track {
+    background: transparent; /* Scrollbar track color */
+}
+
+input[type="text"],
+input[type="number"],
+input[type="time"],
+textarea,
+select {
+    color: #e16c29; /* Set text color to blue */
+}
+
+
+.text-blue-500 {
+    color: #e16c29 !important; /* Change text color to the specified orange */
+    font-weight: bold; /* Optional: maintain the bold styling */
+}
+
+
+
+/* iPhone-style time picker enhancements */
+.custom-time-picker {
+    appearance: none;
+    -webkit-appearance: none;
+    background-color: #ffffff;
+    font-size: 1rem;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+}
+
+.custom-time-picker::-webkit-date-and-time-value {
+    text-align: left !important;
+}
+
+
+
+#exportTableContainer {
+    opacity: 0; /* Hide from users */
+    height: 0; /* Prevent visible space usage */
+    overflow: hidden; /* Hide any scrolling */
+    position: absolute; /* Keep it off-screen but still part of the page */
+    left: -9999px;
+}
+
+
+#backupButton, #restoreButton {
+    background-color: black;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: background 0.3s ease;
+}
+
+#backupButton:hover, #restoreButton:hover {
+    background-color: #333; /* Slightly lighter black on hover */
+}
+
+
+
+td {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+
+
+#dateSearchBtn {
+    position: relative; /* Default position inside the rectangle box */
+    transition: all 0.3s ease-in-out;
+}
+
+.fixed-date-search {
+    position: fixed !important;
+    bottom: 9.5rem; /* Positioned above the up-arrow button */
+    right: 1rem;
+    z-index: 100;
+    background-color: #1a1a1a;
+    color: white;
+    padding: 10px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+}
+
+.fixed-date-search:hover {
+    transform: scale(1);
+    background-color: #333;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    border: 0.5px solid rgba(0, 0, 0, 0.358); /* Thinner but bold outer border */
+}
+
+th, td {
+    border: 0.5px solid rgba(0, 0, 0, 0.319); /* Thinner but bold inner borders */
+    padding: 8px;
+    text-align: left;
+}
+
+th {
+    background-color: #f2f2f2; /* Optional: Header background */
+}
+
+
+
+
+#reminderModal {
+  z-index: 99999 !important;
+}
+#reminderContent {
+  z-index: 100000 !important;
+  position: relative;
+}
+#reminderContent {
+  background-color: black;
+  color: white;
+  padding: 2rem;
+  border-radius: 0.75rem;
+  width: 90%;
+  max-width: 500px;
+  max-height: 80%;
+  overflow-y: auto;
+
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* center fix */
+  z-index: 100000;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+}
+
+
+button.btn-primary {
+  background-color: #1559b3; /* Primary blue */
+  color: white;
+  transition: background 0.3s ease;
+}
+
+button.btn-primary:hover {
+  background-color: black;
+}
+
+
+/* DARK MODE: Change all black buttons to mild blue */
+.theme-dark button,
+.theme-dark button.bg-black,
+.theme-dark button.p-2,
+.theme-dark button.rounded-full,
+.theme-dark button.text-white {
+  background-color: #1559b3 !important; /* Mild blue */
+  color: white !important;
+  border: none !important;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+/* DARK MODE Hover effect: darker blue or black */
+.theme-dark button:hover {
+  background-color: #1559b3 !important; /* Darker blue */
+  color: white !important;
+}
+
+/* Base: Turn all black buttons into mild blue */
+button,
+button.bg-black,
+button.p-2,
+button.rounded-full,
+button.text-white {
+  background-color: #000000d7 !important; /* Mild blue */
+  color: rgb(255, 255, 255) !important;
+  border: none !important;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+/* On Hover: Dark blue or black */
+button:hover {
+  background-color: #1559b3 !important; /* darker blue */
+  color: white !important;
+}
+
+
+
+/* DARK MODE: Make all user input text orange */
+.theme-dark input,
+.theme-dark textarea,
+.theme-dark select {
+  color: #d66b00 !important; /* Bright orange */
+  caret-color: #d66b00 !important; /* Orange blinking cursor */
+}
+
+
+
+/* Dark mode: Rectangle box around reminder, date search, and share buttons */
+.theme-dark .flex.items-center.space-x-2.bg-gray-100 {
+  background-color: #000000 !important;
+  border: 1px solid #333 !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+
+
+
+
+
+
+
+
+
+
+/* DARK MODE: Monthly Summary background change to black */
+.theme-dark .mt-8.p-6.bg-white.rounded-lg.shadow-lg {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  border: 1px solid #333333;
+}
+
+/* DARK MODE: Share Options Popup modal box (white → black) */
+.theme-dark #shareExportModal .bg-white {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  border: 1px solid #333333;
+}
+
+/* DARK MODE: Text inside Share Options modal */
+.theme-dark #shareExportModal h2,
+.theme-dark #shareExportModal p,
+.theme-dark #shareExportModal pre,
+.theme-dark #shareExportModal button {
+  color: #ffffff !important;
+}
+
+/* DARK MODE: Buttons inside Share Options modal */
+.theme-dark #shareExportModal button {
+  background-color: #1a1a1a !important;
+  border: 1px solid #444 !important;
+}
+
+.theme-dark #shareExportModal button:hover {
+  background-color: #333333 !important;
+}
+
+
+
+
+/* Optional: Make summary box background lighter if needed */
+.theme-dark #shareExportModal .bg-gray-100 {
+  background-color: #262626 !important;
+}
+
+/* DARK MODE: Fix bottom Backup & Restore container background */
+.theme-dark .sticky.bottom-0.left-0.w-full.bg-white.shadow-md.p-4 {
+  background-color: #000000 !important;
+  color: #000000 !important;
+  border-top: 1px solid #444444;
+}
+
+/* DARK MODE: Ensure text in buttons is white */
+.theme-dark .sticky.bottom-0 button {
+  color: #ffffff !important;
+}
+
+/* DARK MODE: Button background and hover (optional for consistency) */
+.theme-dark .sticky.bottom-0 button.bg-blue-500,
+.theme-dark .sticky.bottom-0 button.bg-green-500 {
+  background-color: #1a1a1a !important;
+  border: 1px solid #333 !important;
+}
+
+.theme-dark .sticky.bottom-0 button:hover {
+  background-color: #333333 !important;
+}
+
+
+
+/* DARK MODE: Export Data Modal popup background black */
+.theme-dark #dataExportModal .bg-white {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  border: 1px solid #333333;
+}
+
+/* DARK MODE: Export Data Modal - header text color */
+.theme-dark #dataExportModal h2,
+.theme-dark #dataExportModal h3,
+.theme-dark #dataExportModal p {
+  color: #ffffff !important;
+}
+
+/* DARK MODE: Export Data Modal - table text and background */
+.theme-dark #dataExportModal table {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  border-color: #444444 !important;
+}
+
+.theme-dark #dataExportModal th,
+.theme-dark #dataExportModal td {
+  border: 1px solid #444444 !important;
+}
+
+/* DARK MODE: Export Data Modal - Close button color */
+.theme-dark #dataExportModal button {
+  background-color: #1559b3!important;
+  color: #ffffff !important;
+  border: 1px solid #444444 !important;
+}
+
+.theme-dark #dataExportModal button:hover {
+  background-color: #333333 !important;
+}
+
+
+
+/* DARK MODE: Clean dropdowns for Month and Year */
+.theme-dark select#monthDropdown,
+.theme-dark select#yearDropdown {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  border: 1px solid #444444 !important;
+  outline: none !important;
+  box-shadow: none !important;
+  transition: none !important;
+}
+
+/* DARK MODE: Remove hover/focus effects */
+.theme-dark select#monthDropdown:hover,
+.theme-dark select#yearDropdown:hover,
+.theme-dark select#monthDropdown:focus,
+.theme-dark select#yearDropdown:focus {
+  background-color: #000000 !important;
+  border: 1px solid #444444 !important;
+  color: #ffffff !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* DARK MODE: Clean input/select/textarea inside .day-box (no glow, no orange/blue borders) */
+.theme-dark .day-box input,
+.theme-dark .day-box select,
+.theme-dark .day-box textarea {
+  background-color: #1a1a1a !important;
+  color: #ffffff !important;
+  border: 1px solid #444444 !important;
+  outline: none !important;
+  box-shadow: none !important;
+  transition: none !important;
+}
+
+/* DARK MODE: Remove hover/focus glow */
+.theme-dark .day-box input:hover,
+.theme-dark .day-box select:hover,
+.theme-dark .day-box textarea:hover,
+.theme-dark .day-box input:focus,
+.theme-dark .day-box select:focus,
+.theme-dark .day-box textarea:focus {
+  border: 1px solid #444444 !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+
+
+/* DARK MODE: Make all user-typed input text orange */
+.theme-dark input,
+.theme-dark textarea,
+.theme-dark select {
+  color: #ff8c00 !important; /* Deep orange */
+  caret-color: #ff8c00 !important; /* Orange blinking cursor */
+}
+
+/* DARK MODE: Also apply to inputs inside .day-box */
+.theme-dark .day-box input,
+.theme-dark .day-box textarea,
+.theme-dark .day-box select {
+  color: #ff8c00 !important;
+  caret-color: #ff8c00 !important;
+}
+
+
+</style>   
+</head>
+<!-- 🔘 Top Right Login Button -->
+<div id="loginArea" style="position:fixed;top:10px;right:10px;z-index:999;">
+    <button id="openLogin" style="background:#007bff;color:#fff;border:none;padding:8px 16px;border-radius:8px;cursor:pointer;">Login</button>
+    <button id="logoutBtn" style="display:none;background:#f00;color:#fff;border:none;padding:8px 16px;border-radius:8px;cursor:pointer;">Logout</button>
+  </div>
+  
+  <!-- 💠 Login Popup -->
+  <div id="loginModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;
+  background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);z-index:1000;justify-content:center;align-items:center;">
+    <div style="background:#0a0f1a;border-radius:16px;padding:30px;width:320px;text-align:center;color:#fff;box-shadow:0 0 20px rgba(0,0,0,0.5);">
+      <h2 style="color:#00bfff;">Login</h2>
+      <input id="email" type="email" placeholder="Enter Email" style="width:90%;padding:10px;margin:10px 0;border:none;border-radius:8px;"><br>
+      <input id="password" type="password" placeholder="Enter Password" style="width:90%;padding:10px;margin:10px 0;border:none;border-radius:8px;"><br>
+      <button id="loginSubmit" style="width:90%;background:#007bff;color:#fff;padding:10px;border:none;border-radius:8px;cursor:pointer;">Login</button><br><br>
+      <a href="#" id="forgotPassword" style="color:#00bfff;text-decoration:none;">Forgot Password?</a><br><br>
+      <button id="googleLogin" style="width:90%;background:#db4437;color:#fff;padding:10px;border:none;border-radius:8px;cursor:pointer;">Sign in with Google</button><br><br>
+      <button id="closeLogin" style="background:#444;color:#fff;padding:8px 20px;border:none;border-radius:8px;cursor:pointer;">Close</button>
     </div>
   </div>
-  <script type="module" src="main.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="max-w-7xl mx-auto p-4">
+    <h1 class="text-2xl font-bold text-center text-black mb-6">Work Report Tracker</h1>
+ 
+    <!-- Month and Year Selection -->
+    <div class="flex justify-between items-center mb-6">
+        <button id="prevMonth" class="p-2 hover:bg-gray-100 rounded-full text-lg">←</button>
+        <div class="flex items-center space-x-2">
+            <select id="monthDropdown" class="text-xl font-semibold p-2 rounded"></select>
+            <select id="yearDropdown" class="text-xl font-semibold p-2 rounded"></select>
+        </div>
+        <button id="nextMonth" class="p-2 hover:bg-gray-100 rounded-full text-lg">→</button>
+     </div>
+
+    
+  
+
+
+    <!-- New rectangular box for buttons -->
+    <div class="flex justify-center mb-6">
+        <div class="flex items-center space-x-2 bg-gray-100 p-2 rounded-lg">
+            <!-- Dark Mode Toggle Button -->
+            <button id="darkModeToggle" class="dark-mode-toggle p-2 hover:bg-gray-300 rounded-full">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                </svg>
+            </button>
+            <button id="reminderButton" class="p-2 hover:bg-gray-300 rounded-full">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/>
+                    <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>
+                </svg>
+            </button>
+            <!-- Date Search Button -->
+            <button id="dateSearchBtn" class="p-2 hover:bg-gray-300 rounded-full">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"/>
+                    <path d="m21 21-4.3-4.3"/>
+                </svg>
+                <input type="date" id="nativeDatePicker" class="hidden">
+
+            </button>
+
+    
+            
+            <!-- Share Button -->
+            <button id="shareButton" class="p-2 hover:bg-gray-300 rounded-full">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="18" cy="5" r="3"/>
+                    <circle cx="6" cy="12" r="3"/>
+                    <circle cx="18" cy="19" r="3"/>
+                    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+                    <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+                </svg>
+            </button>
+            
+
+<!-- Date Picker Modal -->
+<div id="dateSearchModal" class="modal-container hidden">
+    <div class="modal-glass w-11/12 max-w-md">
+        <h2 class="text-xl font-semibold mb-4">Select Date</h2>
+        <div class="grid grid-cols-4 gap-3 mb-4" id="datesGrid"></div>
+        <button id="closeDatePicker" class="btn-premium w-full">Close</button>
+    </div>
+</div>
+        <script>
+            document.getElementById("closeDatePicker").addEventListener("click", function(event) {
+                event.stopPropagation(); // Prevent event from closing the container
+            });
+            </script>
+    </div>
+</div>
+
+            
+
+    <script>
+        
+        document.addEventListener("deviceready", function () {
+            document.getElementById("downloadBtn").addEventListener("click", downloadFile);
+        });
+    
+        function downloadFile() {
+            var fileTransfer = new FileTransfer();
+            var uri = encodeURI("https://example.com/file.pdf"); // Replace with your actual file URL
+            var fileURL = cordova.file.externalRootDirectory + "Download/file.pdf";
+    
+            fileTransfer.download(
+                uri,
+                fileURL,
+                function(entry) {
+                    alert("Download complete: " + entry.toURL());
+                },
+                function(error) {
+                    alert("Download failed: " + error.code);
+                }
+            );
+        }
+
+
+
+        window.addEventListener("scroll", () => {
+        const dateSearchBtn = document.getElementById("dateSearchBtn");
+        const referenceBox = document.querySelector(".flex.items-center.space-x-2.bg-gray-100"); // The rectangular box
+
+        const rect = referenceBox.getBoundingClientRect();
+        const scrollPosition = window.scrollY;
+
+        if (scrollPosition > rect.bottom + 100) {
+            dateSearchBtn.classList.add("fixed-date-search"); // Move to bottom-right above up arrow
+        } else {
+            dateSearchBtn.classList.remove("fixed-date-search"); // Stay in the rectangle
+        }
+    });
+    </script>
+
+
+
+    
+    <script>
+
+        document.getElementById("closeDatePicker").addEventListener("click", function() {
+    document.getElementById("dateSearchModal").classList.add("hidden"); // Remove or comment out this line
+});
+
+        document.addEventListener("DOMContentLoaded", function () {
+    const shareButton = document.getElementById("shareButton");
+
+    if (shareButton) {
+        shareButton.addEventListener("click", function () {
+            openShareModal();
+        });
+    } else {
+        console.error("Share button not found!");
+    }
+});
+
+function openShareModal() {
+    let shareModal = document.getElementById("shareExportModal");
+
+    // If modal doesn't exist, create it
+    if (!shareModal) {
+        shareModal = document.createElement("div");
+        shareModal.id = "shareExportModal";
+        shareModal.className = "fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-50";
+        shareModal.innerHTML = `
+            <div class="bg-white rounded-lg shadow-lg w-11/12 max-w-md p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-bold">Share Options</h2>
+                    <button id="closeShareModal" class="text-gray-500 hover:text-gray-700">
+                        ✖
+                    </button>
+                </div>
+                <div class="grid grid-cols-1 gap-4">
+                    <button id="shareTextBtn" class="p-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+                        Share as Text
+                    </button>
+                    <button id="exportDataBtn" class="p-3 bg-green-500 text-white rounded-lg hover:bg-green-600">
+                        Export Data as PDF
+                    </button>
+                    <button id="exportSelectedMonthBtn" class="p-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
+    Export Selected Month
+</button>
+
+                </div>
+            </div>
+        `;
+        document.getElementById("exportTableContainer").appendChild(shareButton);
+
+
+        // Close modal functionality
+        document.getElementById("closeShareModal").addEventListener("click", function () {
+            document.body.removeChild(shareModal);
+        });
+
+        // Event Listeners
+        document.getElementById("exportDataBtn").addEventListener("click", generatePDF);
+        document.getElementById("shareTextBtn").addEventListener("click", shareText);
+    }
+}
+
+        // Replace the existing share button click event handler with this new one
+    document.getElementById('shareButton').addEventListener('click', function() {
+        // Create the popup modal for sharing and exporting
+        const shareModal = document.createElement('div');
+        shareModal.id = 'shareExportModal';
+        shareModal.className = 'fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-100';
+        
+        // Generate content for the popup
+        const monthName = months[currentDate.getMonth()];
+        const year = currentDate.getFullYear();
+        const totalOtHours = document.getElementById("totalOtHours").textContent;
+        
+        // Create the summary text
+        const summaryText = `Work Summary Report for ${monthName} ${year}:\n` +
+            `- Regular Leaves: ${document.getElementById("regularLeaves").textContent}\n` +
+            `- Special Days: ${document.getElementById("specialDays").textContent}\n` +
+            `- Weekend Leaves: ${document.getElementById("weekendLeaveDays").textContent}\n` +
+            `- Total OT Hours: ${totalOtHours} hours`;
+        
+        // Popup content
+        shareModal.innerHTML = `
+            <div class="bg-white rounded-lg shadow-lg w-11/12 max-w-md p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-bold">Share Options</h2>
+                    <button id="closeShareModal" class="text-gray-500 hover:text-gray-700">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+                
+                <div class="mb-4 p-4 bg-gray-100 rounded-lg">
+                    <p class="font-bold mb-2">Summary</p>
+                    <pre class="whitespace-pre-wrap text-sm">${summaryText}</pre>
+                </div>
+                
+                <div class="grid grid-cols-1 gap-4">
+                    <button id="shareTextBtn" class="p-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 flex items-center justify-center">
+                        <svg class="mr-2" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="18" cy="5" r="3"></circle>
+                            <circle cx="6" cy="12" r="3"></circle>
+                            <circle cx="18" cy="19" r="3"></circle>
+                            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                        </svg>
+                        Share as Text
+                    </button>
+                    
+                    <button id="exportDataBtn" class="p-3 bg-green-500 text-white rounded-lg hover:bg-green-600 flex items-center justify-center">
+                        <svg class="mr-2" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        Export Data
+                    </button>
+
+                    
+                </div>
+            </div>
+        `;
+        
+        // Append modal to the body
+        document.body.appendChild(shareModal);
+        
+        // Close modal functionality
+        document.getElementById('closeShareModal').addEventListener('click', function() {
+            document.body.removeChild(shareModal);
+        });
+        
+        // Share as text functionality
+        document.getElementById('shareTextBtn').addEventListener('click', function() {
+    const summaryText = `Work Summary Report for ${monthName} ${year}:\n` +
+        `- Regular Leaves: ${document.getElementById("regularLeaves").textContent}\n` +
+        `- Special Days: ${document.getElementById("specialDays").textContent}\n` +
+        `- Weekend Leaves: ${document.getElementById("weekendLeaveDays").textContent}\n` +
+        `- Total OT Hours: ${document.getElementById("totalOtHours").textContent} hours`;
+
+    navigator.clipboard.writeText(summaryText).then(() => {
+        alert("Summary copied to clipboard!");
+    }).catch(err => {
+        console.error("Failed to copy text: ", err);
+        alert("Failed to copy. Please try again.");
+    });
+});
+
+        
+        // Export data functionality
+        document.getElementById('exportDataBtn').addEventListener('click', function() {
+            
+            
+            // Create export modal with detailed table
+            const exportModal = document.createElement('div');
+            exportModal.id = 'dataExportModal';
+            exportModal.className = 'fixed inset-0 bg-gray-800 bg-opacity-80 flex justify-center items-center z-110';
+    exportModal.style.display = 'flex';
+    exportModal.style.alignItems = 'center';
+    exportModal.style.justifyContent = 'center';
+    exportModal.style.height = '100vh';
+    exportModal.style.width = '100vw';
+    exportModal.style.overflowY = 'auto'; // Ensures modal is scrollable
+    
+    
+    
+    
+            
+            // Generate table HTML with all month data
+            let tableRows = '';
+    const daysInMonth = getDaysInMonth(currentDate.getFullYear(), currentDate.getMonth());
+
+    for (let day = 1; day <= daysInMonth; day++) {
+        const dateKey = `${currentDate.getFullYear()}-${currentDate.getMonth()}-${day}`;
+        const dayData = workData[dateKey] || {};
+        const dayDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+const formattedDate = `${String(day).padStart(2, '0')}.${String(currentDate.getMonth() + 1).padStart(2, '0')}.${currentDate.getFullYear()}`;
+
+let specialDayClass = "";
+    if (dayData.specialDays === "Poya Day" || dayData.specialDays === "Public Holiday") {
+        specialDayClass = 'style="color: green; font-weight: bold;"';
+    }
+
+
+    // Determine the correct leave reason value with custom reason details
+let leaveReasonText = '-';
+if (dayData.leaveReason) {
+    if (dayData.leaveReason === "Custom Reason") {
+         leaveReasonText = dayData.customReasonDetails ? dayData.customReasonDetails : "Custom Reason";
+    } else if (dayData.leaveReason === "Own Leave") {
+         leaveReasonText = dayData.leaveReasonDetails ? dayData.leaveReasonDetails : "Own Leave";
+    } else {
+         leaveReasonText = dayData.leaveReason;
+    }
+}
+
+
+    
+
+    
+
+
+        tableRows += `
+            <tr class="border-b">
+        <td class="p-2 border-r ${isWeekend(currentDate.getFullYear(), currentDate.getMonth(), day) ? 'text-red-500 font-bold' : ''}">${formattedDate}</td>
+        <td class="p-2 border-r">${dayData.inTime || '-'}</td>
+        <td class="p-2 border-r">${dayData.outTime || '-'}</td>
+        <td class="p-2 border-r">${dayData.movementOut || '-'}</td>
+        <td class="p-2 border-r">${dayData.movementIn || '-'}</td>
+        <td class="p-2 border-r">${dayData.teamMembers || '-'}</td>
+        <td class="p-2 border-r">${dayData.workLocation || '-'}</td>
+        <td class="p-2 border-r">${dayData.vehicleNumber || '-'}</td>
+        <td class="p-2 border-r">${dayData.km || '-'}</td>
+        <td class="p-2 border-r" ${specialDayClass}>${dayData.specialDays || '-'}</td>
+        <td class="p-2 border-r" style="${dayData.leaveStatus === 'Yes' ? 'color: #1E90FF; font-weight: bold;' : ''}">
+            ${dayData.leaveStatus || '-'}
+        </td>
+        <td class="p-2 border-r">${leaveReasonText}</td>
+    </tr>
+        `;
+    }
+
+    exportModal.innerHTML = `
+        <div class="bg-white rounded-lg shadow-lg w-11/12 max-w-4xl p-6 flex flex-col items-center justify-center">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold">Export Data: ${months[currentDate.getMonth()]} ${currentDate.getFullYear()}</h2>
+                <button id="closeExportModal" class="text-gray-500 hover:text-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            
+            
+            <div id="exportTableContainer" class="overflow-auto mb-4">
+   <!-- New Heading Section -->
+<div class="flex flex-col items-center mb-4">
+    <h2 class="text-xl font-bold">Work Data Sheet</h2>
+    <p class="text-md font-semibold">Name: T.Jeyaraman | Service No: 016696</p>
+    <h3 class="text-lg font-semibold" id="exportMonthYear"></h3>
+</div>
+
+
+                <table class="min-w-full bg-white border">
+                    <thead>
+                        <tr class="bg-gray-100">
+                            <th class="p-2 border-r">Day</th>
+                
+                            <th class="p-2 border-r">In Time</th>
+                            <th class="p-2 border-r">Out Time</th>
+                            <th class="p-2 border-r">Movement Out Time</th>
+                            <th class="p-2 border-r">Movement In Time</th>
+                            <th class="p-2 border-r">Team Members</th>
+                            <th class="p-2 border-r">Work Location</th>
+                            <th class="p-2 border-r">Vehicle Number</th>
+                            <th class="p-2 border-r">KM Reading</th>
+                        
+                            <th class="p-2 border-r">Present Special Day</th>
+                            <th class="p-2 border-r">Leave Status</th>
+                            <th class="p-2 border-r">Leave Reason</th>
+                            
+                            
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${tableRows}
+                    </tbody>
+                </table>
+                
+            </div>
+
+             <!-- Save as Image Button (Added Here) -->
+        <div class="flex justify-center mt-4 sticky bottom-0 bg-white p-4 shadow-lg w-full">
+            <button id="saveAsPdfBtn" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+                Save as Pdf
+            </button>
+        </div>
+    </div>
+    
+
+
+
+
+
+            `;
+            
+            // Append export modal to the body
+            document.body.appendChild(exportModal);
+            document.getElementById('saveAsPdfBtn').addEventListener('click', function() {
+    if (typeof html2canvas === 'undefined') {
+        var script = document.createElement('script');
+        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+        script.onload = loadJsPDF;
+        document.head.appendChild(script);
+    } else {
+        loadJsPDF();
+    }
+});
+
+function updateExportTableHeader() {
+    const monthNames = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    ];
+    
+    const selectedMonth = currentDate.getMonth();
+    const selectedYear = currentDate.getFullYear();
+    
+    document.getElementById("exportMonthYear").textContent = `${monthNames[selectedMonth]} ${selectedYear}`;
+}
+
+// Call this function when the export table is displayed
+updateExportTableHeader();
+
+
+
+
+function loadJsPDF() {
+    if (typeof jsPDF === 'undefined') {
+        var script = document.createElement('script');
+        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+        script.onload = generateTablePDF;
+        document.head.appendChild(script);
+    } else {
+        generateTablePDF();
+    }
+}
+
+function generateTablePDF() {
+    const { jsPDF } = window.jspdf;
+    const tableContainer = document.getElementById('exportTableContainer');
+    const body = document.body;
+    const wasDark = body.classList.contains("theme-dark");
+
+    if (!tableContainer) {
+        alert("Table not found.");
+        return;
+    }
+
+    // 🔁 Switch to light-mode-export style
+    if (wasDark) {
+        body.classList.remove("theme-dark");
+        body.classList.add("light-export-mode");
+    }
+
+    setTimeout(() => {
+        tableContainer.style.opacity = '1';
+        tableContainer.style.height = 'auto';
+        tableContainer.style.overflow = 'visible';
+        tableContainer.style.position = 'relative';
+
+        html2canvas(tableContainer, {
+            scale: 3,
+            useCORS: true,
+            scrollX: 0,
+            scrollY: 0,
+            backgroundColor: '#FFFFFF'
+        }).then(canvas => {
+            const imgData = canvas.toDataURL('image/png');
+            const pdf = new jsPDF({
+                orientation: 'portrait',
+                unit: 'mm',
+                format: 'a4'
+            });
+
+            const pageWidth = 210;
+            const pageHeight = 297;
+            const imgWidth = pageWidth - 10;
+            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+            if (imgHeight > pageHeight - 20) {
+                const scaleFactor = (pageHeight - 20) / imgHeight;
+                pdf.addImage(imgData, 'PNG', 8, 10, imgWidth * scaleFactor, imgHeight * scaleFactor);
+            } else {
+                pdf.addImage(imgData, 'PNG', 5, 10, imgWidth, imgHeight);
+            }
+
+            pdf.save('Work_Report_A4.pdf');
+
+            // Hide export table again
+            tableContainer.style.opacity = '0';
+            tableContainer.style.height = '0';
+            tableContainer.style.overflow = 'hidden';
+            tableContainer.style.position = 'absolute';
+            tableContainer.style.left = '-9999px';
+
+            // 🔁 Restore dark mode
+            if (wasDark) {
+                body.classList.remove("light-export-mode");
+                body.classList.add("theme-dark");
+            }
+        }).catch(err => {
+            alert("PDF failed.");
+            if (wasDark) {
+                body.classList.remove("light-export-mode");
+                body.classList.add("theme-dark");
+            }
+        });
+    }, 200);
+}
+
+
+
+
+
+
+document.addEventListener("deviceready", function() {
+    var permissions = cordova.plugins.permissions;
+
+    permissions.requestPermission(permissions.WRITE_EXTERNAL_STORAGE, function(status) {
+        if (!status.hasPermission) {
+            alert("Storage permission denied! Please enable storage access.");
+        }
+    }, function() {
+        alert("Permission request failed.");
+    });
+}, false);
+
+
+function savePDF(pdfData) {
+    var fileName = "MyDocument.pdf";
+    var filePath = cordova.file.externalRootDirectory + "Download/" + fileName;
+
+    window.resolveLocalFileSystemURL(cordova.file.externalRootDirectory, function(dir) {
+        dir.getFile("Download/" + fileName, { create: true, exclusive: false }, function(fileEntry) {
+            fileEntry.createWriter(function(fileWriter) {
+                var dataObj = new Blob([pdfData], { type: "application/pdf" });
+
+                fileWriter.write(dataObj);
+                fileWriter.onwriteend = function() {
+                    alert("PDF saved successfully: " + filePath);
+                };
+                fileWriter.onerror = function(e) {
+                    alert("Failed to write file: " + e.toString());
+                };
+            });
+        }, function(error) {
+            alert("Error creating file: " + error.code);
+        });
+    });
+}
+
+
+
+function openPDF() {
+    var filePath = cordova.file.externalRootDirectory + "Download/MyDocument.pdf";
+
+    cordova.plugins.fileOpener2.open(
+        filePath,
+        "application/pdf",
+        {
+            error: function(e) {
+                alert("Error opening PDF: " + JSON.stringify(e));
+            },
+            success: function() {
+                console.log("PDF opened successfully");
+            }
+        }
+    );
+}
+
+
+
+
+
+
+
+
+
+            
+            // Close export modal functionality
+            document.getElementById('closeExportModal').addEventListener('click', function() {
+                document.body.removeChild(exportModal);
+            });
+            
+            
+
+
+
+            
+            
+        });
+    });
+    
+    document.getElementById('saveAsImageBtn').addEventListener('click', function() {
+    if (typeof html2canvas === 'undefined') {
+        var script = document.createElement('script');
+        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+        script.onload = captureFullTableAsImage;
+        document.head.appendChild(script);
+    } else {
+        captureFullTableAsImage();
+    }
+});
+
+function captureFullTableAsImage() {
+    const element = document.body; // Capture the full page including all table colors
+    html2canvas(element, {
+        scrollX: 0,
+        scrollY: 0,
+        useCORS: true
+    }).then(canvas => {
+        const link = document.createElement('a');
+        link.href = canvas.toDataURL('image/png');
+        link.download = 'Work_Report_Full_Page.png';
+        link.click();
+    });
+}
+
+
+    
+
+
+
+
+
+    
+    
+    </script>
+    
+
+    <!-- New alert box for reminders -->
+<div id="reminderAlertBox" class="hidden bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-md mt-4">
+    <p id="reminderAlertMessage" class="text-sm"></p>
+</div>
+    
+    <!-- Rest of the existing HTML remains the same -->
+ </div>
+
+<!-- Rest of the existing HTML remains the same -->
+
+        <!-- Reminder Modal -->
+        <!-- Reminder Modal -->
+<div id="reminderModal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-100">
+    <div id="reminderContent" class="bg-white rounded-lg shadow-lg w-11/12 max-w-md p-6">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-bold">Set Your Reminder</h2>
+            
+            <div class="flex items-center space-x-2">
+                <!-- Close button -->
+                
+                
+                <button id="addReminderBtn" class="bg-green-500 text-white rounded-full w-10 h-10 flex items-center justify-center">
+                    +
+                </button>
+            </div>
+        </div>
+        <div id="reminderList"></div>
+    </div>
+</div>
+
+
+        
+
+<!-- Add at bottom of body -->
+<div id="dateSearchModal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-70">
+    <div class="bg-white rounded-lg shadow-lg w-64 max-h-96 overflow-y-auto p-4">
+        <div class="grid grid-cols-4 gap-2" id="datesGrid"></div>
+    </div>
+</div>
+
+        <!-- Daily Entries -->
+        <div id="daysContainer" class="space-y-6"></div>
+
+        <!-- Monthly Summary -->
+       <div class="mt-8 p-6 bg-white rounded-lg shadow-lg">
+    <h2 class="text-xl font-bold mb-4">Monthly Summary</h2>
+    <div>
+        <p>Leave Days (Regular): <span id="regularLeaves">0</span></p>
+        <p>Leave Days (Poya/Public): <span id="specialDays">0</span></p>
+        <p>Leave Days (Saturday/Sunday): <span id="weekendLeaveDays">0</span></p>
+        <hr class="border-t-3.5 border-black my-4">
+        <p>Weekend OT Hours: <span id="weekendOtHours">0</span> hours</p>
+        <p>Sat/Sun OT Hours: <span id="satSunOtHours">0</span> hours</p>
+        <p>Poya/Public OT Hours: <span id="poyaPublicOtHours">0</span> hours</p>
+        <p class="text-blue-500 font-semibold">Total OT Hours: <span id="totalOtHours">0</span> hours</p>
+    </div>
+    <button id="clearAllButton" class="mt-4 p-2 bg-red-100 text-red-600 rounded hover:bg-red-200 w-full">
+        Clear All Month Data
+    </button>
+
+    <div class="sticky bottom-0 left-0 w-full bg-white shadow-md p-4 flex justify-center gap-4">
+        <button id="backupButton" class="p-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+            Backup Data
+        </button>
+        <button id="restoreButton" class="p-2 bg-green-500 text-white rounded hover:bg-green-600">
+            Restore Data
+        </button>
+    </div>
+    <input type="file" id="restoreFileInput" class="hidden" accept=".json">
+    
+
+    
+
+    
+</div>
+        </div>
+
+        <!-- Scroll Buttons -->
+        <div class="fixed bottom-4 right-4 flex flex-col gap-2">
+            <button id="scrollUpButton" class="p-2 bg-gray-800 text-white rounded-full shadow-lg hover:bg-gray-700 hidden">
+                ↑
+            </button>
+            <button id="scrollDownButton" class="p-2 bg-gray-800 text-white rounded-full shadow-lg hover:bg-gray-700">
+                ↓
+            </button>
+        </div>
+
+    <script>
+
+
+
+
+        // Backup Data Functionality
+document.getElementById("backupButton").addEventListener("click", function () {
+    const selectedMonth = document.getElementById("monthDropdown").value;
+    const selectedYear = document.getElementById("yearDropdown").value;
+    const monthPrefix = `${selectedYear}-${selectedMonth}`;
+
+    let monthData = {};
+    Object.keys(workData).forEach((key) => {
+        if (key.startsWith(monthPrefix)) {
+            monthData[key] = workData[key];
+        }
+    });
+
+    if (Object.keys(monthData).length === 0) {
+        alert("No data found for this month to backup.");
+        return;
+    }
+
+    const blob = new Blob([JSON.stringify(monthData, null, 2)], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `WorkData_${selectedYear}_${parseInt(selectedMonth) + 1}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    alert("Backup downloaded successfully.");
+});
+
+// Restore Data Functionality
+document.getElementById("restoreButton").addEventListener("click", function () {
+    document.getElementById("restoreFileInput").click();
+});
+
+document.getElementById("restoreFileInput").addEventListener("change", function (event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        try {
+            const restoredData = JSON.parse(e.target.result);
+            Object.assign(workData, restoredData);
+            localStorage.setItem("workData", JSON.stringify(workData));
+            syncToFirebase();
+
+            calculateSummary();
+            renderDays();
+            alert("Backup restored successfully.");
+        } catch (error) {
+            alert("Error restoring backup. Please select a valid file.");
+        }
+    };
+    reader.readAsText(file);
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // State
+        let currentDate = new Date();
+        let workData = JSON.parse(localStorage.getItem("workData")) || {};
+
+        const months = [
+            "January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"
+        ];
+
+        // DOM Elements
+        const monthDropdown = document.getElementById("monthDropdown");
+        const yearDropdown = document.getElementById("yearDropdown");
+        const daysContainer = document.getElementById("daysContainer");
+        const regularLeavesEl = document.getElementById("regularLeaves");
+        const specialDaysEl = document.getElementById("specialDays");
+        const otHoursEl = document.getElementById("otHours");
+        const scrollButton = document.getElementById("scrollButton");
+        const clearAllButton = document.getElementById("clearAllButton");
+
+        // Utilities
+        const getDaysInMonth = (year, month) => new Date(year, month + 1, 0).getDate();
+        const formatDayDisplay = (day, month, year, weekday) => `${weekday} : ${months[month]} ${day} : ${year}`;
+        const isWeekend = (year, month, day) => {
+            const date = new Date(year, month, day);
+            return date.getDay() === 0 || date.getDay() === 6; // Sunday (0) or Saturday (6)
+        };
+
+        // Convert Time to 24-Hour Format
+        function convertTo24Hour(time, isPM = false) {
+            if (!time) return null;
+            let [hours, minutes] = time.split(":").map(Number);
+            if (isPM && hours < 12) hours += 12;
+            if (!isPM && hours === 12) hours = 0;
+            return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
+        }
+
+        // Calculate Hours Difference
+        function calculateHoursDifference(inTime, outTime) {
+            if (!inTime || !outTime) return 0;
+            const [inHours, inMinutes] = inTime.split(":").map(Number);
+            const [outHours, outMinutes] = outTime.split(":").map(Number);
+
+            const inTimeMinutes = inHours * 60 + inMinutes;
+            const outTimeMinutes = outHours * 60 + outMinutes;
+
+            const diffMinutes = outTimeMinutes - inTimeMinutes;
+            return diffMinutes / 60; // Convert minutes to hours
+        }
+
+        // Populate Month and Year Dropdowns
+        function populateDropdowns() {
+            monthDropdown.innerHTML = months
+                .map((month, index) => `<option value="${index}" ${index === currentDate.getMonth() ? "selected" : ""}>${month}</option>`)
+                .join("");
+
+            const currentYear = currentDate.getFullYear();
+            yearDropdown.innerHTML = Array.from({ length: 11 }, (_, i) => currentYear - 5 + i)
+                .map(year => `<option value="${year}" ${year === currentYear ? "selected" : ""}>${year}</option>`)
+                .join("");
+        }
+
+        // Render Days
+        function renderDays() {
+    daysContainer.innerHTML = "";
+    const daysInMonth = getDaysInMonth(currentDate.getFullYear(), currentDate.getMonth());
+
+    for (let day = 1; day <= daysInMonth; day++) {
+        const dateKey = `${currentDate.getFullYear()}-${currentDate.getMonth()}-${day}`;
+        let dayData = workData[dateKey] || {};
+
+// Set default leaveStatus to "No" if it's not defined
+if (dayData.leaveStatus === undefined || dayData.leaveStatus === "") {
+    dayData.leaveStatus = "No";
+    workData[dateKey] = dayData;
+    localStorage.setItem("workData", JSON.stringify(workData));
+    syncToFirebase();
+
+}
+
+        const dayDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+        const dayName = dayDate.toLocaleDateString("en-US", { weekday: "long" });
+        const isWeekendDay = isWeekend(currentDate.getFullYear(), currentDate.getMonth(), day);
+        
+
+        const formattedDay = formatDayDisplay(day, currentDate.getMonth(), currentDate.getFullYear(), dayName);
+
+        const card = document.createElement("div");
+card.className = "day-box p-4 rounded-lg mb-4"; /* Apply the premium style class */
+card.setAttribute('data-day', day);
+
+
+        card.innerHTML = `
+            <div class="space-y-4">
+                <div class="text-lg font-semibold ${isWeekendDay ? 'text-red-600' : 'text-black'}">
+                    ${formattedDay}
+                </div>
+                <div class="grid grid-cols-1 gap-4">
+                    ${createInputField("In Time", "inTime", dayData.inTime || "", "Enter in time (AM)", dateKey, "time")}
+                ${createInputField("Out Time", "outTime", dayData.outTime || "", "Enter out time (PM)", dateKey, "time")}
+                ${createInputField("Movement Out Time", "movementOut", dayData.movementOut || "", "Enter movement out time", dateKey, "time")}
+                ${createInputField("Movement In Time", "movementIn", dayData.movementIn || "", "Enter movement in time", dateKey, "time")}
+                ${createInputField("Team Members", "teamMembers", dayData.teamMembers || "", "Enter team members", dateKey, "text")}
+                ${createInputField("Work Location", "workLocation", dayData.workLocation || "", "Enter work location", dateKey, "text")}
+                ${createInputField("Vehicle Number", "vehicleNumber", dayData.vehicleNumber || "", "Enter vehicle number", dateKey, "text")}
+                ${createInputField("KM", "km", dayData.km || "", "Enter kilometers", dateKey, "number")}
+                ${createDropdown("Present On specialDays", "specialDays", ["", "Poya Day", "Public Holiday"], dayData.specialDays || "", "Select special day", dateKey)}
+                ${createDropdown("Leave Status", "leaveStatus", ["", "Yes", "No"], dayData.leaveStatus || "", "Select leave status", dateKey)}
+${dayData.leaveStatus === "Yes" ? 
+    createDropdown("Leave Reason", "leaveReason", 
+        isWeekend(currentDate.getFullYear(), currentDate.getMonth(), day)
+            ? ["", "Poya Day", "Public Holiday", "Custom Reason", "Own Leave", "Normal Leave Day"]
+            : ["", "Poya Day", "Public Holiday", "Custom Reason", "Own Leave"],
+        dayData.leaveReason || "", "Select leave reason", dateKey)
+    : ""}
+
+
+                ${dayData.leaveStatus === "Yes" && dayData.leaveReason === "Custom Reason" ? createInputField("Custom Reason Details", "customReasonDetails", dayData.customReasonDetails || "", "Enter custom reason details", dateKey, "text") : ""}
+                ${dayData.leaveStatus === "Yes" && dayData.leaveReason === "Own Leave" ? createInputField("Leave Reason Details", "leaveReasonText", dayData.leaveReasonText || "", "Enter leave reason details", dateKey, "text") : ""}
+                
+                
+                </div>
+                <button 
+            onclick="clearDayData('${dateKey}')"
+            class="mt-4 p-2 bg-black bg-opacity-84 text-white rounded hover:bg-black hover:bg-opacity-75">
+            Clear Day Data
+        </button>
+
+            </div>
+         `;
+
+        daysContainer.appendChild(card);
+    }
+}
+
+
+
+
+        // Create Input Field with Placeholder
+        function createInputField(label, field, value, placeholder, dateKey, type = "text") {
+    if (type === "time") {
+        return `
+            <div class="flex flex-col">
+                <label class="font-medium mb-1">${label}</label>
+                <input 
+                    type="time" 
+                    class="p-2 border rounded custom-time-picker"
+                    placeholder="${placeholder}"
+                    value="${value}" 
+                    onchange="updateWorkData('${dateKey}', '${field}', this.value)"
+                />
+            </div>
+        `;
+    }
+    return `
+        <div class="flex flex-col">
+            <label class="font-medium mb-1">${label}</label>
+            <input 
+                type="${type}" 
+                class="p-2 border rounded"
+                placeholder="${placeholder}"
+                value="${value}" 
+                onchange="updateWorkData('${dateKey}', '${field}', this.value)"
+            />
+        </div>
+    `;
+}
+
+function openTimePicker(field, dateKey) {
+    // Get the time input associated with the button
+    const timeInput = document.querySelector(`[onchange="updateWorkData('${dateKey}', '${field}', this.value)"]`);
+    if (timeInput) {
+        // Programmatically focus or open the input
+        timeInput.focus();
+    }
+}
+
+
+
+        // Create Dropdown
+        function createDropdown(label, field, options, value, placeholder, dateKey) {
+    const dateParts = dateKey.split("-");
+    const day = parseInt(dateParts[2], 10);
+    const isWeekendDay = isWeekend(currentDate.getFullYear(), currentDate.getMonth(), day);
+    
+
+    // Modified options for weekend days
+    let filteredOptions;
+    if (field === "leaveStatus") {
+        if (isWeekendDay) {
+            filteredOptions = ["", "Yes", "No", ]; // Changed "Normal Leave Day" to "Normal Day" for weekends
+        } else {
+            filteredOptions = ["", "Yes", "No"]; // Weekdays don't show the Normal Day option
+        }
+    } else {
+        filteredOptions = options;
+    }
+
+    return `
+        <div class="flex flex-col">
+            <label class="font-medium mb-1">${label}</label>
+            <select 
+                class="p-2 border rounded"
+                onchange="updateWorkData('${dateKey}', '${field}', this.value)">
+                <option value="" ${value === "" ? "selected" : ""}>${placeholder}</option>
+                ${filteredOptions.map(opt => `<option value="${opt}" ${value === opt ? "selected" : ""}>${opt}</option>`).join("")}
+            </select>
+        </div>
+    `;
+}
+
+
+// Reminder Functionality
+const reminderButton = document.getElementById('reminderButton');
+const reminderModal = document.getElementById('reminderModal');
+        const addReminderBtn = document.getElementById('addReminderBtn');
+        const reminderList = document.getElementById('reminderList');
+        
+        
+
+        // Reminder Categories
+        const reminderCategories = [
+            'Wedding', 
+            'Nobility Ceremony', 
+            'Birthday', 
+            'House Warming Ceremony', 
+            'Other'
+        ];
+
+        
+
+        // Load existing reminders from localStorage
+        let reminders = JSON.parse(localStorage.getItem('reminders')) || [];
+
+        // Render Reminders
+function renderReminders() {
+    reminderList.innerHTML = '';
+    reminders.forEach((reminder, index) => {
+        const reminderItem = document.createElement('div');
+        reminderItem.className = 'reminder-item';
+        reminderItem.innerHTML = `
+    <div>
+        <p><strong>Category:</strong> ${reminder.category}</p>
+        ${reminder.category === 'Other' ? `<p><strong>Custom Details:</strong> ${reminder.customDetails}</p>` : ''}
+        <p><strong>Date:</strong> ${reminder.date}</p>
+    </div>
+    <div class="flex space-x-2">
+        <button onclick="editReminder(${index})" class="edit-pencil">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 20h9"/>
+                <path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/>
+            </svg>
+        </button>
+        <button onclick="removeReminder(${index})" class="bg-red-500 text-white px-2 py-1 rounded">
+            Remove
+        </button>
+    </div>
+`;
+
+        reminderList.appendChild(reminderItem);
+    });
+}
+
+(function () {
+    // Reminder Alert Box
+    const reminderAlertBox = document.getElementById('reminderAlertBox');
+    const reminderAlertMessage = document.getElementById('reminderAlertMessage');
+
+    function checkUpcomingReminders() {
+    const today = new Date();
+    let alertMessages = [];
+    let updatedReminders = [];
+
+    reminders.forEach(reminder => {
+        const reminderDate = new Date(reminder.date);
+        const timeDiff = reminderDate.getTime() - today.getTime();
+        const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+
+        if (daysDiff === 2) { 
+            // Show alert if the reminder is 2 days away
+            alertMessages.push(`Upcoming ${reminder.category} on ${reminder.date}`);
+        }
+
+        // Keep reminders that are not outdated
+        if (daysDiff >= 0) {
+            updatedReminders.push(reminder);
+        }
+    });
+    
+
+    
+
+
+     
+    
+
+
+    // Update the reminders array with only upcoming reminders
+    reminders = updatedReminders;
+    localStorage.setItem('reminders', JSON.stringify(reminders)); // Save updated reminders
+
+    // Display the alert message in the box
+    if (alertMessages.length > 0) {
+        reminderAlertMessage.innerHTML = alertMessages.join('<br>');
+        reminderAlertBox.classList.remove('hidden');
+    } else {
+        reminderAlertBox.classList.add('hidden');
+    }
+}
+
+
+    // Run reminder check on page load
+    checkUpcomingReminders();
+})();
+
+
+// Edit Reminder Functionality
+function editReminder(index) {
+    const reminder = reminders[index];
+    const categorySelect = document.createElement('select');
+    categorySelect.className = 'w-full p-2 border rounded mb-2';
+    reminderCategories.forEach(category => {
+        const option = document.createElement('option');
+        option.value = category;
+        option.textContent = category;
+        if (category === reminder.category) option.selected = true;
+        categorySelect.appendChild(option);
+    });
+
+    const dateInput = document.createElement('input');
+    dateInput.type = 'date';
+    dateInput.className = 'w-full p-2 border rounded mb-2';
+    dateInput.value = reminder.date;
+
+    const customDetailsInput = document.createElement('input');
+    customDetailsInput.type = 'text';
+    customDetailsInput.placeholder = 'Custom Reminder Details';
+    customDetailsInput.className = 'w-full p-2 border rounded mb-2';
+    customDetailsInput.value = reminder.customDetails || '';
+    customDetailsInput.classList.toggle('hidden', reminder.category !== 'Other');
+
+    categorySelect.addEventListener('change', (e) => {
+        customDetailsInput.classList.toggle('hidden', e.target.value !== 'Other');
+    });
+
+    const saveButton = document.createElement('button');
+    saveButton.textContent = 'Save Changes';
+    saveButton.className = 'bg-green-500 text-white px-4 py-2 rounded w-full';
+    saveButton.onclick = () => {
+        reminders[index] = {
+            category: categorySelect.value,
+            date: dateInput.value,
+            customDetails: categorySelect.value === 'Other' ? customDetailsInput.value : ''
+        };
+        localStorage.setItem('reminders', JSON.stringify(reminders));
+        renderReminders();
+    };
+
+    const container = document.createElement('div');
+    container.appendChild(categorySelect);
+    container.appendChild(dateInput);
+    container.appendChild(customDetailsInput);
+    container.appendChild(saveButton);
+
+    reminderList.innerHTML = '';
+    reminderList.appendChild(container);
+}
+
+
+        
+
+        
+
+        // Add Reminder
+        function addReminder() {
+            const categorySelect = document.createElement('select');
+            categorySelect.className = 'w-full p-2 border rounded mb-2';
+            reminderCategories.forEach(category => {
+                const option = document.createElement('option');
+                option.value = category;
+                option.textContent = category;
+                categorySelect.appendChild(option);
+            });
+
+            const dateInput = document.createElement('input');
+            dateInput.type = 'date';
+            dateInput.className = 'w-full p-2 border rounded mb-2';
+
+            const customDetailsInput = document.createElement('input');
+            customDetailsInput.type = 'text';
+            customDetailsInput.placeholder = 'Custom Reminder Details';
+            customDetailsInput.className = 'w-full p-2 border rounded mb-2 hidden';
+
+            categorySelect.addEventListener('change', (e) => {
+                customDetailsInput.classList.toggle('hidden', e.target.value !== 'Other');
+            });
+
+            const saveButton = document.createElement('button');
+            saveButton.textContent = 'Save Reminder';
+            saveButton.className = 'bg-blue-500 text-white px-4 py-2 rounded w-full';
+            saveButton.onclick = () => {
+                const reminder = {
+                    category: categorySelect.value,
+                    date: dateInput.value,
+                    customDetails: categorySelect.value === 'Other' ? customDetailsInput.value : ''
+                };
+                reminders.push(reminder);
+                localStorage.setItem('reminders', JSON.stringify(reminders));
+                renderReminders();
+            };
+
+            const container = document.createElement('div');
+            container.appendChild(categorySelect);
+            container.appendChild(dateInput);
+            container.appendChild(customDetailsInput);
+            container.appendChild(saveButton);
+
+            reminderList.appendChild(container);
+        }
+
+        
+
+
+
+        // Remove Reminder
+        function removeReminder(index) {
+            reminders.splice(index, 1);
+            localStorage.setItem('reminders', JSON.stringify(reminders));
+            renderReminders();
+        }
+
+        // Toggle Reminder Modal
+        reminderButton.addEventListener('click', () => {
+            reminderModal.classList.remove('hidden');
+            renderReminders();
+        });
+
+        // Close Reminder Modal when clicking outside
+        reminderModal.addEventListener('click', (e) => {
+            if (e.target === reminderModal) {
+                reminderModal.classList.add('hidden');
+            }
+        });
+
+        
+
+        // Add Reminder Button
+        addReminderBtn.addEventListener('click', addReminder);
+
+        // Check for upcoming reminders on page load
+        function checkUpcomingReminders() {
+            const today = new Date();
+            reminders.forEach(reminder => {
+                const reminderDate = new Date(reminder.date);
+                const timeDiff = reminderDate.getTime() - today.getTime();
+                const daysDiff = timeDiff / (1000 * 3600 * 24);
+
+                
+            });
+        }
+
+        // Run reminder check on page load
+        checkUpcomingReminders();
+ 
+
+
+        // Update Work Data
+        function updateWorkData(dateKey, field, value) {
+  workData[dateKey] = workData[dateKey] || {};
+  workData[dateKey][field] = value;
+  localStorage.setItem("workData", JSON.stringify(workData));
+  syncToFirebase();
+  calculateSummary();
+  renderDays();
+}
+
+
+        function scrollToCurrentDateBox() {
+    const today = new Date();
+    const currentDay = today.getDate();
+    const dayElement = document.querySelector(`[data-day="${currentDay}"]`);
+    
+    if (dayElement) {
+        dayElement.scrollIntoView({ behavior: 'smooth' });
+    }
+}
+
+// Add this to the initial render section
+populateDropdowns();
+calculateSummary();
+renderDays();
+scrollToCurrentDateBox(); // New line to automatically scroll to current date
+
+
+        
+
+        // Clear Day Data
+function clearDayData(dateKey) {
+    const modal = document.getElementById("confirmationModal");
+    const confirmButton = document.getElementById("confirmButton");
+    const cancelButton = document.getElementById("cancelButton");
+    
+
+    // Show the modal
+    modal.classList.remove("hidden");
+
+    // Handle confirm action
+    confirmButton.onclick = () => {
+        delete workData[dateKey];
+        localStorage.setItem("workData", JSON.stringify(workData));
+        syncToFirebase();
+
+        calculateSummary();
+        renderDays();
+        modal.classList.add("hidden"); // Hide the modal after clearing
+    };
+
+    // Handle cancel action
+    cancelButton.onclick = () => {
+        modal.classList.add("hidden"); // Hide the modal without clearing
+    };
+}
+
+        // Calculate Monthly Summary
+        function calculateSummary() {
+    const monthPrefix = `${currentDate.getFullYear()}-${currentDate.getMonth()}`;
+    let regularLeaves = 0;
+    let specialDays = 0;
+    let weekendLeaveDays = 0;
+    let weekendOtHours = 0;
+    let satSunOtHours = 0;
+    let poyaPublicOtHours = 0;
+
+    Object.entries(workData).forEach(([key, data]) => {
+        if (key.startsWith(monthPrefix)) {
+            const dateParts = key.split("-");
+            const day = parseInt(dateParts[2], 10);
+            const isWeekendDay = isWeekend(currentDate.getFullYear(), currentDate.getMonth(), day);
+            const isSpecialDay = data.specialDays === "Poya Day" || data.specialDays === "Public Holiday";
+
+            const inTime = convertTo24Hour(data.inTime);
+            const outTime = convertTo24Hour(data.outTime, true);
+            const workingHours = calculateHoursDifference(inTime, outTime);
+
+            if (isSpecialDay) {
+                poyaPublicOtHours += workingHours;
+            } else if (isWeekendDay) {
+                satSunOtHours += workingHours;
+            } else if (workingHours > 9) {
+                weekendOtHours += workingHours - 9;
+            }
+
+            // Updated leave day calculations to include Custom Reason
+            if (data.leaveReason === "Own Leave") {
+                regularLeaves++;
+            } else if (data.leaveReason === "Poya Day" || data.leaveReason === "Public Holiday" || data.leaveReason === "Custom Reason") {
+                specialDays++;
+            }
+
+            if (isWeekendDay && (data.leaveReason === "Normal Leave Day" || data.leaveStatus === "Normal Day")) {
+                weekendLeaveDays++;
+            }
+        }
+    });
+    
+    // Dat Search
+    const dateSearchBtn = document.getElementById('dateSearchBtn');
+const dateSearchModal = document.getElementById('dateSearchModal');
+const datesGrid = document.getElementById('datesGrid');
+
+dateSearchBtn.addEventListener('click', () => {
+    datesGrid.innerHTML = '';
+    const daysInMonth = getDaysInMonth(currentDate.getFullYear(), currentDate.getMonth());
+    
+    for(let i = 1; i <= daysInMonth; i++) {
+        const dateBtn = document.createElement('button');
+        dateBtn.className = 'p-2 hover:bg-gray-100 rounded text-center';
+        dateBtn.textContent = i;
+        dateBtn.onclick = () => {
+            const dayElement = document.querySelector(`[data-day="${i}"]`);
+            if(dayElement) {
+                dayElement.scrollIntoView({ behavior: 'smooth' });
+            }
+            dateSearchModal.classList.add('hidden');
+        };
+        datesGrid.appendChild(dateBtn);
+    }
+    
+    dateSearchModal.classList.remove('hidden');
+});
+
+dateSearchModal.addEventListener('click', (e) => {
+    if(e.target === dateSearchModal) {
+        dateSearchModal.classList.add('hidden');
+    }
+});
+
+    // Calculate total OT hours
+    const totalOtHours = weekendOtHours + satSunOtHours + poyaPublicOtHours;
+
+    // Update the DOM elements - Make sure all these elements exist in your HTML
+    regularLeavesEl.textContent = regularLeaves;
+    specialDaysEl.textContent = specialDays;
+    document.getElementById("weekendLeaveDays").textContent = weekendLeaveDays; // This line is crucial
+    document.getElementById("weekendOtHours").textContent = weekendOtHours.toFixed(2);
+    document.getElementById("satSunOtHours").textContent = satSunOtHours.toFixed(2);
+    document.getElementById("totalOtHours").textContent = totalOtHours.toFixed(2);
+    document.getElementById("poyaPublicOtHours").textContent = poyaPublicOtHours.toFixed(2);
+}
+
+
+
+        // Clear All Month Data
+clearAllButton.addEventListener("click", () => {
+    const modal = document.getElementById("confirmationModal");
+    const modalTitle = document.getElementById("modalTitle");
+    const modalMessage = document.getElementById("modalMessage");
+    const confirmButton = document.getElementById("confirmButton");
+    const cancelButton = document.getElementById("cancelButton");
+
+    // Set modal content for this action
+    modalTitle.textContent = "Clear All Month Data";
+    modalMessage.textContent =
+        "Are you sure you want to clear all data for this month? This action cannot be undone.";
+
+    // Show the modal
+    modal.classList.remove("hidden");
+
+    // Handle confirm action
+    confirmButton.onclick = () => {
+        const monthPrefix = `${currentDate.getFullYear()}-${currentDate.getMonth()}`;
+        Object.keys(workData).forEach((key) => {
+            if (key.startsWith(monthPrefix)) delete workData[key];
+        });
+        localStorage.setItem("workData", JSON.stringify(workData));
+        syncToFirebase();
+
+        calculateSummary();
+        renderDays();
+        modal.classList.add("hidden"); // Hide the modal after clearing
+    };
+
+    // Handle cancel action
+    cancelButton.onclick = () => {
+        modal.classList.add("hidden"); // Hide the modal without clearing
+    };
+});
+        // Month Navigation
+        document.getElementById("prevMonth").addEventListener("click", () => {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            populateDropdowns();
+            calculateSummary();
+            renderDays();
+        });
+
+        document.getElementById("nextMonth").addEventListener("click", () => {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            populateDropdowns();
+            calculateSummary();
+            renderDays();
+        });
+
+        // Dropdown Change Events
+        monthDropdown.addEventListener("change", (e) => {
+            currentDate.setMonth(parseInt(e.target.value));
+            calculateSummary();
+            renderDays();
+        });
+
+        yearDropdown.addEventListener("change", (e) => {
+            currentDate.setFullYear(parseInt(e.target.value));
+            calculateSummary();
+            renderDays();
+        });
+
+        // Scroll Button
+        const scrollUpButton = document.getElementById("scrollUpButton");
+const scrollDownButton = document.getElementById("scrollDownButton");
+
+window.addEventListener("scroll", () => {
+    const isAtBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 100;
+    const isAtTop = window.scrollY < 100;
+    
+    scrollUpButton.classList.toggle("hidden", isAtTop);
+    scrollDownButton.classList.toggle("hidden", isAtBottom);
+});
+
+scrollUpButton.addEventListener("click", () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+scrollDownButton.addEventListener("click", () => {
+    window.scrollTo({ top: document.documentElement.scrollHeight, behavior: "smooth" });
+});
+
+        // Initial Render
+        populateDropdowns();
+        calculateSummary();
+        renderDays();
+    </script>
+    <!-- Update modal container -->
+    <div id="confirmationModal" class="modal-container hidden">
+    <div class="modal-glass w-11/12 max-w-md">
+        <h3 class="text-xl font-semibold mb-4" id="modalTitle">Confirm Action</h3>
+        <p class="text-gray-300 mb-6" id="modalMessage">Are you sure you want to proceed?</p>
+        <div class="flex justify-end space-x-4">
+            <button id="cancelButton" class="btn-premium bg-opacity-50">Cancel</button>
+            <button id="confirmButton" class="btn-premium bg-red-600 hover:bg-red-700">Confirm</button>
+        </div>
+    </div>
+</div>
+
+    <!-- Dark Mode Toggle Script -->
+    <script>
+        // Dark Mode Toggle Functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const darkModeToggle = document.getElementById('darkModeToggle');
+            
+            // Check for saved theme preference or use preferred color scheme
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.body.classList.add('theme-dark');
+                updateDarkModeIcon(true);
+            }
+            
+            // Toggle dark mode on button click
+            darkModeToggle.addEventListener('click', function() {
+                const isDarkMode = document.body.classList.toggle('theme-dark');
+                localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+                updateDarkModeIcon(isDarkMode);
+            });
+            
+            // Update the icon based on current mode
+            function updateDarkModeIcon(isDarkMode) {
+                const iconPath = darkModeToggle.querySelector('svg path');
+                if (isDarkMode) {
+                    // Sun icon for when in dark mode (clicking will switch to light)
+                    iconPath.setAttribute('d', 'M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z');
+                } else {
+                    // Moon icon for when in light mode (clicking will switch to dark)
+                    iconPath.setAttribute('d', 'M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z');
+                }
+            }
+        });
+    </script>
+
+
+
+
+
+
+<script>
+    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyDzaAqT7NRAyQhTNDh8GsMKlTKNmttzIWo",
+  authDomain: "work-report-fe3da.firebaseapp.com",
+  projectId: "work-report-fe3da",
+  storageBucket: "work-report-fe3da.firebasestorage.app",
+  messagingSenderId: "879340317679",
+  appId: "1:879340317679:web:a28e2d3906bca3e927a41a",
+  measurementId: "G-ZR8RGLKB77"
+};
+const app = firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+
+
+
+  const loginModal = document.getElementById('loginModal');
+  const openLogin = document.getElementById('openLogin');
+  const closeLogin = document.getElementById('closeLogin');
+  const logoutBtn = document.getElementById('logoutBtn');
+
+  openLogin.onclick = () => loginModal.style.display = 'flex';
+  closeLogin.onclick = () => loginModal.style.display = 'none';
+
+  // Email login
+  document.getElementById('loginSubmit').onclick = async () => {
+    const email = document.getElementById('email').value;
+    const pass = document.getElementById('password').value;
+
+    try {
+      await auth.signInWithEmailAndPassword(email, pass);
+      alert("Login success!");
+      loginModal.style.display = 'none';
+    } catch (e) {
+      if (e.code === 'auth/user-not-found') {
+        await auth.createUserWithEmailAndPassword(email, pass);
+        alert("Account created!");
+        loginModal.style.display = 'none';
+      } else {
+        alert(e.message);
+      }
+    }
+  };
+
+  // Forgot password
+  document.getElementById('forgotPassword').onclick = async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('email').value;
+    if (!email) return alert("Enter email first!");
+    try {
+      await auth.sendPasswordResetEmail(email);
+      alert("Password reset email sent!");
+    } catch (e) {
+      alert(e.message);
+    }
+  };
+
+  // Google sign-in
+  document.getElementById('googleLogin').onclick = async () => {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    try {
+      await auth.signInWithPopup(provider);
+      alert("Google login success!");
+      loginModal.style.display = 'none';
+    } catch (e) {
+      alert(e.message);
+    }
+  };
+
+  // Logout
+  logoutBtn.onclick = () => auth.signOut();
+
+  // State change
+  auth.onAuthStateChanged(async user => {
+    if (user) {
+      openLogin.style.display = 'none';
+      logoutBtn.style.display = 'inline-block';
+      localStorage.setItem('userEmail', user.email);
+
+      // Load Firestore data
+      const ref = db.collection('users').doc(user.email);
+      ref.onSnapshot(doc => {
+        if (doc.exists) {
+          localStorage.setItem('workData', JSON.stringify(doc.data().workData || []));
+          // TODO: call your update UI function here if needed
+        }
+      });
+    } else {
+      openLogin.style.display = 'inline-block';
+      logoutBtn.style.display = 'none';
+      localStorage.clear();
+    }
+  });
+
+  // Sync function
+  function syncToFirebase(data) {
+    const email = localStorage.getItem('userEmail');
+    if (!email) return;
+    db.collection('users').doc(email).set({ workData: data }, { merge: true });
+  }
+
+
+
+
+</script>
+
+
 </body>
 </html>
