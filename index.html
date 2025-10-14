@@ -2483,25 +2483,31 @@ const app = firebase.initializeApp(firebaseConfig);
 
 
 
-document.addEventListener("DOMContentLoaded", () => {
-  const modal = document.getElementById('loginModal');
+  const loginModal = document.getElementById('loginModal');
   const openLogin = document.getElementById('openLogin');
-  const logoutBtn = document.getElementById('logoutBtn');
   const closeLogin = document.getElementById('closeLogin');
+  const logoutBtn = document.getElementById('logoutBtn');
 
-  openLogin.onclick = () => modal.style.display = 'flex';
-  closeLogin.onclick = () => modal.style.display = 'none';
+  openLogin.onclick = () => loginModal.style.display = 'flex';
+  closeLogin.onclick = () => loginModal.style.display = 'none';
 
   // Email login
   document.getElementById('loginSubmit').onclick = async () => {
     const email = document.getElementById('email').value;
     const pass = document.getElementById('password').value;
+
     try {
       await auth.signInWithEmailAndPassword(email, pass);
+      alert("Login success!");
+      loginModal.style.display = 'none';
     } catch (e) {
       if (e.code === 'auth/user-not-found') {
         await auth.createUserWithEmailAndPassword(email, pass);
-      } else alert(e.message);
+        alert("Account created!");
+        loginModal.style.display = 'none';
+      } else {
+        alert(e.message);
+      }
     }
   };
 
@@ -2518,47 +2524,49 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
-  // Google login
+  // Google sign-in
   document.getElementById('googleLogin').onclick = async () => {
     const provider = new firebase.auth.GoogleAuthProvider();
-    await auth.signInWithPopup(provider);
+    try {
+      await auth.signInWithPopup(provider);
+      alert("Google login success!");
+      loginModal.style.display = 'none';
+    } catch (e) {
+      alert(e.message);
+    }
   };
 
   // Logout
   logoutBtn.onclick = () => auth.signOut();
 
-  // Auth state
-  auth.onAuthStateChanged(user => {
+  // State change
+  auth.onAuthStateChanged(async user => {
     if (user) {
       openLogin.style.display = 'none';
-      logoutBtn.style.display = 'inline';
-      modal.style.display = 'none';
+      logoutBtn.style.display = 'inline-block';
       localStorage.setItem('userEmail', user.email);
-      loadUserData(user.email);
+
+      // Load Firestore data
+      const ref = db.collection('users').doc(user.email);
+      ref.onSnapshot(doc => {
+        if (doc.exists) {
+          localStorage.setItem('workData', JSON.stringify(doc.data().workData || []));
+          // TODO: call your update UI function here if needed
+        }
+      });
     } else {
-      openLogin.style.display = 'inline';
+      openLogin.style.display = 'inline-block';
       logoutBtn.style.display = 'none';
       localStorage.clear();
     }
   });
 
+  // Sync function
   function syncToFirebase(data) {
     const email = localStorage.getItem('userEmail');
     if (!email) return;
-    db.collection('users').doc(email).set({ workData: JSON.parse(data) }, { merge: true });
+    db.collection('users').doc(email).set({ workData: data }, { merge: true });
   }
-
-  function loadUserData(email) {
-    const ref = db.collection('users').doc(email);
-    ref.onSnapshot(doc => {
-      if (doc.exists) {
-        const data = doc.data().workData || [];
-        localStorage.setItem('workData', JSON.stringify(data));
-        // call your update UI here if you want to show data again
-      }
-    });
-  }
-});
 
 
 
