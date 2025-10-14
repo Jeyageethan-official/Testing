@@ -2482,81 +2482,84 @@ const app = firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
 
 
+
+document.addEventListener("DOMContentLoaded", () => {
   const modal = document.getElementById('loginModal');
-const openLogin = document.getElementById('openLogin');
-const logoutBtn = document.getElementById('logoutBtn');
-const closeLogin = document.getElementById('closeLogin');
+  const openLogin = document.getElementById('openLogin');
+  const logoutBtn = document.getElementById('logoutBtn');
+  const closeLogin = document.getElementById('closeLogin');
 
-openLogin.onclick = () => modal.style.display = 'flex';
-closeLogin.onclick = () => modal.style.display = 'none';
+  openLogin.onclick = () => modal.style.display = 'flex';
+  closeLogin.onclick = () => modal.style.display = 'none';
 
-// Email/Password login
-document.getElementById('loginSubmit').onclick = async () => {
-  const email = document.getElementById('email').value;
-  const pass = document.getElementById('password').value;
-  try {
-    await auth.signInWithEmailAndPassword(email, pass);
-  } catch (e) {
-    if (e.code === 'auth/user-not-found') {
-      await auth.createUserWithEmailAndPassword(email, pass);
-    } else alert(e.message);
+  // Email login
+  document.getElementById('loginSubmit').onclick = async () => {
+    const email = document.getElementById('email').value;
+    const pass = document.getElementById('password').value;
+    try {
+      await auth.signInWithEmailAndPassword(email, pass);
+    } catch (e) {
+      if (e.code === 'auth/user-not-found') {
+        await auth.createUserWithEmailAndPassword(email, pass);
+      } else alert(e.message);
+    }
+  };
+
+  // Forgot password
+  document.getElementById('forgotPassword').onclick = async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('email').value;
+    if (!email) return alert("Enter email first!");
+    try {
+      await auth.sendPasswordResetEmail(email);
+      alert("Password reset email sent!");
+    } catch (e) {
+      alert(e.message);
+    }
+  };
+
+  // Google login
+  document.getElementById('googleLogin').onclick = async () => {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    await auth.signInWithPopup(provider);
+  };
+
+  // Logout
+  logoutBtn.onclick = () => auth.signOut();
+
+  // Auth state
+  auth.onAuthStateChanged(user => {
+    if (user) {
+      openLogin.style.display = 'none';
+      logoutBtn.style.display = 'inline';
+      modal.style.display = 'none';
+      localStorage.setItem('userEmail', user.email);
+      loadUserData(user.email);
+    } else {
+      openLogin.style.display = 'inline';
+      logoutBtn.style.display = 'none';
+      localStorage.clear();
+    }
+  });
+
+  function syncToFirebase(data) {
+    const email = localStorage.getItem('userEmail');
+    if (!email) return;
+    db.collection('users').doc(email).set({ workData: JSON.parse(data) }, { merge: true });
   }
-};
 
-// Forgot password
-document.getElementById('forgotPassword').onclick = async (e) => {
-  e.preventDefault();
-  const email = document.getElementById('email').value;
-  if (!email) return alert("Enter email first!");
-  try {
-    await auth.sendPasswordResetEmail(email);
-    alert("Password reset email sent!");
-  } catch (e) {
-    alert(e.message);
-  }
-};
-
-// Google login
-document.getElementById('googleLogin').onclick = async () => {
-  const provider = new firebase.auth.GoogleAuthProvider();
-  await auth.signInWithPopup(provider);
-};
-
-// Logout
-logoutBtn.onclick = () => auth.signOut();
-
-// Auth state
-auth.onAuthStateChanged(user => {
-  if (user) {
-    openLogin.style.display = 'none';
-    logoutBtn.style.display = 'inline';
-    modal.style.display = 'none';
-    localStorage.setItem('userEmail', user.email);
-    loadUserData(user.email);
-  } else {
-    openLogin.style.display = 'inline';
-    logoutBtn.style.display = 'none';
-    localStorage.clear();
+  function loadUserData(email) {
+    const ref = db.collection('users').doc(email);
+    ref.onSnapshot(doc => {
+      if (doc.exists) {
+        const data = doc.data().workData || [];
+        localStorage.setItem('workData', JSON.stringify(data));
+        // call your update UI here if you want to show data again
+      }
+    });
   }
 });
 
-// 🔥 Sync + restore functions
-function syncToFirebase(data) {
-  const email = localStorage.getItem('userEmail');
-  if (!email) return;
-  db.collection('users').doc(email).set({ workData: JSON.parse(data) }, { merge: true });
-}
-
-function loadUserData(email) {
-  const ref = db.collection('users').doc(email);
-  ref.onSnapshot(doc => {
-    if (doc.exists) {
-      const data = doc.data().workData || [];
-      localStorage.setItem('workData', JSON.stringify(data));
-      // TODO: update your UI here (like refresh table/list)
-    }
-  });
-}
 
 
 
