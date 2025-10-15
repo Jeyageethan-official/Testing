@@ -2495,47 +2495,6 @@ const app = firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-
-
-
-function getDeviceId() {
-  let id = localStorage.getItem('deviceId');
-  if (!id) {
-    id = 'd-' + Math.random().toString(36).substring(2, 12);
-    localStorage.setItem('deviceId', id);
-  }
-  return id;
-}
-const DEVICE_ID = getDeviceId();
-
-// simple local logout (no global Firebase signout)
-function localLogout() {
-  localStorage.removeItem('loginState');
-  alert("Logged out on this device only");
-  location.reload();
-}
-
-// update your logout button click
-document.getElementById("logoutBtn").addEventListener("click", localLogout);
-
-// (Optional) example for login button
-document.getElementById("openLogin").addEventListener("click", () => {
-  document.getElementById("loginModal").style.display = "flex";
-});
-
-// after user successful login (email/password or Google)
-// just store state locally — don't worry about multi-device sync
-function afterLoginSuccess(email) {
-  localStorage.setItem('loginState', 'true');
-  localStorage.setItem('userEmail', email);
-  document.getElementById("loginModal").style.display = "none";
-  document.getElementById("openLogin").style.display = "none";
-  document.getElementById("logoutBtn").style.display = "inline-block";
-}
-
-
-
-
   
 
 const modal = document.getElementById('loginModal');
@@ -2619,7 +2578,6 @@ function loadUserData(email) {
 }
 
 
-afterLoginSuccess(user.email);
 
 
 
@@ -2696,9 +2654,6 @@ document.getElementById("logoutBtn").addEventListener("click", () => {
     location.reload();
   });
 });
-
-
-
 
 
 
