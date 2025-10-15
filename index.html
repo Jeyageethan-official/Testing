@@ -2492,35 +2492,24 @@ scrollDownButton.addEventListener("click", () => {
 };
 
 const app = firebase.initializeApp(firebaseConfig);
+function sanitizeEmailKey(email){
+  return String(email||'').toLowerCase().replace(/\./g,'_').replace(/[@]/g,'_at_');
+}
+function afterLoginSuccess(email){
+  localStorage.setItem('loginState','true');
+  localStorage.setItem('userEmail',email);
+}
+function localLogout(){
+  localStorage.removeItem('loginState');
+  localStorage.removeItem('userEmail');
+  alert("Logged out only on this device");
+  location.reload();
+}
 const auth = firebase.auth();
 const db = firebase.firestore();
 
 
-function getDeviceId() {
-  let id = localStorage.getItem('deviceId');
-  if (!id) {
-    id = 'd-' + Math.random().toString(36).substring(2, 12);
-    localStorage.setItem('deviceId', id);
-  }
-  return id;
-}
-const DEVICE_ID = getDeviceId();
 
-function localLogout() {
-  localStorage.removeItem('loginState');
-  alert("Logged out on this device only");
-  location.reload();
-}
-
-document.getElementById("logoutBtn").addEventListener("click", localLogout);
-
-function afterLoginSuccess(email) {
-  localStorage.setItem('loginState', 'true');
-  localStorage.setItem('userEmail', email);
-  document.getElementById("loginModal").style.display = "none";
-  document.getElementById("openLogin").style.display = "none";
-  document.getElementById("logoutBtn").style.display = "inline-block";
-}
   
 
 const modal = document.getElementById('loginModal');
@@ -2675,12 +2664,12 @@ function saveToCloud() {
 }
 
 // 🔹 Logout
-document.getElementById("logoutBtn").addEventListener("click", () => {
+document.getElementById("logoutBtn").onclick = localLogout; () => {
   auth.signOut().then(() => {
     localStorage.clear();
     location.reload();
   });
-});
+};
 
 
 
