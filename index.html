@@ -2476,7 +2476,18 @@ scrollDownButton.addEventListener("click", () => {
 
 
             // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-
+            const firebaseConfig = {
+  apiKey: "AIzaSyDzaAqT7NRAyQhTNDh8GsMKlTKNmttzIWo",
+  authDomain: "work-report-fe3da.firebaseapp.com",
+  projectId: "work-report-fe3da",
+  storageBucket: "work-report-fe3da.firebasestorage.app",
+  messagingSenderId: "879340317679",
+  appId: "1:879340317679:web:a28e2d3906bca3e927a41a",
+  measurementId: "G-ZR8RGLKB77"
+};
+const app = firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
   
 
 const modal = document.getElementById('loginModal');
@@ -2566,19 +2577,6 @@ function loadUserData(email) {
 
 
 
-const firebaseConfig = {
-  apiKey: "AIzaSyDzaAqT7NRAyQhTNDh8GsMKlTKNmttzIWo",
-  authDomain: "work-report-fe3da.firebaseapp.com",
-  projectId: "work-report-fe3da",
-  storageBucket: "work-report-fe3da.firebasestorage.app",
-  messagingSenderId: "879340317679",
-  appId: "1:879340317679:web:a28e2d3906bca3e927a41a",
-  measurementId: "G-ZR8RGLKB77"
-};
-  // ✅ 2. Initialize Firebase
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-  const db = firebase.firestore();
 
 
 
@@ -2642,6 +2640,10 @@ const firebaseConfig = {
       location.reload();
     });
   });
+
+
+
+
 
 
         
