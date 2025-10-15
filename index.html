@@ -2481,19 +2481,6 @@ scrollDownButton.addEventListener("click", () => {
 
 
             // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-            const firebaseConfig = {
-  apiKey: "AIzaSyDzaAqT7NRAyQhTNDh8GsMKlTKNmttzIWo",
-  authDomain: "work-report-fe3da.firebaseapp.com",
-  projectId: "work-report-fe3da",
-  storageBucket: "work-report-fe3da.appspot.com", // ✅ Corrected line
-  messagingSenderId: "879340317679",
-  appId: "1:879340317679:web:a28e2d3906bca3e927a41a",
-  measurementId: "G-ZR8RGLKB77"
-};
-
-const app = firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.firestore();
 
   
 
@@ -2516,7 +2503,6 @@ document.getElementById('loginSubmit').onclick = async () => {
       await auth.createUserWithEmailAndPassword(email, pass);
     } else alert(e.message);
   }
-  
 };
 
 // Forgot password
@@ -2657,6 +2643,86 @@ document.getElementById("logoutBtn").addEventListener("click", () => {
 });
 
 
+
+
+
+
+
+
+
+
+
+const firebaseConfig = {
+    apiKey: "AIzaSyDzaAqT7NRAyQhTNDh8GsMKlTKNmttzIWo",
+  authDomain: "work-report-fe3da.firebaseapp.com",
+  projectId: "work-report-fe3da",
+  storageBucket: "work-report-fe3da.appspot.com", // ✅ Corrected line
+  messagingSenderId: "879340317679",
+  appId: "1:879340317679:web:a28e2d3906bca3e927a41a",
+  measurementId: "G-ZR8RGLKB77"
+  };
+  firebase.initializeApp(firebaseConfig);
+
+  const auth = firebase.auth();
+  const db = firebase.database();
+
+  // Device-specific session ID
+  function getDeviceId() {
+    let id = localStorage.getItem('deviceId');
+    if (!id) {
+      id = 'd-' + Math.random().toString(36).substr(2, 9);
+      localStorage.setItem('deviceId', id);
+    }
+    return id;
+  }
+  const DEVICE_ID = getDeviceId();
+
+  // Login handler
+  document.getElementById('loginSubmit').addEventListener('click', async () => {
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value.trim();
+    try {
+      const userCredential = await auth.signInWithEmailAndPassword(email, password);
+      const user = userCredential.user;
+
+      // Device session entry
+      await db.ref(`sessions/${user.uid}/${DEVICE_ID}`).set({
+        deviceId: DEVICE_ID,
+        createdAt: firebase.database.ServerValue.TIMESTAMP
+      });
+
+      // Watch realtime login state
+      db.ref(`sessions/${user.uid}`).on('value', snapshot => {
+        const activeDevices = snapshot.val();
+        if (activeDevices && !activeDevices[DEVICE_ID]) {
+          auth.signOut();
+          localStorage.clear();
+          alert("You have been logged out from another device.");
+        }
+      });
+
+      alert("Login successful!");
+      document.getElementById('loginModal').style.display = 'none';
+      document.getElementById('logoutBtn').style.display = 'inline-block';
+      document.getElementById('openLogin').style.display = 'none';
+
+    } catch (error) {
+      alert("Login failed: " + error.message);
+    }
+  });
+
+  // Logout (only this device)
+  document.getElementById('logoutBtn').addEventListener('click', async () => {
+    const user = auth.currentUser;
+    if (user) {
+      await db.ref(`sessions/${user.uid}/${DEVICE_ID}`).remove();
+      await auth.signOut();
+      localStorage.clear();
+      alert("Logged out!");
+      document.getElementById('logoutBtn').style.display = 'none';
+      document.getElementById('openLogin').style.display = 'inline-block';
+    }
+  });
 
         
     </script>
