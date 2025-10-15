@@ -2480,14 +2480,16 @@ scrollDownButton.addEventListener("click", () => {
   apiKey: "AIzaSyDzaAqT7NRAyQhTNDh8GsMKlTKNmttzIWo",
   authDomain: "work-report-fe3da.firebaseapp.com",
   projectId: "work-report-fe3da",
-  storageBucket: "work-report-fe3da.firebasestorage.app",
+  storageBucket: "work-report-fe3da.appspot.com", // ✅ Corrected line
   messagingSenderId: "879340317679",
   appId: "1:879340317679:web:a28e2d3906bca3e927a41a",
   measurementId: "G-ZR8RGLKB77"
 };
+
 const app = firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-  const db = firebase.firestore();
+const auth = firebase.auth();
+const db = firebase.firestore();
+
   
 
 const modal = document.getElementById('loginModal');
@@ -2583,6 +2585,8 @@ function loadUserData(email) {
 
   // ✅ Realtime Firestore Sync Logic
 
+ // ✅ Realtime Firestore Sync Logic
+
   let userRef = null; // will hold Firestore doc ref
 
   auth.onAuthStateChanged(user => {
@@ -2640,7 +2644,6 @@ function loadUserData(email) {
       location.reload();
     });
   });
-
 
 
 
