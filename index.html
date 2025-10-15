@@ -2481,6 +2481,19 @@ scrollDownButton.addEventListener("click", () => {
 
 
             // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+            const firebaseConfig = {
+  apiKey: "AIzaSyDzaAqT7NRAyQhTNDh8GsMKlTKNmttzIWo",
+  authDomain: "work-report-fe3da.firebaseapp.com",
+  projectId: "work-report-fe3da",
+  storageBucket: "work-report-fe3da.appspot.com", // ✅ Corrected line
+  messagingSenderId: "879340317679",
+  appId: "1:879340317679:web:a28e2d3906bca3e927a41a",
+  measurementId: "G-ZR8RGLKB77"
+};
+
+const app = firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
 
   
 
@@ -2579,85 +2592,76 @@ function loadUserData(email) {
 
 
 
-const firebaseConfig = {
-    apiKey: "AIzaSyDzaAqT7NRAyQhTNDh8GsMKlTKNmttzIWo",
-  authDomain: "work-report-fe3da.firebaseapp.com",
-  projectId: "work-report-fe3da",
-  storageBucket: "work-report-fe3da.appspot.com", // ✅ Corrected line
-  messagingSenderId: "879340317679",
-  appId: "1:879340317679:web:a28e2d3906bca3e927a41a",
-  measurementId: "G-ZR8RGLKB77"
-  };
+  // ✅ Realtime Firestore Sync Logic
+  let userRef = null; // Firestore reference
 
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-  const db = firebase.database();
+auth.onAuthStateChanged(user => {
+  if (user) {
+    console.log("✅ Logged in:", user.email);
 
-  // 🔹 create unique device id
-  function getDeviceId() {
-    let id = localStorage.getItem('deviceId');
-    if (!id) {
-      id = 'dev-' + Math.random().toString(36).substring(2, 10);
-      localStorage.setItem('deviceId', id);
-    }
-    return id;
+    userRef = db.collection("users").doc(user.uid);
+
+    // 🔹 Create user doc first time if not exists
+    userRef.get().then(docSnap => {
+      if (!docSnap.exists) {
+        userRef.set({
+          email: user.email,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          workData: {}
+        }).then(() => console.log("🆕 User doc created in Firestore"));
+      }
+    });
+
+    // 🔹 Listen realtime to Firestore
+    userRef.onSnapshot(doc => {
+      if (doc.exists) {
+        const cloudData = doc.data().workData || {};
+        localStorage.setItem("workData", JSON.stringify(cloudData));
+        workData = cloudData;
+        console.log("🔥 Realtime update:", workData);
+        if (typeof renderDays === "function") renderDays();
+      }
+    });
+
+    // 🔹 Save to Firestore before closing tab
+    window.addEventListener("beforeunload", () => {
+      if (userRef) userRef.set({ workData }, { merge: true });
+    });
+
+  } else {
+    console.log("🚪 Logged out, clearing local data");
+    localStorage.clear();
+    workData = {};
+    if (typeof renderDays === "function") renderDays();
   }
-  const DEVICE_ID = getDeviceId();
+});
 
-  // 🔹 LOGIN
-  async function handleLogin(email, password) {
-    try {
-      const userCredential = await auth.signInWithEmailAndPassword(email, password);
-      const user = userCredential.user;
-
-      // store session for this device only
-      await db.ref(`sessions/${user.uid}/${DEVICE_ID}`).set({
-        createdAt: firebase.database.ServerValue.TIMESTAMP
-      });
-
-      // show success
-      alert("✅ Login success!");
-      document.getElementById('loginModal').style.display = "none";
-      document.getElementById('openLogin').style.display = "none";
-      document.getElementById('logoutBtn').style.display = "inline-block";
-
-    } catch (err) {
-      alert("❌ Login failed: " + err.message);
-    }
+// 🔹 Manual Save Button (optional)
+function saveToCloud() {
+  const user = auth.currentUser;
+  if (user && userRef) {
+    userRef.set({ workData }, { merge: true })
+      .then(() => alert("✅ Synced to Firestore!"));
+  } else {
+    alert("Login first!");
   }
+}
 
-  // 🔹 LOGOUT (only this device)
-  async function handleLogout() {
-    const user = auth.currentUser;
-    if (user) {
-      await db.ref(`sessions/${user.uid}/${DEVICE_ID}`).remove();
-      await auth.signOut();
-      localStorage.clear();
-      alert("🔒 Logged out only on this device!");
-      document.getElementById('openLogin').style.display = "inline-block";
-      document.getElementById('logoutBtn').style.display = "none";
-    }
-  }
-
-  // 🔹 Attach buttons (if present)
-  document.getElementById('logoutBtn').addEventListener('click', handleLogout);
-  document.getElementById('loginSubmit').addEventListener('click', async () => {
-    const email = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value.trim();
-    await handleLogin(email, password);
+// 🔹 Logout
+document.getElementById("logoutBtn").addEventListener("click", () => {
+  auth.signOut().then(() => {
+    localStorage.clear();
+    location.reload();
   });
+});
 
-  // 🔹 Keep realtime sync for each user's data
-  auth.onAuthStateChanged(user => {
-    if (user) {
-      const userDataRef = db.ref(`users/${user.uid}/data`);
-      userDataRef.on('value', snap => {
-        const data = snap.val();
-        console.log("Realtime sync:", data);
-        // here call your render or update UI function if you have one
-      });
-    }
-  });
+
+
+
+
+
+
+
 
 
 
