@@ -1703,6 +1703,7 @@ document.getElementById("restoreFileInput").addEventListener("change", function 
             const restoredData = JSON.parse(e.target.result);
             Object.assign(workData, restoredData);
             localStorage.setItem("workData", JSON.stringify(workData));
+            syncToCloud();
             calculateSummary();
             renderDays();
             alert("Backup restored successfully.");
@@ -1802,6 +1803,7 @@ if (dayData.leaveStatus === undefined || dayData.leaveStatus === "") {
     dayData.leaveStatus = "No";
     workData[dateKey] = dayData;
     localStorage.setItem("workData", JSON.stringify(workData));
+    syncToCloud();
 }
 
         const dayDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
@@ -2195,6 +2197,7 @@ function editReminder(index) {
             workData[dateKey] = workData[dateKey] || {};
             workData[dateKey][field] = value;
             localStorage.setItem("workData", JSON.stringify(workData));
+            syncToCloud();
             calculateSummary();
             renderDays();
         }
@@ -2232,6 +2235,7 @@ function clearDayData(dateKey) {
     confirmButton.onclick = () => {
         delete workData[dateKey];
         localStorage.setItem("workData", JSON.stringify(workData));
+        syncToCloud();
         calculateSummary();
         renderDays();
         modal.classList.add("hidden"); // Hide the modal after clearing
@@ -2355,6 +2359,7 @@ clearAllButton.addEventListener("click", () => {
             if (key.startsWith(monthPrefix)) delete workData[key];
         });
         localStorage.setItem("workData", JSON.stringify(workData));
+        syncToCloud();
         calculateSummary();
         renderDays();
         modal.classList.add("hidden"); // Hide the modal after clearing
@@ -2551,10 +2556,14 @@ auth.onAuthStateChanged(user => {
 });
 
 // 🔥 Sync + restore functions
-function syncToFirebase(data) {
-  const email = localStorage.getItem('userEmail');
-  if (!email) return;
-  db.collection('users').doc(email).set({ workData: JSON.parse(data) }, { merge: true });
+function syncToCloud() {
+  const user = auth.currentUser;
+  if (user && userRef) {
+    // Push latest local workData to Firestore
+    userRef.set({ workData }, { merge: true })
+      .then(() => console.log("✅ workData saved to Firestore"))
+      .catch(err => console.error("❌ Firestore write error:", err));
+  }
 }
 
 function loadUserData(email) {
