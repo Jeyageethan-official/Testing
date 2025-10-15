@@ -877,6 +877,34 @@ button:hover {
 }
 
 
+
+
+
+#closeLogin {
+    position: fixed;        /* full screen relative */
+    top: 20px;              /* distance from top edge */
+    right: 20px;            /* distance from right edge */
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background-color: #e53935;
+    color: #fff;
+    border: none;
+    font-size: 22px;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 10000;         /* stay above popup */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    transition: background 0.2s ease;
+  }
+  #closeLogin:hover {
+    background-color: #b71c1c;
+  }
+
+
 </style>   
 </head>
 <!-- 🔘 Top Right Login Button -->
@@ -895,7 +923,7 @@ button:hover {
       <button id="loginSubmit" style="width:90%;background:#007bff;color:#fff;padding:10px;border:none;border-radius:8px;cursor:pointer;">Login</button><br><br>
       <a href="#" id="forgotPassword" style="color:#00bfff;text-decoration:none;">Forgot Password?</a><br><br>
       <button id="googleLogin" style="width:90%;background:#db4437;color:#fff;padding:10px;border:none;border-radius:8px;cursor:pointer;">Sign in with Google</button><br><br>
-      <button id="closeLogin" style="background:#444;color:#fff;padding:8px 20px;border:none;border-radius:8px;cursor:pointer;">Close</button>
+      <button id="closeLogin">&times;</button>
     </div>
   </div>
   
@@ -2661,7 +2689,37 @@ document.getElementById("logoutBtn").addEventListener("click", () => {
 
 
 
+document.addEventListener("DOMContentLoaded", function(){
+  const auth = firebase.auth();
+  const forgotLink = document.getElementById("forgotPassword"); // your link/button id
+  
+  if(forgotLink){
+    forgotLink.addEventListener("click", async (e)=>{
+      e.preventDefault();
 
+      const emailInput = document.getElementById("email");
+      const email = emailInput.value.trim();
+
+      if(!email){
+        alert("⚠️ Please enter your email first.");
+        return;
+      }
+
+      try {
+        await auth.sendPasswordResetEmail(email);
+        alert("✅ Password reset email sent successfully! Please check your inbox.");
+      } catch(err){
+        if (err.code === "auth/user-not-found") {
+          alert("❌ No user found with this email.");
+        } else if (err.code === "auth/invalid-email") {
+          alert("⚠️ Invalid email format.");
+        } else {
+          alert("❌ Error: " + err.message);
+        }
+      }
+    });
+  }
+});
 
 
 
