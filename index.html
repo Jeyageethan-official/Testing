@@ -2495,6 +2495,32 @@ const app = firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
+
+function getDeviceId() {
+  let id = localStorage.getItem('deviceId');
+  if (!id) {
+    id = 'd-' + Math.random().toString(36).substring(2, 12);
+    localStorage.setItem('deviceId', id);
+  }
+  return id;
+}
+const DEVICE_ID = getDeviceId();
+
+function localLogout() {
+  localStorage.removeItem('loginState');
+  alert("Logged out on this device only");
+  location.reload();
+}
+
+document.getElementById("logoutBtn").addEventListener("click", localLogout);
+
+function afterLoginSuccess(email) {
+  localStorage.setItem('loginState', 'true');
+  localStorage.setItem('userEmail', email);
+  document.getElementById("loginModal").style.display = "none";
+  document.getElementById("openLogin").style.display = "none";
+  document.getElementById("logoutBtn").style.display = "inline-block";
+}
   
 
 const modal = document.getElementById('loginModal');
@@ -2516,6 +2542,7 @@ document.getElementById('loginSubmit').onclick = async () => {
       await auth.createUserWithEmailAndPassword(email, pass);
     } else alert(e.message);
   }
+   afterLoginSuccess(user.email);
 };
 
 // Forgot password
