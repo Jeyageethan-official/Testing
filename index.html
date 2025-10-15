@@ -2584,68 +2584,67 @@ function loadUserData(email) {
 
 
   // ✅ Realtime Firestore Sync Logic
+  let userRef = null; // Firestore reference
 
- // ✅ Realtime Firestore Sync Logic
+auth.onAuthStateChanged(user => {
+  if (user) {
+    console.log("✅ Logged in:", user.email);
 
-  let userRef = null; // will hold Firestore doc ref
+    userRef = db.collection("users").doc(user.uid);
 
-  auth.onAuthStateChanged(user => {
-    if (user) {
-      console.log("Logged in as:", user.email);
-
-      // 🔹 Reference to this user's Firestore document
-      userRef = db.collection("users").doc(user.uid);
-
-      // 🔹 Listen realtime for updates
-      userRef.onSnapshot(doc => {
-        if (doc.exists) {
-          const cloudData = doc.data().workData || {};
-          console.log("Realtime update from Firestore:", cloudData);
-
-          // Update local data
-          workData = cloudData;
-          localStorage.setItem("workData", JSON.stringify(workData));
-
-          // Re-render UI if needed
-          if (typeof renderDays === "function") renderDays();
-        }
-      });
-
-      // 🔹 Sync local changes back to Firestore when leaving page
-      window.addEventListener("beforeunload", () => {
-        if (userRef) {
-          userRef.set({ workData }, { merge: true });
-        }
-      });
-
-    } else {
-      console.log("User logged out, clearing local data.");
-      localStorage.clear();
-      workData = {};
-      if (typeof renderDays === "function") renderDays();
-    }
-  });
-
-  // 🔹 Optional manual sync button (if you want one)
-  function saveToCloud() {
-    const user = auth.currentUser;
-    if (user && userRef) {
-      userRef.set({ workData }, { merge: true })
-        .then(() => alert("✅ Synced to Firebase Cloud!"));
-    } else {
-      alert("Please login first!");
-    }
-  }
-
-  // 🔹 Logout logic — clear local storage fully
-  document.getElementById("logoutBtn").addEventListener("click", () => {
-    auth.signOut().then(() => {
-      localStorage.clear();
-      location.reload();
+    // 🔹 Create user doc first time if not exists
+    userRef.get().then(docSnap => {
+      if (!docSnap.exists) {
+        userRef.set({
+          email: user.email,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          workData: {}
+        }).then(() => console.log("🆕 User doc created in Firestore"));
+      }
     });
+
+    // 🔹 Listen realtime to Firestore
+    userRef.onSnapshot(doc => {
+      if (doc.exists) {
+        const cloudData = doc.data().workData || {};
+        localStorage.setItem("workData", JSON.stringify(cloudData));
+        workData = cloudData;
+        console.log("🔥 Realtime update:", workData);
+        if (typeof renderDays === "function") renderDays();
+      }
+    });
+
+    // 🔹 Save to Firestore before closing tab
+    window.addEventListener("beforeunload", () => {
+      if (userRef) userRef.set({ workData }, { merge: true });
+    });
+
+  } else {
+    console.log("🚪 Logged out, clearing local data");
+    localStorage.clear();
+    workData = {};
+    if (typeof renderDays === "function") renderDays();
+  }
+});
+
+// 🔹 Manual Save Button (optional)
+function saveToCloud() {
+  const user = auth.currentUser;
+  if (user && userRef) {
+    userRef.set({ workData }, { merge: true })
+      .then(() => alert("✅ Synced to Firestore!"));
+  } else {
+    alert("Login first!");
+  }
+}
+
+// 🔹 Logout
+document.getElementById("logoutBtn").addEventListener("click", () => {
+  auth.signOut().then(() => {
+    localStorage.clear();
+    location.reload();
   });
-
-
+});
 
 
 
