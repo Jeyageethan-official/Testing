@@ -2664,12 +2664,12 @@ function saveToCloud() {
 }
 
 // 🔹 Logout
-document.getElementById("logoutBtn").onclick = localLogout; () => {
+document.getElementById("logoutBtn").addEventListener("click", () => {
   auth.signOut().then(() => {
     localStorage.clear();
     location.reload();
   });
-};
+});
 
 
 
