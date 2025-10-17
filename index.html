@@ -1689,64 +1689,32 @@ function captureFullTableAsImage() {
 
 
         // Backup Data Functionality
-// REPLACE the current backupButton click handler with this code
-
-document.getElementById("backupButton").addEventListener("click", async function () {
-  try {
-    const user = firebase.auth().currentUser;
-    if (!user) {
-      return alert("Please login first to save backup to Firebase.");
-    }
-
+document.getElementById("backupButton").addEventListener("click", function () {
     const selectedMonth = document.getElementById("monthDropdown").value;
     const selectedYear = document.getElementById("yearDropdown").value;
     const monthPrefix = `${selectedYear}-${selectedMonth}`;
 
-    // gather month data (same logic as you already have)
     let monthData = {};
     Object.keys(workData).forEach((key) => {
-      if (key.startsWith(monthPrefix)) monthData[key] = workData[key];
+        if (key.startsWith(monthPrefix)) {
+            monthData[key] = workData[key];
+        }
     });
 
     if (Object.keys(monthData).length === 0) {
-      return alert("No data found for this month to backup.");
+        alert("No data found for this month to backup.");
+        return;
     }
 
-    // prepare file
-    const filename = `WorkData_${selectedYear}_${String(parseInt(selectedMonth) + 1).padStart(2, '0')}.json`;
-    const jsonString = JSON.stringify(monthData, null, 2);
-    const blob = new Blob([jsonString], { type: "application/json" });
-
-    // storage path: backups/{uid}/{filename}
-    const storageRef = firebase.storage().ref();
-    const fileRef = storageRef.child(`backups/${user.uid}/${filename}`);
-
-    // upload
-    const uploadTaskSnapshot = await fileRef.put(blob);
-
-    // get download URL
-    const downloadURL = await uploadTaskSnapshot.ref.getDownloadURL();
-    const size = uploadTaskSnapshot.totalBytes;
-
-    // save metadata in Firestore under users/{uid}/backups/{autoId}
-    const backupsRef = db.collection("users").doc(user.uid).collection("backups");
-    await backupsRef.add({
-      filename,
-      path: `backups/${user.uid}/${filename}`,
-      downloadURL,
-      size,
-      month: `${selectedYear}-${selectedMonth}`,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
-
-    alert("Backup uploaded to Firebase Storage successfully.");
-  } catch (err) {
-    console.error("Backup upload failed:", err);
-    alert("Backup failed: " + (err.message || err));
-  }
+    const blob = new Blob([JSON.stringify(monthData, null, 2)], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `WorkData_${selectedYear}_${parseInt(selectedMonth) + 1}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    alert("Backup downloaded successfully.");
 });
-
-
 
 // Restore Data Functionality
 document.getElementById("restoreButton").addEventListener("click", function () {
@@ -2721,7 +2689,37 @@ document.getElementById("logoutBtn").addEventListener("click", () => {
 
 
 
+document.addEventListener("DOMContentLoaded", function(){
+  const auth = firebase.auth();
+  const forgotLink = document.getElementById("forgotPassword"); // your link/button id
+  
+  if(forgotLink){
+    forgotLink.addEventListener("click", async (e)=>{
+      e.preventDefault();
 
+      const emailInput = document.getElementById("email");
+      const email = emailInput.value.trim();
+
+      if(!email){
+        alert("⚠️ Please enter your email first.");
+        return;
+      }
+
+      try {
+        await auth.sendPasswordResetEmail(email);
+        alert("✅ Password reset email sent successfully! Please check your inbox.");
+      } catch(err){
+        if (err.code === "auth/user-not-found") {
+          alert("❌ No user found with this email.");
+        } else if (err.code === "auth/invalid-email") {
+          alert("⚠️ Invalid email format.");
+        } else {
+          alert("❌ Error: " + err.message);
+        }
+      }
+    });
+  }
+});
 
 
 
