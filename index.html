@@ -1750,75 +1750,31 @@ document.getElementById("backupButton").addEventListener("click", async function
 
 
 // Restore Data Functionality
-// === Restore Backup from Firebase Storage ===
-
-document.getElementById("restoreFromCloudBtn").addEventListener("click", async () => {
-  const user = firebase.auth().currentUser;
-  if (!user) {
-    alert("Please login first!");
-    return;
-  }
-
-  const listDiv = document.getElementById("cloudBackupList");
-  listDiv.innerHTML = "<p>Loading your backups...</p>";
-
-  try {
-    const backupDocs = await db
-      .collection("users")
-      .doc(user.uid)
-      .collection("backups")
-      .orderBy("createdAt", "desc")
-      .get();
-
-    if (backupDocs.empty) {
-      listDiv.innerHTML = "<p>No backups found in Firebase.</p>";
-      return;
-    }
-
-    listDiv.innerHTML = "<h4>Select a Backup to Restore:</h4>";
-
-    backupDocs.forEach((doc) => {
-      const data = doc.data();
-      const btn = document.createElement("button");
-      const dateStr = data.createdAt?.toDate
-        ? data.createdAt.toDate().toLocaleString()
-        : "Unknown Date";
-
-      btn.textContent = `${data.filename} (${dateStr})`;
-      btn.style.display = "block";
-      btn.style.margin = "5px 0";
-
-      btn.addEventListener("click", async () => {
-        if (!confirm(`Restore backup "${data.filename}"? This will overwrite current data.`))
-          return;
-
-        try {
-          // Fetch JSON file from Firebase Storage
-          const response = await fetch(data.downloadURL);
-          const json = await response.json();
-
-          // Replace current workData with backup data
-          workData = json;
-
-          // Sync to Firestore live (optional)
-          await db.collection("users").doc(user.uid).set({ workData });
-
-          alert("Backup restored successfully from Firebase!");
-          listDiv.innerHTML = "";
-          renderWorkData(); // if your page has render function
-        } catch (err) {
-          console.error(err);
-          alert("Failed to restore backup: " + err.message);
-        }
-      });
-
-      listDiv.appendChild(btn);
-    });
-  } catch (err) {
-    console.error("Error loading backups:", err);
-    listDiv.innerHTML = `<p>Error: ${err.message}</p>`;
-  }
+document.getElementById("restoreButton").addEventListener("click", function () {
+    document.getElementById("restoreFileInput").click();
 });
+
+document.getElementById("restoreFileInput").addEventListener("change", function (event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        try {
+            const restoredData = JSON.parse(e.target.result);
+            Object.assign(workData, restoredData);
+            localStorage.setItem("workData", JSON.stringify(workData));
+            syncToCloud();
+            calculateSummary();
+            renderDays();
+            alert("Backup restored successfully.");
+        } catch (error) {
+            alert("Error restoring backup. Please select a valid file.");
+        }
+    };
+    reader.readAsText(file);
+});
+
 
 
 
