@@ -1689,59 +1689,136 @@ function captureFullTableAsImage() {
 
 
         // Backup Data Functionality
-document.getElementById("backupButton").addEventListener("click", function () {
+// REPLACE the current backupButton click handler with this code
+
+document.getElementById("backupButton").addEventListener("click", async function () {
+  try {
+    const user = firebase.auth().currentUser;
+    if (!user) {
+      return alert("Please login first to save backup to Firebase.");
+    }
+
     const selectedMonth = document.getElementById("monthDropdown").value;
     const selectedYear = document.getElementById("yearDropdown").value;
     const monthPrefix = `${selectedYear}-${selectedMonth}`;
 
+    // gather month data (same logic as you already have)
     let monthData = {};
     Object.keys(workData).forEach((key) => {
-        if (key.startsWith(monthPrefix)) {
-            monthData[key] = workData[key];
-        }
+      if (key.startsWith(monthPrefix)) monthData[key] = workData[key];
     });
 
     if (Object.keys(monthData).length === 0) {
-        alert("No data found for this month to backup.");
-        return;
+      return alert("No data found for this month to backup.");
     }
 
-    const blob = new Blob([JSON.stringify(monthData, null, 2)], { type: "application/json" });
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = `WorkData_${selectedYear}_${parseInt(selectedMonth) + 1}.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    alert("Backup downloaded successfully.");
+    // prepare file
+    const filename = `WorkData_${selectedYear}_${String(parseInt(selectedMonth) + 1).padStart(2, '0')}.json`;
+    const jsonString = JSON.stringify(monthData, null, 2);
+    const blob = new Blob([jsonString], { type: "application/json" });
+
+    // storage path: backups/{uid}/{filename}
+    const storageRef = firebase.storage().ref();
+    const fileRef = storageRef.child(`backups/${user.uid}/${filename}`);
+
+    // upload
+    const uploadTaskSnapshot = await fileRef.put(blob);
+
+    // get download URL
+    const downloadURL = await uploadTaskSnapshot.ref.getDownloadURL();
+    const size = uploadTaskSnapshot.totalBytes;
+
+    // save metadata in Firestore under users/{uid}/backups/{autoId}
+    const backupsRef = db.collection("users").doc(user.uid).collection("backups");
+    await backupsRef.add({
+      filename,
+      path: `backups/${user.uid}/${filename}`,
+      downloadURL,
+      size,
+      month: `${selectedYear}-${selectedMonth}`,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    alert("Backup uploaded to Firebase Storage successfully.");
+  } catch (err) {
+    console.error("Backup upload failed:", err);
+    alert("Backup failed: " + (err.message || err));
+  }
 });
+
+
+
 
 // Restore Data Functionality
-document.getElementById("restoreButton").addEventListener("click", function () {
-    document.getElementById("restoreFileInput").click();
-});
+// === Restore Backup from Firebase Storage ===
 
-document.getElementById("restoreFileInput").addEventListener("change", function (event) {
-    const file = event.target.files[0];
-    if (!file) return;
+document.getElementById("restoreFromCloudBtn").addEventListener("click", async () => {
+  const user = firebase.auth().currentUser;
+  if (!user) {
+    alert("Please login first!");
+    return;
+  }
 
-    const reader = new FileReader();
-    reader.onload = function (e) {
+  const listDiv = document.getElementById("cloudBackupList");
+  listDiv.innerHTML = "<p>Loading your backups...</p>";
+
+  try {
+    const backupDocs = await db
+      .collection("users")
+      .doc(user.uid)
+      .collection("backups")
+      .orderBy("createdAt", "desc")
+      .get();
+
+    if (backupDocs.empty) {
+      listDiv.innerHTML = "<p>No backups found in Firebase.</p>";
+      return;
+    }
+
+    listDiv.innerHTML = "<h4>Select a Backup to Restore:</h4>";
+
+    backupDocs.forEach((doc) => {
+      const data = doc.data();
+      const btn = document.createElement("button");
+      const dateStr = data.createdAt?.toDate
+        ? data.createdAt.toDate().toLocaleString()
+        : "Unknown Date";
+
+      btn.textContent = `${data.filename} (${dateStr})`;
+      btn.style.display = "block";
+      btn.style.margin = "5px 0";
+
+      btn.addEventListener("click", async () => {
+        if (!confirm(`Restore backup "${data.filename}"? This will overwrite current data.`))
+          return;
+
         try {
-            const restoredData = JSON.parse(e.target.result);
-            Object.assign(workData, restoredData);
-            localStorage.setItem("workData", JSON.stringify(workData));
-            syncToCloud();
-            calculateSummary();
-            renderDays();
-            alert("Backup restored successfully.");
-        } catch (error) {
-            alert("Error restoring backup. Please select a valid file.");
-        }
-    };
-    reader.readAsText(file);
-});
+          // Fetch JSON file from Firebase Storage
+          const response = await fetch(data.downloadURL);
+          const json = await response.json();
 
+          // Replace current workData with backup data
+          workData = json;
+
+          // Sync to Firestore live (optional)
+          await db.collection("users").doc(user.uid).set({ workData });
+
+          alert("Backup restored successfully from Firebase!");
+          listDiv.innerHTML = "";
+          renderWorkData(); // if your page has render function
+        } catch (err) {
+          console.error(err);
+          alert("Failed to restore backup: " + err.message);
+        }
+      });
+
+      listDiv.appendChild(btn);
+    });
+  } catch (err) {
+    console.error("Error loading backups:", err);
+    listDiv.innerHTML = `<p>Error: ${err.message}</p>`;
+  }
+});
 
 
 
@@ -2689,37 +2766,7 @@ document.getElementById("logoutBtn").addEventListener("click", () => {
 
 
 
-document.addEventListener("DOMContentLoaded", function(){
-  const auth = firebase.auth();
-  const forgotLink = document.getElementById("forgotPassword"); // your link/button id
-  
-  if(forgotLink){
-    forgotLink.addEventListener("click", async (e)=>{
-      e.preventDefault();
 
-      const emailInput = document.getElementById("email");
-      const email = emailInput.value.trim();
-
-      if(!email){
-        alert("⚠️ Please enter your email first.");
-        return;
-      }
-
-      try {
-        await auth.sendPasswordResetEmail(email);
-        alert("✅ Password reset email sent successfully! Please check your inbox.");
-      } catch(err){
-        if (err.code === "auth/user-not-found") {
-          alert("❌ No user found with this email.");
-        } else if (err.code === "auth/invalid-email") {
-          alert("⚠️ Invalid email format.");
-        } else {
-          alert("❌ Error: " + err.message);
-        }
-      }
-    });
-  }
-});
 
 
 
