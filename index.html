@@ -1,2729 +1,1038 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Work Journal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class', // enable dark mode based on class
+        }
+    </script>
     
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Work Report</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
-  
-
-<!-- Firebase Core + Services (Compat versions) -->
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
-
-
+    <!-- Firebase Libraries -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+    
+    <!-- PDF/Image Export Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <style>
-
-
-
-/* Dark Mode Base Theme */
-.theme-dark {
-  background: #000000 !important;
-  color: #ffffff;
-}
-
-/* Dark Mode Container */
-.theme-dark .max-w-7xl {
-  background-color: #000000 !important;
-}
-
-/* Dark Mode Headers */
-.theme-dark h1,
-.theme-dark h2,
-.theme-dark h3,
-.theme-dark .text-black {
-  color: #ffffff !important;
-}
-
-/* Dark Mode Dropdowns */
-.theme-dark select#monthDropdown,
-.theme-dark select#yearDropdown {
-  color: #ffffff !important;
-  background: #000000 !important;
-  border: 1px solid #333333;
-}
-
-/* Dark Mode Day Box */
-.theme-dark .day-box {
-  background: rgba(18, 18, 18, 0.7) !important;
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(75, 85, 99, 0.2);
-  border-top: 3px solid #1a365d;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-}
-
-.theme-dark .day-box:hover {
-  background: rgba(28, 28, 28, 0.8) !important;
-  border-top-color: #1559b3;
-}
-
-/* Dark Mode Buttons */
-.theme-dark button:not(.btn-premium) {
-  background: #1559b3 !important;
-  color: white !important;
-}
-
-.theme-dark button:not(.btn-premium):hover {
-  background: #1a365d !important;
-}
-
-/* Dark Mode Input Fields */
-.theme-dark input,
-.theme-dark select,
-.theme-dark textarea {
-  background: #121212 !important;
-  color: #ffffff !important;
-  border: 1px solid #333333;
-}
-
-.theme-dark input:focus,
-.theme-dark select:focus,
-.theme-dark textarea:focus {
-  border-color: #1559b3;
-  box-shadow: 0 0 0 2px rgba(30, 64, 175, 0.2);
-}
-
-/* Dark Mode Navigation Buttons */
-.theme-dark #prevMonth,
-.theme-dark #nextMonth {
-  color: #ffffff;
-}
-
-/* Dark Mode Modal */
-.theme-dark .modal-container {
-  background: rgba(0, 0, 0, 0.9);
-}
-
-.theme-dark .modal-glass {
-  background: #121212;
-  border: 1px solid #333333;
-}
-
-/* Dark Mode Text Colors */
-.theme-dark .text-gray-600,
-.theme-dark .text-gray-700,
-.theme-dark .text-gray-800,
-.theme-dark .text-gray-900 {
-  color: #ffffff !important;
-}
-
-/* Dark Mode Border Colors */
-.theme-dark .border,
-.theme-dark .border-t,
-.theme-dark .border-b,
-.theme-dark .border-l,
-.theme-dark .border-r {
-  border-color: #333333 !important;
-}
-
-/* Dark Mode Hover States */
-.theme-dark .hover\:bg-gray-100:hover {
-  background-color: #1a1a1a !important;
-}
-
-/* Professional Glass Effect for Modals */
-.modal-container {
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: rgba(0, 0, 0, 0.85);
-  backdrop-filter: blur(10px);
-}
-
-.modal-glass {
-  background: linear-gradient(145deg, rgba(17, 17, 17, 0.95), rgba(28, 28, 28, 0.95));
-  border: 1px solid rgba(75, 85, 99, 0.3);
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-  border-radius: 16px;
-  padding: 2rem;
-  max-width: 90%;
-  width: 500px;
-  position: relative;
-  overflow: hidden;
-}
-
-.modal-glass::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, #1559b3, transparent);
-}
-
-/* Premium Modal Content Styling */
-.theme-dark .modal-glass h2,
-.theme-dark .modal-glass h3 {
-  color: #fff;
-  font-size: 1.5rem;
-  font-weight: 600;
-  margin-bottom: 1.5rem;
-}
-
-.theme-dark .modal-glass p {
-  color: #94a3b8;
-  margin-bottom: 1.5rem;
-}
-
-/* Premium Button Styling */
-.theme-dark .modal-glass button {
-  background: linear-gradient(145deg, #165ebd, #1559b3);
-  color: white;
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  font-weight: 500;
-  transition: all 0.3s ease;
-  border: none;
-  box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
-}
-
-.theme-dark .modal-glass button:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 8px 12px -1px rgba(37, 99, 235, 0.3);
-  background: linear-gradient(145deg, #165ebd, #1559b3);
-}
-
-/* Cancel Button Styling */
-.theme-dark .modal-glass button.cancel-btn {
-  background: linear-gradient(145deg, #374151, #1f2937);
-  color: #e2e8f0;
-}
-
-.theme-dark .modal-glass button.cancel-btn:hover {
-  background: linear-gradient(145deg, #1f2937, #111827);
-}
-
-/* Modal Close Button */
-.theme-dark .modal-glass .close-btn {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(75, 85, 99, 0.2);
-  color: #e2e8f0;
-  transition: all 0.2s ease;
-}
-
-.theme-dark .modal-glass .close-btn:hover {
-  background: rgba(75, 85, 99, 0.4);
-  transform: rotate(90deg);
-}
-
-/* Dark Mode Input Fields */
-.theme-dark input,
-.theme-dark select,
-.theme-dark textarea {
-  background: #1a1a1a !important;
-  border: 1px solid rgba(75, 85, 99, 0.3);
-  color: #e2e8f0;
-}
-
-.theme-dark input:focus,
-.theme-dark select:focus,
-.theme-dark textarea:focus {
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
-}
-
-/* Fixed Position Elements */
-.fixed-date-search,
-.scroll-button {
-  background: var(--glass-bg);
-  backdrop-filter: blur(8px);
-  border: 1px solid var(--glass-border);
-  box-shadow: var(--premium-shadow);
-}
-
-/* Mobile Responsive Slide Menu Styles */
-        #mobileMenu {
-            position: fixed;
-            top: 0;
-            left: -300px;
-            width: 300px;
-            height: 100%;
-            background-color: #f8f9fa;
-            transition: 0.3s;
-            z-index: 1000;
-            padding-top: 60px;
+        :root {
+            --bg-light: #f8f9fa; /* A clean, near-white */
+            --bg-dark-start: #111827;
+            --bg-dark-end: #000000;
+        }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            transition: background 0.3s ease;
+        }
+        html:not(.dark) body {
+            background-color: var(--bg-light);
+        }
+        html.dark body {
+            background: linear-gradient(135deg, var(--bg-dark-start) 0%, var(--bg-dark-end) 100%);
         }
 
-        #mobileMenu.open {
-            left: 0;
+        /* Webkit scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #c3cfe2;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8b8d0;
+        }
+        html.dark ::-webkit-scrollbar-track {
+            background: #111827;
+        }
+        html.dark ::-webkit-scrollbar-thumb {
+            background: #374151;
+        }
+        html.dark ::-webkit-scrollbar-thumb:hover {
+            background: #4b5563;
         }
 
-        #menuOverlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            display: none;
-            z-index: 999;
+        /* Page fade-in animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
         }
 
-        #menuOverlay.active {
-            display: block;
+        /* Modal animations */
+        @keyframes modal-in {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .modal-content-animate {
+            animation: modal-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .modal-bg-animate {
+            animation: fadeIn 0.3s ease-out forwards;
         }
 
-        #hamburgerMenu {
+        /* Premium input focus glow */
+        .premium-input:focus,
+        .premium-select:focus {
+             border-color: #1559b3;
+             box-shadow: 0 0 0 3px rgba(21, 89, 179, 0.2);
+             outline: none;
+        }
+        html.dark .premium-input:focus,
+        html.dark .premium-select:focus {
+             border-color: #60a5fa; /* blue-400 */
+             box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2);
+        }
+
+        /* Hide default time/date input icons */
+        input[type="time"]::-webkit-calendar-picker-indicator,
+        input[type="date"]::-webkit-calendar-picker-indicator {
             display: none;
         }
-
-        @media (max-width: 768px) {
-            #hamburgerMenu {
-                display: block;
-                position: fixed;
-                top: 15px;
-                left: 15px;
-                z-index: 1100;
-                cursor: pointer;
-            }
-
-            .main-content {
-                margin-left: 0;
-            }
+        
+        /* Custom select arrow */
+        .premium-select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+            padding-right: 2.5rem;
         }
-
-        /* Authentication Styles */
-        #authContainer {
-            position: fixed;
-            top: 15px;
-            right: 15px;
-            z-index: 1100;
+        html.dark .premium-select {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+        }
+        .hidden {
+            display: none;
         }
     </style>
-    <style>
-
-        
-    .hidden {
-        display: none;
-    }
-    .scroll-button {
-    position: fixed;
-    bottom: 1rem;
-    right: 1rem;
-    z-index: 50;
-    width: 60px;  /* Increased width */
-    height: 60px; /* Increased height */
-    background-color: #1a1a1a; /* Darker background */
-    color: white;
-    border-radius: 50%; /* Circular shape */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.2); /* Added shadow */
-    transition: all 0.3s ease;
-}
-
-.scroll-button:hover {
-    transform: scale(1.1); /* Slight enlargement on hover */
-    background-color: #333; /* Slightly lighter on hover */
-}
-
-/* Specific adjustments for up and down buttons */
-#scrollUpButton, #scrollDownButton {
-    font-size: 24px; /* Larger arrow text */
-    font-weight: bold;
-}
-
-    /* Only change input fields to blue, exclude select elements for title */
-    input[type="text"], input[type="number"], input[type="time"], textarea {
-        color: #e16c29; /* Change text color to blue */
-    }
-
-    /* Exclude dropdowns (select elements) specifically for title */
-    select#monthDropdown, select#yearDropdown {
-        color: #000000; /* Ensure dropdown title stays black */
-    }      
-
-    /* General select element styling, if needed */
-    select:not(#monthDropdown):not(#yearDropdown) {
-        color: #e16c29; /* Apply blue to other select elements */
-    }
-    
-    .day-box {
-    
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1); /* Enhanced shadow */
-    padding: 20px; /* Add padding for spacing */
-    margin: 15px 10px; /* Add margin to create space between boxes */
-    transition: all 0.3s ease; /* Smooth transition for hover effects */
-    
-    overflow: hidden; /* Ensures content stays within rounded corners */
-}
-
-
-
-.day-box {
-    border-top: 3px solid #1559b3;
-    background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(8px);
-    border-radius: 12px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    padding: 20px;
-    margin: 15px 10px;
-    overflow: hidden;
-    transition: all 0.3s ease;
-}
-
-.day-box:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-}
-
-.day-box::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 4px;
-    background-color: #1559b3; /* Remove previous gradient */
-    display: none; /* Hide the previous pseudo-element */
-}
-
-/* Ensure input fields and buttons have consistent styling within day-box */
-.day-box input, 
-.day-box select, 
-.day-box button {
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    transition: all 0.2s ease;
-}
-
-.day-box input:focus, 
-.day-box select:focus {
-    border-color: #1559b3;
-    box-shadow: 0 0 0 3px rgba(47, 109, 247, 0.1);
-}
-.custom-time-picker::-webkit-date-and-time-value {
-  text-align: left !important;
-}
-
-
-
-    .hidden {
-            display: none;
-        }
-        
-        /* Reminder Modal Styles */
-        
-        
-        #reminderContent {
-            background-color: white;
-            padding: 2rem;
-            border-radius: 0.75rem;
-            width: 90%;
-            max-width: 500px;
-            max-height: 80%;
-            overflow-y: auto;
-        }
-        
-        .reminder-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 1rem;
-            padding: 0.5rem;
-            border: 1px solid #e2e8f0;
-            border-radius: 0.5rem;
-        }
-
-
-        .edit-pencil {
-    border: 1px solid black;
-    border-radius: 50%;
-    padding: 5px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    width: 32px;
-    height: 32px;
-    background: none; /* Remove background */
-    transition: transform 0.2s ease-in-out; /* Add hover animation */
-}
-
-.edit-pencil:hover {
-    transform: scale(1.1); /* Slight zoom on hover */
-    border-color: #ca0505; /* Change border color on hover */
-}
-
-.edit-pencil svg {
-    stroke: black; /* Ensure the pencil icon is black */
-    width: 16px;
-    height: 16px;
-}
-
-
-#reminderList {
-    max-height: 400px; /* Adjust height to fit around 5 reminders */
-    overflow-y: auto; /* Enable vertical scrolling */
-    padding-right: 10px; /* Space for scrollbar */
-    scrollbar-width: thin; /* Thin scrollbar for Firefox */
-    scrollbar-color: #cbd5e0 transparent; /* Colors for scrollbar */
-}
-
-/* Scrollbar styles for WebKit-based browsers */
-#reminderList::-webkit-scrollbar {
-    width: 8px;
-}
-
-#reminderList::-webkit-scrollbar-thumb {
-    background-color: #cbd5e0; /* Scrollbar thumb color */
-    border-radius: 4px; /* Rounded edges for thumb */
-}
-
-#reminderList::-webkit-scrollbar-track {
-    background: transparent; /* Scrollbar track color */
-}
-
-input[type="text"],
-input[type="number"],
-input[type="time"],
-textarea,
-select {
-    color: #e16c29; /* Set text color to blue */
-}
-
-
-.text-blue-500 {
-    color: #e16c29 !important; /* Change text color to the specified orange */
-    font-weight: bold; /* Optional: maintain the bold styling */
-}
-
-
-
-/* iPhone-style time picker enhancements */
-.custom-time-picker {
-    appearance: none;
-    -webkit-appearance: none;
-    background-color: #ffffff;
-    font-size: 1rem;
-    padding: 10px;
-    border-radius: 8px;
-    border: 1px solid #e0e0e0;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    cursor: pointer;
-}
-
-.custom-time-picker::-webkit-date-and-time-value {
-    text-align: left !important;
-}
-
-
-
-#exportTableContainer {
-    opacity: 0; /* Hide from users */
-    height: 0; /* Prevent visible space usage */
-    overflow: hidden; /* Hide any scrolling */
-    position: absolute; /* Keep it off-screen but still part of the page */
-    left: -9999px;
-}
-
-
-#backupButton, #restoreButton {
-    background-color: black;
-    color: white;
-    padding: 10px 20px;
-    border-radius: 5px;
-    font-weight: bold;
-    transition: background 0.3s ease;
-}
-
-#backupButton:hover, #restoreButton:hover {
-    background-color: #333; /* Slightly lighter black on hover */
-}
-
-
-
-td {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-
-
-
-#dateSearchBtn {
-    position: relative; /* Default position inside the rectangle box */
-    transition: all 0.3s ease-in-out;
-}
-
-.fixed-date-search {
-    position: fixed !important;
-    bottom: 9.5rem; /* Positioned above the up-arrow button */
-    right: 1rem;
-    z-index: 100;
-    background-color: #1a1a1a;
-    color: white;
-    padding: 10px;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-}
-
-.fixed-date-search:hover {
-    transform: scale(1);
-    background-color: #333;
-}
-
-table {
-    border-collapse: collapse;
-    width: 100%;
-    border: 0.5px solid rgba(0, 0, 0, 0.358); /* Thinner but bold outer border */
-}
-
-th, td {
-    border: 0.5px solid rgba(0, 0, 0, 0.319); /* Thinner but bold inner borders */
-    padding: 8px;
-    text-align: left;
-}
-
-th {
-    background-color: #f2f2f2; /* Optional: Header background */
-}
-
-
-
-
-#reminderModal {
-  z-index: 99999 !important;
-}
-#reminderContent {
-  z-index: 100000 !important;
-  position: relative;
-}
-#reminderContent {
-  background-color: black;
-  color: white;
-  padding: 2rem;
-  border-radius: 0.75rem;
-  width: 90%;
-  max-width: 500px;
-  max-height: 80%;
-  overflow-y: auto;
-
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%); /* center fix */
-  z-index: 100000;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-}
-
-
-button.btn-primary {
-  background-color: #1559b3; /* Primary blue */
-  color: white;
-  transition: background 0.3s ease;
-}
-
-button.btn-primary:hover {
-  background-color: black;
-}
-
-
-/* DARK MODE: Change all black buttons to mild blue */
-.theme-dark button,
-.theme-dark button.bg-black,
-.theme-dark button.p-2,
-.theme-dark button.rounded-full,
-.theme-dark button.text-white {
-  background-color: #1559b3 !important; /* Mild blue */
-  color: white !important;
-  border: none !important;
-  transition: background 0.3s ease, color 0.3s ease;
-}
-
-/* DARK MODE Hover effect: darker blue or black */
-.theme-dark button:hover {
-  background-color: #1559b3 !important; /* Darker blue */
-  color: white !important;
-}
-
-/* Base: Turn all black buttons into mild blue */
-button,
-button.bg-black,
-button.p-2,
-button.rounded-full,
-button.text-white {
-  background-color: #000000d7 !important; /* Mild blue */
-  color: rgb(255, 255, 255) !important;
-  border: none !important;
-  transition: background 0.3s ease, color 0.3s ease;
-}
-
-/* On Hover: Dark blue or black */
-button:hover {
-  background-color: #1559b3 !important; /* darker blue */
-  color: white !important;
-}
-
-
-
-/* DARK MODE: Make all user input text orange */
-.theme-dark input,
-.theme-dark textarea,
-.theme-dark select {
-  color: #d66b00 !important; /* Bright orange */
-  caret-color: #d66b00 !important; /* Orange blinking cursor */
-}
-
-
-
-/* Dark mode: Rectangle box around reminder, date search, and share buttons */
-.theme-dark .flex.items-center.space-x-2.bg-gray-100 {
-  background-color: #000000 !important;
-  border: 1px solid #333 !important;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
-}
-
-
-
-
-
-
-
-
-
-
-
-/* DARK MODE: Monthly Summary background change to black */
-.theme-dark .mt-8.p-6.bg-white.rounded-lg.shadow-lg {
-  background-color: #000000 !important;
-  color: #ffffff !important;
-  border: 1px solid #333333;
-}
-
-/* DARK MODE: Share Options Popup modal box (white → black) */
-.theme-dark #shareExportModal .bg-white {
-  background-color: #000000 !important;
-  color: #ffffff !important;
-  border: 1px solid #333333;
-}
-
-/* DARK MODE: Text inside Share Options modal */
-.theme-dark #shareExportModal h2,
-.theme-dark #shareExportModal p,
-.theme-dark #shareExportModal pre,
-.theme-dark #shareExportModal button {
-  color: #ffffff !important;
-}
-
-/* DARK MODE: Buttons inside Share Options modal */
-.theme-dark #shareExportModal button {
-  background-color: #1a1a1a !important;
-  border: 1px solid #444 !important;
-}
-
-.theme-dark #shareExportModal button:hover {
-  background-color: #333333 !important;
-}
-
-
-
-
-/* Optional: Make summary box background lighter if needed */
-.theme-dark #shareExportModal .bg-gray-100 {
-  background-color: #262626 !important;
-}
-
-/* DARK MODE: Fix bottom Backup & Restore container background */
-.theme-dark .sticky.bottom-0.left-0.w-full.bg-white.shadow-md.p-4 {
-  background-color: #000000 !important;
-  color: #000000 !important;
-  border-top: 1px solid #444444;
-}
-
-/* DARK MODE: Ensure text in buttons is white */
-.theme-dark .sticky.bottom-0 button {
-  color: #ffffff !important;
-}
-
-/* DARK MODE: Button background and hover (optional for consistency) */
-.theme-dark .sticky.bottom-0 button.bg-blue-500,
-.theme-dark .sticky.bottom-0 button.bg-green-500 {
-  background-color: #1a1a1a !important;
-  border: 1px solid #333 !important;
-}
-
-.theme-dark .sticky.bottom-0 button:hover {
-  background-color: #333333 !important;
-}
-
-
-
-/* DARK MODE: Export Data Modal popup background black */
-.theme-dark #dataExportModal .bg-white {
-  background-color: #000000 !important;
-  color: #ffffff !important;
-  border: 1px solid #333333;
-}
-
-/* DARK MODE: Export Data Modal - header text color */
-.theme-dark #dataExportModal h2,
-.theme-dark #dataExportModal h3,
-.theme-dark #dataExportModal p {
-  color: #ffffff !important;
-}
-
-/* DARK MODE: Export Data Modal - table text and background */
-.theme-dark #dataExportModal table {
-  background-color: #000000 !important;
-  color: #ffffff !important;
-  border-color: #444444 !important;
-}
-
-.theme-dark #dataExportModal th,
-.theme-dark #dataExportModal td {
-  border: 1px solid #444444 !important;
-}
-
-/* DARK MODE: Export Data Modal - Close button color */
-.theme-dark #dataExportModal button {
-  background-color: #1559b3!important;
-  color: #ffffff !important;
-  border: 1px solid #444444 !important;
-}
-
-.theme-dark #dataExportModal button:hover {
-  background-color: #333333 !important;
-}
-
-
-
-/* DARK MODE: Clean dropdowns for Month and Year */
-.theme-dark select#monthDropdown,
-.theme-dark select#yearDropdown {
-  background-color: #000000 !important;
-  color: #ffffff !important;
-  border: 1px solid #444444 !important;
-  outline: none !important;
-  box-shadow: none !important;
-  transition: none !important;
-}
-
-/* DARK MODE: Remove hover/focus effects */
-.theme-dark select#monthDropdown:hover,
-.theme-dark select#yearDropdown:hover,
-.theme-dark select#monthDropdown:focus,
-.theme-dark select#yearDropdown:focus {
-  background-color: #000000 !important;
-  border: 1px solid #444444 !important;
-  color: #ffffff !important;
-  outline: none !important;
-  box-shadow: none !important;
-}
-
-/* DARK MODE: Clean input/select/textarea inside .day-box (no glow, no orange/blue borders) */
-.theme-dark .day-box input,
-.theme-dark .day-box select,
-.theme-dark .day-box textarea {
-  background-color: #1a1a1a !important;
-  color: #ffffff !important;
-  border: 1px solid #444444 !important;
-  outline: none !important;
-  box-shadow: none !important;
-  transition: none !important;
-}
-
-/* DARK MODE: Remove hover/focus glow */
-.theme-dark .day-box input:hover,
-.theme-dark .day-box select:hover,
-.theme-dark .day-box textarea:hover,
-.theme-dark .day-box input:focus,
-.theme-dark .day-box select:focus,
-.theme-dark .day-box textarea:focus {
-  border: 1px solid #444444 !important;
-  outline: none !important;
-  box-shadow: none !important;
-}
-
-
-
-/* DARK MODE: Make all user-typed input text orange */
-.theme-dark input,
-.theme-dark textarea,
-.theme-dark select {
-  color: #ff8c00 !important; /* Deep orange */
-  caret-color: #ff8c00 !important; /* Orange blinking cursor */
-}
-
-/* DARK MODE: Also apply to inputs inside .day-box */
-.theme-dark .day-box input,
-.theme-dark .day-box textarea,
-.theme-dark .day-box select {
-  color: #ff8c00 !important;
-  caret-color: #ff8c00 !important;
-}
-
-
-
-
-
-#closeLogin {
-    position: fixed;        /* full screen relative */
-    top: 20px;              /* distance from top edge */
-    right: 20px;            /* distance from right edge */
-    width: 34px;
-    height: 34px;
-    border-radius: 50%;
-    background-color: #e53935;
-    color: #fff;
-    border: none;
-    font-size: 22px;
-    font-weight: bold;
-    cursor: pointer;
-    z-index: 10000;         /* stay above popup */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-    transition: background 0.2s ease;
-  }
-  #closeLogin:hover {
-    background-color: #b71c1c;
-  }
-
-
-</style>   
+<link rel="stylesheet" href="/index.css">
 </head>
-<!-- 🔘 Top Right Login Button -->
-<div id="loginArea" style="position:fixed;top:10px;right:10px;z-index:999;">
-    <button id="openLogin" style="background:#007bff;color:#fff;border:none;padding:8px 16px;border-radius:8px;cursor:pointer;">Login</button>
-    <button id="logoutBtn" style="display:none;background:#f00;color:#fff;border:none;padding:8px 16px;border-radius:8px;cursor:pointer;">Logout</button>
-  </div>
-  
-  <!-- 💠 Login Popup -->
-  <div id="loginModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;
-  background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);z-index:1000;justify-content:center;align-items:center;">
-    <div style="background:#0a0f1a;border-radius:16px;padding:30px;width:320px;text-align:center;color:#fff;box-shadow:0 0 20px rgba(0,0,0,0.5);">
-      <h2 style="color:#00bfff;">Login</h2>
-      <input id="email" type="email" placeholder="Enter Email" style="width:90%;padding:10px;margin:10px 0;border:none;border-radius:8px;"><br>
-      <input id="password" type="password" placeholder="Enter Password" style="width:90%;padding:10px;margin:10px 0;border:none;border-radius:8px;"><br>
-      <button id="loginSubmit" style="width:90%;background:#007bff;color:#fff;padding:10px;border:none;border-radius:8px;cursor:pointer;">Login</button><br><br>
-      <a href="#" id="forgotPassword" style="color:#00bfff;text-decoration:none;">Forgot Password?</a><br><br>
-      <button id="googleLogin" style="width:90%;background:#db4437;color:#fff;padding:10px;border:none;border-radius:8px;cursor:pointer;">Sign in with Google</button><br><br>
-      <button id="closeLogin">&times;</button>
+<body class="bg-gray-50 dark:bg-gray-950">
+
+    <div id="app-container" class="relative max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 text-gray-800 dark:text-gray-200 opacity-0 transition-opacity duration-500">
+        <!-- Auth Area -->
+        <div id="auth-area" class="absolute top-4 right-4 sm:top-6 sm:right-6 lg:top-8 lg:right-8 z-20"></div>
+
+        <!-- Header will be rendered here -->
+        <header id="header-container"></header>
+
+        <main class="mt-8">
+            <!-- Day cards will be rendered here -->
+            <div id="daysContainer" class="space-y-8"></div>
+            <!-- Summary will be rendered here -->
+            <div id="summary-container"></div>
+        </main>
     </div>
-  </div>
-  
 
+    <!-- Modals Portal -->
+    <div id="modal-root"></div>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div class="max-w-7xl mx-auto p-4">
-    <h1 class="text-2xl font-bold text-center text-black mb-6">Work Report Tracker</h1>
- 
-    <!-- Month and Year Selection -->
-    <div class="flex justify-between items-center mb-6">
-        <button id="prevMonth" class="p-2 hover:bg-gray-100 rounded-full text-lg">←</button>
-        <div class="flex items-center space-x-2">
-            <select id="monthDropdown" class="text-xl font-semibold p-2 rounded"></select>
-            <select id="yearDropdown" class="text-xl font-semibold p-2 rounded"></select>
-        </div>
-        <button id="nextMonth" class="p-2 hover:bg-gray-100 rounded-full text-lg">→</button>
-     </div>
-
-
-    <!-- New rectangular box for buttons -->
-    <div class="flex justify-center mb-6">
-        <div class="flex items-center space-x-2 bg-gray-100 p-2 rounded-lg">
-            <!-- Dark Mode Toggle Button -->
-            <button id="darkModeToggle" class="dark-mode-toggle p-2 hover:bg-gray-300 rounded-full">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-                </svg>
-            </button>
-            <button id="reminderButton" class="p-2 hover:bg-gray-300 rounded-full">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/>
-                    <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>
-                </svg>
-            </button>
-            <!-- Date Search Button -->
-            <button id="dateSearchBtn" class="p-2 hover:bg-gray-300 rounded-full">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="11" cy="11" r="8"/>
-                    <path d="m21 21-4.3-4.3"/>
-                </svg>
-                <input type="date" id="nativeDatePicker" class="hidden">
-
-            </button>
-
-           
-
-            <!-- Share Button -->
-            <button id="shareButton" class="p-2 hover:bg-gray-300 rounded-full">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="18" cy="5" r="3"/>
-                    <circle cx="6" cy="12" r="3"/>
-                    <circle cx="18" cy="19" r="3"/>
-                    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
-                    <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
-                </svg>
-            </button>
-            
-
-<!-- Date Picker Modal -->
-<div id="dateSearchModal" class="modal-container hidden">
-    <div class="modal-glass w-11/12 max-w-md">
-        <h2 class="text-xl font-semibold mb-4">Select Date</h2>
-        <div class="grid grid-cols-4 gap-3 mb-4" id="datesGrid"></div>
-        <button id="closeDatePicker" class="btn-premium w-full">Close</button>
+    <!-- Scroll Buttons -->
+    <div class="fixed bottom-6 right-6 flex flex-col gap-3 z-40">
+        <button id="scrollUpButton" class="w-12 h-12 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm text-gray-700 dark:text-gray-200 rounded-full shadow-lg flex items-center justify-center hover:bg-white dark:hover:bg-gray-700 hover:text-blue-600 transition-all duration-200 hidden">↑</button>
+        <button id="scrollDownButton" class="w-12 h-12 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm text-gray-700 dark:text-gray-200 rounded-full shadow-lg flex items-center justify-center hover:bg-white dark:hover:bg-gray-700 hover:text-blue-600 transition-all duration-200">↓</button>
     </div>
-</div>
-        <script>
-            document.getElementById("closeDatePicker").addEventListener("click", function(event) {
-                event.stopPropagation(); // Prevent event from closing the container
-            });
-            </script>
+
+    <!-- Loading Spinner -->
+    <div id="loading-spinner" class="fixed inset-0 bg-white/50 dark:bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+        <div class="w-16 h-16 border-4 border-blue-200 dark:border-blue-800 border-t-blue-600 rounded-full animate-spin"></div>
     </div>
-</div>
 
-            
+<script>
+// ===================================================================================
+//
+//                          WORK JOURNAL - VANILLA JS APP
+//
+// ===================================================================================
 
-    <script>
-
-
-
-
-        
-        document.addEventListener("deviceready", function () {
-            document.getElementById("downloadBtn").addEventListener("click", downloadFile);
-        });
-    
-        function downloadFile() {
-            var fileTransfer = new FileTransfer();
-            var uri = encodeURI("https://example.com/file.pdf"); // Replace with your actual file URL
-            var fileURL = cordova.file.externalRootDirectory + "Download/file.pdf";
-    
-            fileTransfer.download(
-                uri,
-                fileURL,
-                function(entry) {
-                    alert("Download complete: " + entry.toURL());
-                },
-                function(error) {
-                    alert("Download failed: " + error.code);
-                }
-            );
-        }
-
-
-
-        window.addEventListener("scroll", () => {
-        const dateSearchBtn = document.getElementById("dateSearchBtn");
-        const referenceBox = document.querySelector(".flex.items-center.space-x-2.bg-gray-100"); // The rectangular box
-
-        const rect = referenceBox.getBoundingClientRect();
-        const scrollPosition = window.scrollY;
-
-        if (scrollPosition > rect.bottom + 100) {
-            dateSearchBtn.classList.add("fixed-date-search"); // Move to bottom-right above up arrow
-        } else {
-            dateSearchBtn.classList.remove("fixed-date-search"); // Stay in the rectangle
-        }
-    });
-    </script>
-
-
-  
-
-
-    
-    <script>
-
-        
-        
-
-
-
-
-
-
-
-        document.getElementById("closeDatePicker").addEventListener("click", function() {
-    document.getElementById("dateSearchModal").classList.add("hidden"); // Remove or comment out this line
-});
-
-        document.addEventListener("DOMContentLoaded", function () {
-    const shareButton = document.getElementById("shareButton");
-
-    if (shareButton) {
-        shareButton.addEventListener("click", function () {
-            openShareModal();
-        });
+const applyTheme = (theme) => {
+    const sunIcon = document.getElementById('theme-icon-sun');
+    const moonIcon = document.getElementById('theme-icon-moon');
+    if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+        sunIcon?.classList.remove('hidden');
+        moonIcon?.classList.add('hidden');
     } else {
-        console.error("Share button not found!");
-    }
-});
-
-function openShareModal() {
-    let shareModal = document.getElementById("shareExportModal");
-
-    // If modal doesn't exist, create it
-    if (!shareModal) {
-        shareModal = document.createElement("div");
-        shareModal.id = "shareExportModal";
-        shareModal.className = "fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-50";
-        shareModal.innerHTML = `
-            <div class="bg-white rounded-lg shadow-lg w-11/12 max-w-md p-6">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-xl font-bold">Share Options</h2>
-                    <button id="closeShareModal" class="text-gray-500 hover:text-gray-700">
-                        ✖
-                    </button>
-                </div>
-                <div class="grid grid-cols-1 gap-4">
-                    <button id="shareTextBtn" class="p-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
-                        Share as Text
-                    </button>
-                    <button id="exportDataBtn" class="p-3 bg-green-500 text-white rounded-lg hover:bg-green-600">
-                        Export Data as PDF
-                    </button>
-                    <button id="exportSelectedMonthBtn" class="p-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
-    Export Selected Month
-</button>
-
-                </div>
-            </div>
-        `;
-        document.getElementById("exportTableContainer").appendChild(shareButton);
-
-
-        // Close modal functionality
-        document.getElementById("closeShareModal").addEventListener("click", function () {
-            document.body.removeChild(shareModal);
-        });
-
-        // Event Listeners
-        document.getElementById("exportDataBtn").addEventListener("click", generatePDF);
-        document.getElementById("shareTextBtn").addEventListener("click", shareText);
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem('theme', 'light');
+        sunIcon?.classList.add('hidden');
+        moonIcon?.classList.remove('hidden');
     }
 }
 
-        // Replace the existing share button click event handler with this new one
-    document.getElementById('shareButton').addEventListener('click', function() {
-        // Create the popup modal for sharing and exporting
-        const shareModal = document.createElement('div');
-        shareModal.id = 'shareExportModal';
-        shareModal.className = 'fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-100';
-        
-        // Generate content for the popup
-        const monthName = months[currentDate.getMonth()];
-        const year = currentDate.getFullYear();
-        const totalOtHours = document.getElementById("totalOtHours").textContent;
-        
-        // Create the summary text
-        const summaryText = `Work Summary Report for ${monthName} ${year}:\n` +
-            `- Regular Leaves: ${document.getElementById("regularLeaves").textContent}\n` +
-            `- Special Days: ${document.getElementById("specialDays").textContent}\n` +
-            `- Weekend Leaves: ${document.getElementById("weekendLeaveDays").textContent}\n` +
-            `- Total OT Hours: ${totalOtHours} hours`;
-        
-        // Popup content
-        shareModal.innerHTML = `
-            <div class="bg-white rounded-lg shadow-lg w-11/12 max-w-md p-6">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-xl font-bold">Share Options</h2>
-                    <button id="closeShareModal" class="text-gray-500 hover:text-gray-700">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="18" y1="6" x2="6" y2="18"></line>
-                            <line x1="6" y1="6" x2="18" y2="18"></line>
-                        </svg>
-                    </button>
-                </div>
-                
-                <div class="mb-4 p-4 bg-gray-100 rounded-lg">
-                    <p class="font-bold mb-2">Summary</p>
-                    <pre class="whitespace-pre-wrap text-sm">${summaryText}</pre>
-                </div>
-                
-                <div class="grid grid-cols-1 gap-4">
-                    <button id="shareTextBtn" class="p-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 flex items-center justify-center">
-                        <svg class="mr-2" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="18" cy="5" r="3"></circle>
-                            <circle cx="6" cy="12" r="3"></circle>
-                            <circle cx="18" cy="19" r="3"></circle>
-                            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
-                            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
-                        </svg>
-                        Share as Text
-                    </button>
-                    
-                    <button id="exportDataBtn" class="p-3 bg-green-500 text-white rounded-lg hover:bg-green-600 flex items-center justify-center">
-                        <svg class="mr-2" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                            <polyline points="7 10 12 15 17 10"></polyline>
-                            <line x1="12" y1="15" x2="12" y2="3"></line>
-                        </svg>
-                        Export Data
-                    </button>
-
-                    
-                </div>
-            </div>
-        `;
-        
-        // Append modal to the body
-        document.body.appendChild(shareModal);
-        
-        // Close modal functionality
-        document.getElementById('closeShareModal').addEventListener('click', function() {
-            document.body.removeChild(shareModal);
-        });
-        
-        // Share as text functionality
-        document.getElementById('shareTextBtn').addEventListener('click', function() {
-    const summaryText = `Work Summary Report for ${monthName} ${year}:\n` +
-        `- Regular Leaves: ${document.getElementById("regularLeaves").textContent}\n` +
-        `- Special Days: ${document.getElementById("specialDays").textContent}\n` +
-        `- Weekend Leaves: ${document.getElementById("weekendLeaveDays").textContent}\n` +
-        `- Total OT Hours: ${document.getElementById("totalOtHours").textContent} hours`;
-
-    navigator.clipboard.writeText(summaryText).then(() => {
-        alert("Summary copied to clipboard!");
-    }).catch(err => {
-        console.error("Failed to copy text: ", err);
-        alert("Failed to copy. Please try again.");
-    });
-});
-
-        
-        // Export data functionality
-        document.getElementById('exportDataBtn').addEventListener('click', function() {
-            
-            
-            // Create export modal with detailed table
-            const exportModal = document.createElement('div');
-            exportModal.id = 'dataExportModal';
-            exportModal.className = 'fixed inset-0 bg-gray-800 bg-opacity-80 flex justify-center items-center z-110';
-    exportModal.style.display = 'flex';
-    exportModal.style.alignItems = 'center';
-    exportModal.style.justifyContent = 'center';
-    exportModal.style.height = '100vh';
-    exportModal.style.width = '100vw';
-    exportModal.style.overflowY = 'auto'; // Ensures modal is scrollable
-    
-    
-    
-    
-            
-            // Generate table HTML with all month data
-            let tableRows = '';
-    const daysInMonth = getDaysInMonth(currentDate.getFullYear(), currentDate.getMonth());
-
-    for (let day = 1; day <= daysInMonth; day++) {
-        const dateKey = `${currentDate.getFullYear()}-${currentDate.getMonth()}-${day}`;
-        const dayData = workData[dateKey] || {};
-        const dayDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
-const formattedDate = `${String(day).padStart(2, '0')}.${String(currentDate.getMonth() + 1).padStart(2, '0')}.${currentDate.getFullYear()}`;
-
-let specialDayClass = "";
-    if (dayData.specialDays === "Poya Day" || dayData.specialDays === "Public Holiday") {
-        specialDayClass = 'style="color: green; font-weight: bold;"';
-    }
-
-
-    // Determine the correct leave reason value with custom reason details
-let leaveReasonText = '-';
-if (dayData.leaveReason) {
-    if (dayData.leaveReason === "Custom Reason") {
-         leaveReasonText = dayData.customReasonDetails ? dayData.customReasonDetails : "Custom Reason";
-    } else if (dayData.leaveReason === "Own Leave") {
-         leaveReasonText = dayData.leaveReasonDetails ? dayData.leaveReasonDetails : "Own Leave";
-    } else {
-         leaveReasonText = dayData.leaveReason;
-    }
-}
-
-
-    
-
-    
-
-
-        tableRows += `
-            <tr class="border-b">
-        <td class="p-2 border-r ${isWeekend(currentDate.getFullYear(), currentDate.getMonth(), day) ? 'text-red-500 font-bold' : ''}">${formattedDate}</td>
-        <td class="p-2 border-r">${dayData.inTime || '-'}</td>
-        <td class="p-2 border-r">${dayData.outTime || '-'}</td>
-        <td class="p-2 border-r">${dayData.movementOut || '-'}</td>
-        <td class="p-2 border-r">${dayData.movementIn || '-'}</td>
-        <td class="p-2 border-r">${dayData.teamMembers || '-'}</td>
-        <td class="p-2 border-r">${dayData.workLocation || '-'}</td>
-        <td class="p-2 border-r">${dayData.vehicleNumber || '-'}</td>
-        <td class="p-2 border-r">${dayData.km || '-'}</td>
-        <td class="p-2 border-r" ${specialDayClass}>${dayData.specialDays || '-'}</td>
-        <td class="p-2 border-r" style="${dayData.leaveStatus === 'Yes' ? 'color: #1E90FF; font-weight: bold;' : ''}">
-            ${dayData.leaveStatus || '-'}
-        </td>
-        <td class="p-2 border-r">${leaveReasonText}</td>
-    </tr>
-        `;
-    }
-
-    exportModal.innerHTML = `
-        <div class="bg-white rounded-lg shadow-lg w-11/12 max-w-4xl p-6 flex flex-col items-center justify-center">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-xl font-bold">Export Data: ${months[currentDate.getMonth()]} ${currentDate.getFullYear()}</h2>
-                <button id="closeExportModal" class="text-gray-500 hover:text-gray-700">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg>
-                </button>
-            </div>
-            
-            
-            <div id="exportTableContainer" class="overflow-auto mb-4">
-   <!-- New Heading Section -->
-<div class="flex flex-col items-center mb-4">
-    <h2 class="text-xl font-bold">Work Data Sheet</h2>
-    <p class="text-md font-semibold">Name: T.Jeyaraman | Service No: 016696</p>
-    <h3 class="text-lg font-semibold" id="exportMonthYear"></h3>
-</div>
-
-
-                <table class="min-w-full bg-white border">
-                    <thead>
-                        <tr class="bg-gray-100">
-                            <th class="p-2 border-r">Day</th>
-                
-                            <th class="p-2 border-r">In Time</th>
-                            <th class="p-2 border-r">Out Time</th>
-                            <th class="p-2 border-r">Movement Out Time</th>
-                            <th class="p-2 border-r">Movement In Time</th>
-                            <th class="p-2 border-r">Team Members</th>
-                            <th class="p-2 border-r">Work Location</th>
-                            <th class="p-2 border-r">Vehicle Number</th>
-                            <th class="p-2 border-r">KM Reading</th>
-                        
-                            <th class="p-2 border-r">Present Special Day</th>
-                            <th class="p-2 border-r">Leave Status</th>
-                            <th class="p-2 border-r">Leave Reason</th>
-                            
-                            
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${tableRows}
-                    </tbody>
-                </table>
-                
-            </div>
-
-             <!-- Save as Image Button (Added Here) -->
-        <div class="flex justify-center mt-4 sticky bottom-0 bg-white p-4 shadow-lg w-full">
-            <button id="saveAsPdfBtn" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
-                Save as Pdf
-            </button>
-        </div>
-    </div>
-    
-
-
-
-
-
-            `;
-            
-            // Append export modal to the body
-            document.body.appendChild(exportModal);
-            document.getElementById('saveAsPdfBtn').addEventListener('click', function() {
-    if (typeof html2canvas === 'undefined') {
-        var script = document.createElement('script');
-        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
-        script.onload = loadJsPDF;
-        document.head.appendChild(script);
-    } else {
-        loadJsPDF();
-    }
-});
-
-function updateExportTableHeader() {
-    const monthNames = [
-        "January", "February", "March", "April", "May", "June",
-        "July", "August", "September", "October", "November", "December"
-    ];
-    
-    const selectedMonth = currentDate.getMonth();
-    const selectedYear = currentDate.getFullYear();
-    
-    document.getElementById("exportMonthYear").textContent = `${monthNames[selectedMonth]} ${selectedYear}`;
-}
-
-// Call this function when the export table is displayed
-updateExportTableHeader();
-
-
-
-
-function loadJsPDF() {
-    if (typeof jsPDF === 'undefined') {
-        var script = document.createElement('script');
-        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
-        script.onload = generateTablePDF;
-        document.head.appendChild(script);
-    } else {
-        generateTablePDF();
-    }
-}
-
-function generateTablePDF() {
-    const { jsPDF } = window.jspdf;
-    const tableContainer = document.getElementById('exportTableContainer');
-    const body = document.body;
-    const wasDark = body.classList.contains("theme-dark");
-
-    if (!tableContainer) {
-        alert("Table not found.");
-        return;
-    }
-
-    // 🔁 Switch to light-mode-export style
-    if (wasDark) {
-        body.classList.remove("theme-dark");
-        body.classList.add("light-export-mode");
-    }
-
-    setTimeout(() => {
-        tableContainer.style.opacity = '1';
-        tableContainer.style.height = 'auto';
-        tableContainer.style.overflow = 'visible';
-        tableContainer.style.position = 'relative';
-
-        html2canvas(tableContainer, {
-            scale: 3,
-            useCORS: true,
-            scrollX: 0,
-            scrollY: 0,
-            backgroundColor: '#FFFFFF'
-        }).then(canvas => {
-            const imgData = canvas.toDataURL('image/png');
-            const pdf = new jsPDF({
-                orientation: 'portrait',
-                unit: 'mm',
-                format: 'a4'
-            });
-
-            const pageWidth = 210;
-            const pageHeight = 297;
-            const imgWidth = pageWidth - 10;
-            const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-            if (imgHeight > pageHeight - 20) {
-                const scaleFactor = (pageHeight - 20) / imgHeight;
-                pdf.addImage(imgData, 'PNG', 8, 10, imgWidth * scaleFactor, imgHeight * scaleFactor);
-            } else {
-                pdf.addImage(imgData, 'PNG', 5, 10, imgWidth, imgHeight);
-            }
-
-            pdf.save('Work_Report_A4.pdf');
-
-            // Hide export table again
-            tableContainer.style.opacity = '0';
-            tableContainer.style.height = '0';
-            tableContainer.style.overflow = 'hidden';
-            tableContainer.style.position = 'absolute';
-            tableContainer.style.left = '-9999px';
-
-            // 🔁 Restore dark mode
-            if (wasDark) {
-                body.classList.remove("light-export-mode");
-                body.classList.add("theme-dark");
-            }
-        }).catch(err => {
-            alert("PDF failed.");
-            if (wasDark) {
-                body.classList.remove("light-export-mode");
-                body.classList.add("theme-dark");
-            }
-        });
-    }, 200);
-}
-
-
-
-
-
-
-document.addEventListener("deviceready", function() {
-    var permissions = cordova.plugins.permissions;
-
-    permissions.requestPermission(permissions.WRITE_EXTERNAL_STORAGE, function(status) {
-        if (!status.hasPermission) {
-            alert("Storage permission denied! Please enable storage access.");
-        }
-    }, function() {
-        alert("Permission request failed.");
-    });
-}, false);
-
-
-function savePDF(pdfData) {
-    var fileName = "MyDocument.pdf";
-    var filePath = cordova.file.externalRootDirectory + "Download/" + fileName;
-
-    window.resolveLocalFileSystemURL(cordova.file.externalRootDirectory, function(dir) {
-        dir.getFile("Download/" + fileName, { create: true, exclusive: false }, function(fileEntry) {
-            fileEntry.createWriter(function(fileWriter) {
-                var dataObj = new Blob([pdfData], { type: "application/pdf" });
-
-                fileWriter.write(dataObj);
-                fileWriter.onwriteend = function() {
-                    alert("PDF saved successfully: " + filePath);
-                };
-                fileWriter.onerror = function(e) {
-                    alert("Failed to write file: " + e.toString());
-                };
-            });
-        }, function(error) {
-            alert("Error creating file: " + error.code);
-        });
-    });
-}
-
-
-
-function openPDF() {
-    var filePath = cordova.file.externalRootDirectory + "Download/MyDocument.pdf";
-
-    cordova.plugins.fileOpener2.open(
-        filePath,
-        "application/pdf",
-        {
-            error: function(e) {
-                alert("Error opening PDF: " + JSON.stringify(e));
-            },
-            success: function() {
-                console.log("PDF opened successfully");
-            }
-        }
-    );
-}
-
-
-
-
-
-
-
-
-
-            
-            // Close export modal functionality
-            document.getElementById('closeExportModal').addEventListener('click', function() {
-                document.body.removeChild(exportModal);
-            });
-            
-            
-
-
-
-            
-            
-        });
-    });
-    
-    document.getElementById('saveAsImageBtn').addEventListener('click', function() {
-    if (typeof html2canvas === 'undefined') {
-        var script = document.createElement('script');
-        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
-        script.onload = captureFullTableAsImage;
-        document.head.appendChild(script);
-    } else {
-        captureFullTableAsImage();
-    }
-});
-
-function captureFullTableAsImage() {
-    const element = document.body; // Capture the full page including all table colors
-    html2canvas(element, {
-        scrollX: 0,
-        scrollY: 0,
-        useCORS: true
-    }).then(canvas => {
-        const link = document.createElement('a');
-        link.href = canvas.toDataURL('image/png');
-        link.download = 'Work_Report_Full_Page.png';
-        link.click();
-    });
-}
-
-
-    
-
-
-
-
-
-    
-    
-    </script>
-    
-
-    <!-- New alert box for reminders -->
-<div id="reminderAlertBox" class="hidden bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-md mt-4">
-    <p id="reminderAlertMessage" class="text-sm"></p>
-</div>
-    
-    <!-- Rest of the existing HTML remains the same -->
- </div>
-
-<!-- Rest of the existing HTML remains the same -->
-
-        <!-- Reminder Modal -->
-        <!-- Reminder Modal -->
-<div id="reminderModal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-100">
-    <div id="reminderContent" class="bg-white rounded-lg shadow-lg w-11/12 max-w-md p-6">
-        <div class="flex justify-between items-center mb-4">
-            <h2 class="text-xl font-bold">Set Your Reminder</h2>
-            
-            <div class="flex items-center space-x-2">
-                <!-- Close button -->
-                
-                
-                <button id="addReminderBtn" class="bg-green-500 text-white rounded-full w-10 h-10 flex items-center justify-center">
-                    +
-                </button>
-            </div>
-        </div>
-        <div id="reminderList"></div>
-    </div>
-</div>
-
-
-        
-
-<!-- Add at bottom of body -->
-<div id="dateSearchModal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-70">
-    <div class="bg-white rounded-lg shadow-lg w-64 max-h-96 overflow-y-auto p-4">
-        <div class="grid grid-cols-4 gap-2" id="datesGrid"></div>
-    </div>
-</div>
-
-        <!-- Daily Entries -->
-        <div id="daysContainer" class="space-y-6"></div>
-
-        <!-- Monthly Summary -->
-       <div class="mt-8 p-6 bg-white rounded-lg shadow-lg">
-    <h2 class="text-xl font-bold mb-4">Monthly Summary</h2>
-    <div>
-        <p>Leave Days (Regular): <span id="regularLeaves">0</span></p>
-        <p>Leave Days (Poya/Public): <span id="specialDays">0</span></p>
-        <p>Leave Days (Saturday/Sunday): <span id="weekendLeaveDays">0</span></p>
-        <hr class="border-t-3.5 border-black my-4">
-        <p>Weekend OT Hours: <span id="weekendOtHours">0</span> hours</p>
-        <p>Sat/Sun OT Hours: <span id="satSunOtHours">0</span> hours</p>
-        <p>Poya/Public OT Hours: <span id="poyaPublicOtHours">0</span> hours</p>
-        <p class="text-blue-500 font-semibold">Total OT Hours: <span id="totalOtHours">0</span> hours</p>
-    </div>
-    <button id="clearAllButton" class="mt-4 p-2 bg-red-100 text-red-600 rounded hover:bg-red-200 w-full">
-        Clear All Month Data
-    </button>
-
-    <div class="sticky bottom-0 left-0 w-full bg-white shadow-md p-4 flex justify-center gap-4">
-        <button id="backupButton" class="p-2 bg-blue-500 text-white rounded hover:bg-blue-600">
-            Backup Data
-        </button>
-        <button id="restoreButton" class="p-2 bg-green-500 text-white rounded hover:bg-green-600">
-            Restore Data
-        </button>
-    </div>
-    <input type="file" id="restoreFileInput" class="hidden" accept=".json">
-    
-
-    
-
-    
-</div>
-        </div>
-
-        <!-- Scroll Buttons -->
-        <div class="fixed bottom-4 right-4 flex flex-col gap-2">
-            <button id="scrollUpButton" class="p-2 bg-gray-800 text-white rounded-full shadow-lg hover:bg-gray-700 hidden">
-                ↑
-            </button>
-            <button id="scrollDownButton" class="p-2 bg-gray-800 text-white rounded-full shadow-lg hover:bg-gray-700">
-                ↓
-            </button>
-        </div>
-
-    <script>
-
-
-
-
-        // Backup Data Functionality
-document.getElementById("backupButton").addEventListener("click", function () {
-    const selectedMonth = document.getElementById("monthDropdown").value;
-    const selectedYear = document.getElementById("yearDropdown").value;
-    const monthPrefix = `${selectedYear}-${selectedMonth}`;
-
-    let monthData = {};
-    Object.keys(workData).forEach((key) => {
-        if (key.startsWith(monthPrefix)) {
-            monthData[key] = workData[key];
-        }
-    });
-
-    if (Object.keys(monthData).length === 0) {
-        alert("No data found for this month to backup.");
-        return;
-    }
-
-    const blob = new Blob([JSON.stringify(monthData, null, 2)], { type: "application/json" });
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = `WorkData_${selectedYear}_${parseInt(selectedMonth) + 1}.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    alert("Backup downloaded successfully.");
-});
-
-// Restore Data Functionality
-document.getElementById("restoreButton").addEventListener("click", function () {
-    document.getElementById("restoreFileInput").click();
-});
-
-document.getElementById("restoreFileInput").addEventListener("change", function (event) {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = function (e) {
-        try {
-            const restoredData = JSON.parse(e.target.result);
-            Object.assign(workData, restoredData);
-            localStorage.setItem("workData", JSON.stringify(workData));
-            syncToCloud();
-            calculateSummary();
-            renderDays();
-            alert("Backup restored successfully.");
-        } catch (error) {
-            alert("Error restoring backup. Please select a valid file.");
-        }
-    };
-    reader.readAsText(file);
-});
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        // State
-        let currentDate = new Date();
-        let workData = JSON.parse(localStorage.getItem("workData")) || {};
-
-        const months = [
-            "January", "February", "March", "April", "May", "June",
-            "July", "August", "September", "October", "November", "December"
-        ];
-
-        // DOM Elements
-        const monthDropdown = document.getElementById("monthDropdown");
-        const yearDropdown = document.getElementById("yearDropdown");
-        const daysContainer = document.getElementById("daysContainer");
-        const regularLeavesEl = document.getElementById("regularLeaves");
-        const specialDaysEl = document.getElementById("specialDays");
-        const otHoursEl = document.getElementById("otHours");
-        const scrollButton = document.getElementById("scrollButton");
-        const clearAllButton = document.getElementById("clearAllButton");
-
-        // Utilities
-        const getDaysInMonth = (year, month) => new Date(year, month + 1, 0).getDate();
-        const formatDayDisplay = (day, month, year, weekday) => `${weekday} : ${months[month]} ${day} : ${year}`;
-        const isWeekend = (year, month, day) => {
-            const date = new Date(year, month, day);
-            return date.getDay() === 0 || date.getDay() === 6; // Sunday (0) or Saturday (6)
-        };
-
-        // Convert Time to 24-Hour Format
-        function convertTo24Hour(time, isPM = false) {
-            if (!time) return null;
-            let [hours, minutes] = time.split(":").map(Number);
-            if (isPM && hours < 12) hours += 12;
-            if (!isPM && hours === 12) hours = 0;
-            return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
-        }
-
-        // Calculate Hours Difference
-        function calculateHoursDifference(inTime, outTime) {
-            if (!inTime || !outTime) return 0;
-            const [inHours, inMinutes] = inTime.split(":").map(Number);
-            const [outHours, outMinutes] = outTime.split(":").map(Number);
-
-            const inTimeMinutes = inHours * 60 + inMinutes;
-            const outTimeMinutes = outHours * 60 + outMinutes;
-
-            const diffMinutes = outTimeMinutes - inTimeMinutes;
-            return diffMinutes / 60; // Convert minutes to hours
-        }
-
-        // Populate Month and Year Dropdowns
-        function populateDropdowns() {
-            monthDropdown.innerHTML = months
-                .map((month, index) => `<option value="${index}" ${index === currentDate.getMonth() ? "selected" : ""}>${month}</option>`)
-                .join("");
-
-            const currentYear = currentDate.getFullYear();
-            yearDropdown.innerHTML = Array.from({ length: 11 }, (_, i) => currentYear - 5 + i)
-                .map(year => `<option value="${year}" ${year === currentYear ? "selected" : ""}>${year}</option>`)
-                .join("");
-        }
-
-        // Render Days
-        function renderDays() {
-    daysContainer.innerHTML = "";
-    const daysInMonth = getDaysInMonth(currentDate.getFullYear(), currentDate.getMonth());
-
-    for (let day = 1; day <= daysInMonth; day++) {
-        const dateKey = `${currentDate.getFullYear()}-${currentDate.getMonth()}-${day}`;
-        let dayData = workData[dateKey] || {};
-
-// Set default leaveStatus to "No" if it's not defined
-if (dayData.leaveStatus === undefined || dayData.leaveStatus === "") {
-    dayData.leaveStatus = "No";
-    workData[dateKey] = dayData;
-    localStorage.setItem("workData", JSON.stringify(workData));
-    syncToCloud();
-}
-
-        const dayDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
-        const dayName = dayDate.toLocaleDateString("en-US", { weekday: "long" });
-        const isWeekendDay = isWeekend(currentDate.getFullYear(), currentDate.getMonth(), day);
-        
-
-        const formattedDay = formatDayDisplay(day, currentDate.getMonth(), currentDate.getFullYear(), dayName);
-
-        const card = document.createElement("div");
-card.className = "day-box p-4 rounded-lg mb-4"; /* Apply the premium style class */
-card.setAttribute('data-day', day);
-
-
-        card.innerHTML = `
-            <div class="space-y-4">
-                <div class="text-lg font-semibold ${isWeekendDay ? 'text-red-600' : 'text-black'}">
-                    ${formattedDay}
-                </div>
-                <div class="grid grid-cols-1 gap-4">
-                    ${createInputField("In Time", "inTime", dayData.inTime || "", "Enter in time (AM)", dateKey, "time")}
-                ${createInputField("Out Time", "outTime", dayData.outTime || "", "Enter out time (PM)", dateKey, "time")}
-                ${createInputField("Movement Out Time", "movementOut", dayData.movementOut || "", "Enter movement out time", dateKey, "time")}
-                ${createInputField("Movement In Time", "movementIn", dayData.movementIn || "", "Enter movement in time", dateKey, "time")}
-                ${createInputField("Team Members", "teamMembers", dayData.teamMembers || "", "Enter team members", dateKey, "text")}
-                ${createInputField("Work Location", "workLocation", dayData.workLocation || "", "Enter work location", dateKey, "text")}
-                ${createInputField("Vehicle Number", "vehicleNumber", dayData.vehicleNumber || "", "Enter vehicle number", dateKey, "text")}
-                ${createInputField("KM", "km", dayData.km || "", "Enter kilometers", dateKey, "number")}
-                ${createDropdown("Present On specialDays", "specialDays", ["", "Poya Day", "Public Holiday"], dayData.specialDays || "", "Select special day", dateKey)}
-                ${createDropdown("Leave Status", "leaveStatus", ["", "Yes", "No"], dayData.leaveStatus || "", "Select leave status", dateKey)}
-${dayData.leaveStatus === "Yes" ? 
-    createDropdown("Leave Reason", "leaveReason", 
-        isWeekend(currentDate.getFullYear(), currentDate.getMonth(), day)
-            ? ["", "Poya Day", "Public Holiday", "Custom Reason", "Own Leave", "Normal Leave Day"]
-            : ["", "Poya Day", "Public Holiday", "Custom Reason", "Own Leave"],
-        dayData.leaveReason || "", "Select leave reason", dateKey)
-    : ""}
-
-
-                ${dayData.leaveStatus === "Yes" && dayData.leaveReason === "Custom Reason" ? createInputField("Custom Reason Details", "customReasonDetails", dayData.customReasonDetails || "", "Enter custom reason details", dateKey, "text") : ""}
-                ${dayData.leaveStatus === "Yes" && dayData.leaveReason === "Own Leave" ? createInputField("Leave Reason Details", "leaveReasonText", dayData.leaveReasonText || "", "Enter leave reason details", dateKey, "text") : ""}
-                
-                
-                </div>
-                <button 
-            onclick="clearDayData('${dateKey}')"
-            class="mt-4 p-2 bg-black bg-opacity-84 text-white rounded hover:bg-black hover:bg-opacity-75">
-            Clear Day Data
-        </button>
-
-            </div>
-         `;
-
-        daysContainer.appendChild(card);
-    }
-}
-
-
-
-
-        // Create Input Field with Placeholder
-        function createInputField(label, field, value, placeholder, dateKey, type = "text") {
-    if (type === "time") {
-        return `
-            <div class="flex flex-col">
-                <label class="font-medium mb-1">${label}</label>
-                <input 
-                    type="time" 
-                    class="p-2 border rounded custom-time-picker"
-                    placeholder="${placeholder}"
-                    value="${value}" 
-                    onchange="updateWorkData('${dateKey}', '${field}', this.value)"
-                />
-            </div>
-        `;
-    }
-    return `
-        <div class="flex flex-col">
-            <label class="font-medium mb-1">${label}</label>
-            <input 
-                type="${type}" 
-                class="p-2 border rounded"
-                placeholder="${placeholder}"
-                value="${value}" 
-                onchange="updateWorkData('${dateKey}', '${field}', this.value)"
-            />
-        </div>
-    `;
-}
-
-function openTimePicker(field, dateKey) {
-    // Get the time input associated with the button
-    const timeInput = document.querySelector(`[onchange="updateWorkData('${dateKey}', '${field}', this.value)"]`);
-    if (timeInput) {
-        // Programmatically focus or open the input
-        timeInput.focus();
-    }
-}
-
-
-
-        // Create Dropdown
-        function createDropdown(label, field, options, value, placeholder, dateKey) {
-    const dateParts = dateKey.split("-");
-    const day = parseInt(dateParts[2], 10);
-    const isWeekendDay = isWeekend(currentDate.getFullYear(), currentDate.getMonth(), day);
-    
-
-    // Modified options for weekend days
-    let filteredOptions;
-    if (field === "leaveStatus") {
-        if (isWeekendDay) {
-            filteredOptions = ["", "Yes", "No", ]; // Changed "Normal Leave Day" to "Normal Day" for weekends
-        } else {
-            filteredOptions = ["", "Yes", "No"]; // Weekdays don't show the Normal Day option
-        }
-    } else {
-        filteredOptions = options;
-    }
-
-    return `
-        <div class="flex flex-col">
-            <label class="font-medium mb-1">${label}</label>
-            <select 
-                class="p-2 border rounded"
-                onchange="updateWorkData('${dateKey}', '${field}', this.value)">
-                <option value="" ${value === "" ? "selected" : ""}>${placeholder}</option>
-                ${filteredOptions.map(opt => `<option value="${opt}" ${value === opt ? "selected" : ""}>${opt}</option>`).join("")}
-            </select>
-        </div>
-    `;
-}
-
-
-// Reminder Functionality
-const reminderButton = document.getElementById('reminderButton');
-const reminderModal = document.getElementById('reminderModal');
-        const addReminderBtn = document.getElementById('addReminderBtn');
-        const reminderList = document.getElementById('reminderList');
-        
-        
-
-        // Reminder Categories
-        const reminderCategories = [
-            'Wedding', 
-            'Nobility Ceremony', 
-            'Birthday', 
-            'House Warming Ceremony', 
-            'Other'
-        ];
-
-        
-
-        // Load existing reminders from localStorage
-        let reminders = JSON.parse(localStorage.getItem('reminders')) || [];
-
-        // Render Reminders
-function renderReminders() {
-    reminderList.innerHTML = '';
-    reminders.forEach((reminder, index) => {
-        const reminderItem = document.createElement('div');
-        reminderItem.className = 'reminder-item';
-        reminderItem.innerHTML = `
-    <div>
-        <p><strong>Category:</strong> ${reminder.category}</p>
-        ${reminder.category === 'Other' ? `<p><strong>Custom Details:</strong> ${reminder.customDetails}</p>` : ''}
-        <p><strong>Date:</strong> ${reminder.date}</p>
-    </div>
-    <div class="flex space-x-2">
-        <button onclick="editReminder(${index})" class="edit-pencil">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M12 20h9"/>
-                <path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/>
-            </svg>
-        </button>
-        <button onclick="removeReminder(${index})" class="bg-red-500 text-white px-2 py-1 rounded">
-            Remove
-        </button>
-    </div>
-`;
-
-        reminderList.appendChild(reminderItem);
-    });
-}
-
-(function () {
-    // Reminder Alert Box
-    const reminderAlertBox = document.getElementById('reminderAlertBox');
-    const reminderAlertMessage = document.getElementById('reminderAlertMessage');
-
-    function checkUpcomingReminders() {
-    const today = new Date();
-    let alertMessages = [];
-    let updatedReminders = [];
-
-    reminders.forEach(reminder => {
-        const reminderDate = new Date(reminder.date);
-        const timeDiff = reminderDate.getTime() - today.getTime();
-        const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
-
-        if (daysDiff === 2) { 
-            // Show alert if the reminder is 2 days away
-            alertMessages.push(`Upcoming ${reminder.category} on ${reminder.date}`);
-        }
-
-        // Keep reminders that are not outdated
-        if (daysDiff >= 0) {
-            updatedReminders.push(reminder);
-        }
-    });
-    
-
-    
-
-
-     
-    
-
-
-    // Update the reminders array with only upcoming reminders
-    reminders = updatedReminders;
-    localStorage.setItem('reminders', JSON.stringify(reminders)); // Save updated reminders
-
-    // Display the alert message in the box
-    if (alertMessages.length > 0) {
-        reminderAlertMessage.innerHTML = alertMessages.join('<br>');
-        reminderAlertBox.classList.remove('hidden');
-    } else {
-        reminderAlertBox.classList.add('hidden');
-    }
-}
-
-
-    // Run reminder check on page load
-    checkUpcomingReminders();
-})();
-
-
-// Edit Reminder Functionality
-function editReminder(index) {
-    const reminder = reminders[index];
-    const categorySelect = document.createElement('select');
-    categorySelect.className = 'w-full p-2 border rounded mb-2';
-    reminderCategories.forEach(category => {
-        const option = document.createElement('option');
-        option.value = category;
-        option.textContent = category;
-        if (category === reminder.category) option.selected = true;
-        categorySelect.appendChild(option);
-    });
-
-    const dateInput = document.createElement('input');
-    dateInput.type = 'date';
-    dateInput.className = 'w-full p-2 border rounded mb-2';
-    dateInput.value = reminder.date;
-
-    const customDetailsInput = document.createElement('input');
-    customDetailsInput.type = 'text';
-    customDetailsInput.placeholder = 'Custom Reminder Details';
-    customDetailsInput.className = 'w-full p-2 border rounded mb-2';
-    customDetailsInput.value = reminder.customDetails || '';
-    customDetailsInput.classList.toggle('hidden', reminder.category !== 'Other');
-
-    categorySelect.addEventListener('change', (e) => {
-        customDetailsInput.classList.toggle('hidden', e.target.value !== 'Other');
-    });
-
-    const saveButton = document.createElement('button');
-    saveButton.textContent = 'Save Changes';
-    saveButton.className = 'bg-green-500 text-white px-4 py-2 rounded w-full';
-    saveButton.onclick = () => {
-        reminders[index] = {
-            category: categorySelect.value,
-            date: dateInput.value,
-            customDetails: categorySelect.value === 'Other' ? customDetailsInput.value : ''
-        };
-        localStorage.setItem('reminders', JSON.stringify(reminders));
-        renderReminders();
-    };
-
-    const container = document.createElement('div');
-    container.appendChild(categorySelect);
-    container.appendChild(dateInput);
-    container.appendChild(customDetailsInput);
-    container.appendChild(saveButton);
-
-    reminderList.innerHTML = '';
-    reminderList.appendChild(container);
-}
-
-
-        
-
-        
-
-        // Add Reminder
-        function addReminder() {
-            const categorySelect = document.createElement('select');
-            categorySelect.className = 'w-full p-2 border rounded mb-2';
-            reminderCategories.forEach(category => {
-                const option = document.createElement('option');
-                option.value = category;
-                option.textContent = category;
-                categorySelect.appendChild(option);
-            });
-
-            const dateInput = document.createElement('input');
-            dateInput.type = 'date';
-            dateInput.className = 'w-full p-2 border rounded mb-2';
-
-            const customDetailsInput = document.createElement('input');
-            customDetailsInput.type = 'text';
-            customDetailsInput.placeholder = 'Custom Reminder Details';
-            customDetailsInput.className = 'w-full p-2 border rounded mb-2 hidden';
-
-            categorySelect.addEventListener('change', (e) => {
-                customDetailsInput.classList.toggle('hidden', e.target.value !== 'Other');
-            });
-
-            const saveButton = document.createElement('button');
-            saveButton.textContent = 'Save Reminder';
-            saveButton.className = 'bg-blue-500 text-white px-4 py-2 rounded w-full';
-            saveButton.onclick = () => {
-                const reminder = {
-                    category: categorySelect.value,
-                    date: dateInput.value,
-                    customDetails: categorySelect.value === 'Other' ? customDetailsInput.value : ''
-                };
-                reminders.push(reminder);
-                localStorage.setItem('reminders', JSON.stringify(reminders));
-                renderReminders();
-            };
-
-            const container = document.createElement('div');
-            container.appendChild(categorySelect);
-            container.appendChild(dateInput);
-            container.appendChild(customDetailsInput);
-            container.appendChild(saveButton);
-
-            reminderList.appendChild(container);
-        }
-
-        
-
-
-
-        // Remove Reminder
-        function removeReminder(index) {
-            reminders.splice(index, 1);
-            localStorage.setItem('reminders', JSON.stringify(reminders));
-            renderReminders();
-        }
-
-        // Toggle Reminder Modal
-        reminderButton.addEventListener('click', () => {
-            reminderModal.classList.remove('hidden');
-            renderReminders();
-        });
-
-        // Close Reminder Modal when clicking outside
-        reminderModal.addEventListener('click', (e) => {
-            if (e.target === reminderModal) {
-                reminderModal.classList.add('hidden');
-            }
-        });
-
-        
-
-        // Add Reminder Button
-        addReminderBtn.addEventListener('click', addReminder);
-
-        // Check for upcoming reminders on page load
-        function checkUpcomingReminders() {
-            const today = new Date();
-            reminders.forEach(reminder => {
-                const reminderDate = new Date(reminder.date);
-                const timeDiff = reminderDate.getTime() - today.getTime();
-                const daysDiff = timeDiff / (1000 * 3600 * 24);
-
-                
-            });
-        }
-
-        // Run reminder check on page load
-        checkUpcomingReminders();
- 
-
-
-        // Update Work Data
-        function updateWorkData(dateKey, field, value) {
-            workData[dateKey] = workData[dateKey] || {};
-            workData[dateKey][field] = value;
-            localStorage.setItem("workData", JSON.stringify(workData));
-            syncToCloud();
-            calculateSummary();
-            renderDays();
-        }
-
-        function scrollToCurrentDateBox() {
-    const today = new Date();
-    const currentDay = today.getDate();
-    const dayElement = document.querySelector(`[data-day="${currentDay}"]`);
-    
-    if (dayElement) {
-        dayElement.scrollIntoView({ behavior: 'smooth' });
-    }
-}
-
-// Add this to the initial render section
-populateDropdowns();
-calculateSummary();
-renderDays();
-scrollToCurrentDateBox(); // New line to automatically scroll to current date
-
-
-        
-
-        // Clear Day Data
-function clearDayData(dateKey) {
-    const modal = document.getElementById("confirmationModal");
-    const confirmButton = document.getElementById("confirmButton");
-    const cancelButton = document.getElementById("cancelButton");
-    
-
-    // Show the modal
-    modal.classList.remove("hidden");
-
-    // Handle confirm action
-    confirmButton.onclick = () => {
-        delete workData[dateKey];
-        localStorage.setItem("workData", JSON.stringify(workData));
-        syncToCloud();
-        calculateSummary();
-        renderDays();
-        modal.classList.add("hidden"); // Hide the modal after clearing
-    };
-
-    // Handle cancel action
-    cancelButton.onclick = () => {
-        modal.classList.add("hidden"); // Hide the modal without clearing
-    };
-}
-
-        // Calculate Monthly Summary
-        function calculateSummary() {
-    const monthPrefix = `${currentDate.getFullYear()}-${currentDate.getMonth()}`;
-    let regularLeaves = 0;
-    let specialDays = 0;
-    let weekendLeaveDays = 0;
-    let weekendOtHours = 0;
-    let satSunOtHours = 0;
-    let poyaPublicOtHours = 0;
-
-    Object.entries(workData).forEach(([key, data]) => {
-        if (key.startsWith(monthPrefix)) {
-            const dateParts = key.split("-");
-            const day = parseInt(dateParts[2], 10);
-            const isWeekendDay = isWeekend(currentDate.getFullYear(), currentDate.getMonth(), day);
-            const isSpecialDay = data.specialDays === "Poya Day" || data.specialDays === "Public Holiday";
-
-            const inTime = convertTo24Hour(data.inTime);
-            const outTime = convertTo24Hour(data.outTime, true);
-            const workingHours = calculateHoursDifference(inTime, outTime);
-
-            if (isSpecialDay) {
-                poyaPublicOtHours += workingHours;
-            } else if (isWeekendDay) {
-                satSunOtHours += workingHours;
-            } else if (workingHours > 9) {
-                weekendOtHours += workingHours - 9;
-            }
-
-            // Updated leave day calculations to include Custom Reason
-            if (data.leaveReason === "Own Leave") {
-                regularLeaves++;
-            } else if (data.leaveReason === "Poya Day" || data.leaveReason === "Public Holiday" || data.leaveReason === "Custom Reason") {
-                specialDays++;
-            }
-
-            if (isWeekendDay && (data.leaveReason === "Normal Leave Day" || data.leaveStatus === "Normal Day")) {
-                weekendLeaveDays++;
-            }
-        }
-    });
-    
-    // Dat Search
-    const dateSearchBtn = document.getElementById('dateSearchBtn');
-const dateSearchModal = document.getElementById('dateSearchModal');
-const datesGrid = document.getElementById('datesGrid');
-
-dateSearchBtn.addEventListener('click', () => {
-    datesGrid.innerHTML = '';
-    const daysInMonth = getDaysInMonth(currentDate.getFullYear(), currentDate.getMonth());
-    
-    for(let i = 1; i <= daysInMonth; i++) {
-        const dateBtn = document.createElement('button');
-        dateBtn.className = 'p-2 hover:bg-gray-100 rounded text-center';
-        dateBtn.textContent = i;
-        dateBtn.onclick = () => {
-            const dayElement = document.querySelector(`[data-day="${i}"]`);
-            if(dayElement) {
-                dayElement.scrollIntoView({ behavior: 'smooth' });
-            }
-            dateSearchModal.classList.add('hidden');
-        };
-        datesGrid.appendChild(dateBtn);
-    }
-    
-    dateSearchModal.classList.remove('hidden');
-});
-
-dateSearchModal.addEventListener('click', (e) => {
-    if(e.target === dateSearchModal) {
-        dateSearchModal.classList.add('hidden');
-    }
-});
-
-    // Calculate total OT hours
-    const totalOtHours = weekendOtHours + satSunOtHours + poyaPublicOtHours;
-
-    // Update the DOM elements - Make sure all these elements exist in your HTML
-    regularLeavesEl.textContent = regularLeaves;
-    specialDaysEl.textContent = specialDays;
-    document.getElementById("weekendLeaveDays").textContent = weekendLeaveDays; // This line is crucial
-    document.getElementById("weekendOtHours").textContent = weekendOtHours.toFixed(2);
-    document.getElementById("satSunOtHours").textContent = satSunOtHours.toFixed(2);
-    document.getElementById("totalOtHours").textContent = totalOtHours.toFixed(2);
-    document.getElementById("poyaPublicOtHours").textContent = poyaPublicOtHours.toFixed(2);
-}
-
-
-
-        // Clear All Month Data
-clearAllButton.addEventListener("click", () => {
-    const modal = document.getElementById("confirmationModal");
-    const modalTitle = document.getElementById("modalTitle");
-    const modalMessage = document.getElementById("modalMessage");
-    const confirmButton = document.getElementById("confirmButton");
-    const cancelButton = document.getElementById("cancelButton");
-
-    // Set modal content for this action
-    modalTitle.textContent = "Clear All Month Data";
-    modalMessage.textContent =
-        "Are you sure you want to clear all data for this month? This action cannot be undone.";
-
-    // Show the modal
-    modal.classList.remove("hidden");
-
-    // Handle confirm action
-    confirmButton.onclick = () => {
-        const monthPrefix = `${currentDate.getFullYear()}-${currentDate.getMonth()}`;
-        Object.keys(workData).forEach((key) => {
-            if (key.startsWith(monthPrefix)) delete workData[key];
-        });
-        localStorage.setItem("workData", JSON.stringify(workData));
-        syncToCloud();
-        calculateSummary();
-        renderDays();
-        modal.classList.add("hidden"); // Hide the modal after clearing
-    };
-
-    // Handle cancel action
-    cancelButton.onclick = () => {
-        modal.classList.add("hidden"); // Hide the modal without clearing
-    };
-});
-        // Month Navigation
-        document.getElementById("prevMonth").addEventListener("click", () => {
-            currentDate.setMonth(currentDate.getMonth() - 1);
-            populateDropdowns();
-            calculateSummary();
-            renderDays();
-        });
-
-        document.getElementById("nextMonth").addEventListener("click", () => {
-            currentDate.setMonth(currentDate.getMonth() + 1);
-            populateDropdowns();
-            calculateSummary();
-            renderDays();
-        });
-
-        // Dropdown Change Events
-        monthDropdown.addEventListener("change", (e) => {
-            currentDate.setMonth(parseInt(e.target.value));
-            calculateSummary();
-            renderDays();
-        });
-
-        yearDropdown.addEventListener("change", (e) => {
-            currentDate.setFullYear(parseInt(e.target.value));
-            calculateSummary();
-            renderDays();
-        });
-
-        // Scroll Button
-        const scrollUpButton = document.getElementById("scrollUpButton");
-const scrollDownButton = document.getElementById("scrollDownButton");
-
-window.addEventListener("scroll", () => {
-    const isAtBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 100;
-    const isAtTop = window.scrollY < 100;
-    
-    scrollUpButton.classList.toggle("hidden", isAtTop);
-    scrollDownButton.classList.toggle("hidden", isAtBottom);
-});
-
-scrollUpButton.addEventListener("click", () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-});
-
-scrollDownButton.addEventListener("click", () => {
-    window.scrollTo({ top: document.documentElement.scrollHeight, behavior: "smooth" });
-});
-
-        // Initial Render
-        populateDropdowns();
-        calculateSummary();
-        renderDays();
-    </script>
-    <!-- Update modal container -->
-    <div id="confirmationModal" class="modal-container hidden">
-    <div class="modal-glass w-11/12 max-w-md">
-        <h3 class="text-xl font-semibold mb-4" id="modalTitle">Confirm Action</h3>
-        <p class="text-gray-300 mb-6" id="modalMessage">Are you sure you want to proceed?</p>
-        <div class="flex justify-end space-x-4">
-            <button id="cancelButton" class="btn-premium bg-opacity-50">Cancel</button>
-            <button id="confirmButton" class="btn-premium bg-red-600 hover:bg-red-700">Confirm</button>
-        </div>
-    </div>
-</div>
-
-    <!-- Dark Mode Toggle Script -->
-    <script>
-         // Dark Mode Toggle — default ALWAYS dark unless user previously chose otherwise
-  document.addEventListener('DOMContentLoaded', function() {
-    const darkModeToggle = document.getElementById('darkModeToggle');
-
-    // Read saved preference from localStorage
+const initTheme = () => {
     const savedTheme = localStorage.getItem('theme');
-
-    // If user previously chose a theme, use that. Otherwise default to DARK.
-    if (savedTheme === 'dark' || !savedTheme) {
-      document.body.classList.add('theme-dark');
-      updateDarkModeIcon(true);
-      // If no saved theme, explicitly store 'dark' so automatic switching won't reassert later.
-      if (!savedTheme) localStorage.setItem('theme', 'dark');
+    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    if (savedTheme) {
+        applyTheme(savedTheme);
+    } else if (systemPrefersDark) {
+        applyTheme('dark');
     } else {
-      // savedTheme === 'light'
-      document.body.classList.remove('theme-dark');
-      updateDarkModeIcon(false);
+        applyTheme('light');
     }
-
-    // Toggle dark mode on button click — respect user's manual choice
-    darkModeToggle.addEventListener('click', function() {
-      const isDarkMode = document.body.classList.toggle('theme-dark');
-      localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
-      updateDarkModeIcon(isDarkMode);
-    });
-
-    // Update the icon based on current mode
-    function updateDarkModeIcon(isDarkMode) {
-      const iconPath = darkModeToggle.querySelector('svg path');
-      if (!iconPath) return;
-      if (isDarkMode) {
-        // Sun icon (showing that clicking will switch to light)
-        iconPath.setAttribute('d', 'M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z');
-      } else {
-        // Moon icon (showing that clicking will switch to dark)
-        iconPath.setAttribute('d', 'M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z');
-      }
-    }
-  });
-
-
-
-
-            // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-            const firebaseConfig = {
-  apiKey: "AIzaSyDzaAqT7NRAyQhTNDh8GsMKlTKNmttzIWo",
-  authDomain: "work-report-fe3da.firebaseapp.com",
-  projectId: "work-report-fe3da",
-  storageBucket: "work-report-fe3da.appspot.com", // ✅ Corrected line
-  messagingSenderId: "879340317679",
-  appId: "1:879340317679:web:a28e2d3906bca3e927a41a",
-  measurementId: "G-ZR8RGLKB77"
-};
-
-const app = firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.firestore();
-
-  
-
-const modal = document.getElementById('loginModal');
-const openLogin = document.getElementById('openLogin');
-const logoutBtn = document.getElementById('logoutBtn');
-const closeLogin = document.getElementById('closeLogin');
-
-openLogin.onclick = () => modal.style.display = 'flex';
-closeLogin.onclick = () => modal.style.display = 'none';
-
-// Email/Password login
-document.getElementById('loginSubmit').onclick = async () => {
-  const email = document.getElementById('email').value;
-  const pass = document.getElementById('password').value;
-  try {
-    await auth.signInWithEmailAndPassword(email, pass);
-  } catch (e) {
-    if (e.code === 'auth/user-not-found') {
-      await auth.createUserWithEmailAndPassword(email, pass);
-    } else alert(e.message);
-  }
-};
-
-// Forgot password
-document.getElementById('forgotPassword').onclick = async (e) => {
-  e.preventDefault();
-  const email = document.getElementById('email').value;
-  if (!email) return alert("Enter email first!");
-  try {
-    await auth.sendPasswordResetEmail(email);
-    alert("Password reset email sent!");
-  } catch (e) {
-    alert(e.message);
-  }
-};
-
-// Google login
-document.getElementById('googleLogin').onclick = async () => {
-  const provider = new firebase.auth.GoogleAuthProvider();
-  await auth.signInWithPopup(provider);
-};
-
-// Logout
-logoutBtn.onclick = () => auth.signOut();
-
-// Auth state
-auth.onAuthStateChanged(user => {
-  if (user) {
-    openLogin.style.display = 'none';
-    logoutBtn.style.display = 'inline';
-    modal.style.display = 'none';
-    localStorage.setItem('userEmail', user.email);
-    loadUserData(user.email);
-  } else {
-    openLogin.style.display = 'inline';
-    logoutBtn.style.display = 'none';
-    localStorage.clear();
-  }
-});
-
-// 🔥 Sync + restore functions
-function syncToCloud() {
-  const user = auth.currentUser;
-  if (user && userRef) {
-    // Push latest local workData to Firestore
-    userRef.set({ workData }, { merge: true })
-      .then(() => console.log("✅ workData saved to Firestore"))
-      .catch(err => console.error("❌ Firestore write error:", err));
-  }
 }
 
-function loadUserData(email) {
-  const ref = db.collection('users').doc(email);
-  ref.onSnapshot(doc => {
-    if (doc.exists) {
-      const data = doc.data().workData || [];
-      localStorage.setItem('workData', JSON.stringify(data));
-      // TODO: update your UI here (like refresh table/list)
+initTheme();
+
+document.addEventListener('DOMContentLoaded', () => {
+
+    // -----------------------------------------------------------------------------
+    // STATE MANAGEMENT & GLOBAL VARIABLES
+    // -----------------------------------------------------------------------------
+    let user = null;
+    let currentDate = new Date();
+    let workData = {};
+    let reminders = [];
+    
+    const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    const reminderCategories = ['Wedding', 'Nobility Ceremony', 'Birthday', 'House Warming Ceremony', 'Other'];
+    
+    // DOM Elements
+    const authArea = document.getElementById('auth-area');
+    const headerContainer = document.getElementById('header-container');
+    const daysContainer = document.getElementById('daysContainer');
+    const summaryContainer = document.getElementById('summary-container');
+    const modalRoot = document.getElementById('modal-root');
+    const loadingSpinner = document.getElementById('loading-spinner');
+    const appContainer = document.getElementById('app-container');
+    const scrollUpButton = document.getElementById('scrollUpButton');
+    const scrollDownButton = document.getElementById('scrollDownButton');
+
+
+    // -----------------------------------------------------------------------------
+    // UTILITY & HELPER FUNCTIONS
+    // -----------------------------------------------------------------------------
+    const getDaysInMonth = (year, month) => new Date(year, month + 1, 0).getDate();
+    const isWeekend = (year, month, day) => {
+        const d = new Date(year, month, day).getDay();
+        return d === 0 || d === 6;
+    };
+    const calculateHoursDifference = (inTime, outTime) => {
+        if (!inTime || !outTime) return 0;
+        const [inH, inM] = inTime.split(':').map(Number);
+        const [outH, outM] = outTime.split(':').map(Number);
+        const inMinutes = inH * 60 + inM;
+        const outMinutes = outH * 60 + outM;
+        if (outMinutes < inMinutes) return 0;
+        return (outMinutes - inMinutes) / 60;
+    };
+
+    // -----------------------------------------------------------------------------
+    // MODAL RENDERING & MANAGEMENT
+    // -----------------------------------------------------------------------------
+    const openModal = (modalHTML) => {
+        modalRoot.innerHTML = modalHTML;
+        // Attach close listeners to all elements with data-dismiss="modal"
+        modalRoot.querySelectorAll('[data-dismiss="modal"]').forEach(el => {
+            el.addEventListener('click', closeModal);
+        });
+    };
+    
+    const closeModal = () => {
+        modalRoot.innerHTML = '';
+    };
+
+    const createModal = (title, content, id = '') => {
+        return `
+            <div id="${id}" class="fixed inset-0 bg-gray-900 bg-opacity-50 backdrop-blur-sm flex justify-center items-center z-50 p-4 modal-bg-animate" data-dismiss="modal">
+                <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-md transform transition-all modal-content-animate" onclick="event.stopPropagation()">
+                    <div class="flex justify-between items-center p-6 border-b border-gray-200 dark:border-gray-800">
+                        <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100">${title}</h2>
+                        <button data-dismiss="modal" class="text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        </button>
+                    </div>
+                    <div class="p-6">${content}</div>
+                </div>
+            </div>
+        `;
+    };
+
+    // -----------------------------------------------------------------------------
+    // COMPONENT RENDERING (as HTML strings)
+    // -----------------------------------------------------------------------------
+
+    const renderAuthArea = () => {
+        authArea.innerHTML = `
+            ${user 
+                ? `<div class="flex items-center gap-2">
+                        <span class="text-sm text-gray-600 dark:text-gray-400 hidden sm:block">Welcome, ${user.email}</span>
+                        <button id="logout-btn" class="flex items-center gap-2 text-sm font-semibold bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 px-3 py-2 rounded-lg shadow-sm border border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                            <span class="hidden sm:inline">Logout</span>
+                        </button>
+                   </div>`
+                : `<button id="login-btn" class="text-sm font-semibold bg-blue-600 text-white px-4 py-1.5 rounded-lg shadow-sm hover:bg-blue-700 transition-all duration-200">Login</button>`
+            }
+        `;
+        document.getElementById('login-btn')?.addEventListener('click', showAuthModal);
+        document.getElementById('logout-btn')?.addEventListener('click', () => auth.signOut());
     }
-  });
-}
 
+    // Header Component
+    const renderHeader = () => {
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
+        const years = Array.from({ length: 11 }, (_, i) => new Date().getFullYear() - 5 + i);
+        const isDarkMode = document.documentElement.classList.contains('dark');
 
+        headerContainer.innerHTML = `
+            <div class="text-center pb-4 border-b border-gray-200 dark:border-gray-800">
+                <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-50 tracking-tight">Work Journal</h1>
+            </div>
+            <div class="mt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div class="flex items-center gap-2 bg-white dark:bg-gray-900 p-1 rounded-lg border border-gray-200 dark:border-gray-800 shadow-sm">
+                    <button id="prev-month-btn" class="p-2 text-gray-500 hover:bg-gray-100 hover:text-blue-600 dark:text-gray-400 dark:hover:bg-gray-800 rounded-md transition-colors">←</button>
+                    <select id="monthDropdown" class="bg-transparent text-lg font-semibold text-gray-800 dark:text-gray-200 border-none focus:ring-0 premium-select">
+                        ${months.map((m, i) => `<option value="${i}" ${i === month ? "selected" : ""}>${m}</option>`).join("")}
+                    </select>
+                    <select id="yearDropdown" class="bg-transparent text-lg font-semibold text-gray-800 dark:text-gray-200 border-none focus:ring-0 premium-select">
+                        ${years.map(y => `<option value="${y}" ${y === year ? "selected" : ""}>${y}</option>`).join("")}
+                    </select>
+                    <button id="next-month-btn" class="p-2 text-gray-500 hover:bg-gray-100 hover:text-blue-600 dark:text-gray-400 dark:hover:bg-gray-800 rounded-md transition-colors">→</button>
+                </div>
+                <div class="flex items-center gap-2 bg-white dark:bg-gray-900 p-2 rounded-full border border-gray-200 dark:border-gray-800 shadow-sm">
+                    <button id="date-picker-btn" title="Go to Date" class="p-2 text-gray-500 hover:bg-gray-100 hover:text-blue-600 dark:text-gray-400 dark:hover:bg-gray-800 rounded-full transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></button>
+                    <button id="theme-toggle-btn" title="Toggle Theme" class="p-2 text-gray-500 hover:bg-gray-100 hover:text-blue-600 dark:text-gray-400 dark:hover:bg-gray-800 rounded-full transition-colors">
+                        <svg id="theme-icon-sun" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 ${isDarkMode ? '' : 'hidden'}"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                        <svg id="theme-icon-moon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 ${isDarkMode ? 'hidden' : ''}"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    </button>
+                    <button id="reminder-btn" title="Reminders" class="p-2 text-gray-500 hover:bg-gray-100 hover:text-blue-600 dark:text-gray-400 dark:hover:bg-gray-800 rounded-full transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg></button>
+                    <button id="share-btn" title="Share or Export" class="p-2 text-gray-500 hover:bg-gray-100 hover:text-blue-600 dark:text-gray-400 dark:hover:bg-gray-800 rounded-full transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></button>
+                </div>
+            </div>
+        `;
+        addHeaderEventListeners();
+    };
+    
+    // Day Card Component
+    const createDayCardHTML = (day) => {
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
+        const dateKey = `${year}-${month}-${day}`;
+        const dayData = workData[dateKey] || {};
+        const dayName = new Date(year, month, day).toLocaleDateString("en-US", { weekday: "long" });
+        const weekend = isWeekend(year, month, day);
+        const leaveReasonOptions = weekend
+            ? ["", "Poya Day", "Public Holiday", "Custom Reason", "Own Leave", "Normal Leave Day"]
+            : ["", "Poya Day", "Public Holiday", "Custom Reason", "Own Leave"];
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-  // ✅ Realtime Firestore Sync Logic
-  let userRef = null; // Firestore reference
-
-auth.onAuthStateChanged(user => {
-  if (user) {
-    console.log("✅ Logged in:", user.email);
-
-    userRef = db.collection("users").doc(user.uid);
-
-    // 🔹 Create user doc first time if not exists
-    userRef.get().then(docSnap => {
-      if (!docSnap.exists) {
-        userRef.set({
-          email: user.email,
-          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-          workData: {}
-        }).then(() => console.log("🆕 User doc created in Firestore"));
-      }
-    });
-
-    // 🔹 Listen realtime to Firestore
-    userRef.onSnapshot(doc => {
-      if (doc.exists) {
-        const cloudData = doc.data().workData || {};
-        localStorage.setItem("workData", JSON.stringify(cloudData));
-        workData = cloudData;
-        console.log("🔥 Realtime update:", workData);
-        if (typeof renderDays === "function") renderDays();
-      }
-    });
-
-    // 🔹 Save to Firestore before closing tab
-    window.addEventListener("beforeunload", () => {
-      if (userRef) userRef.set({ workData }, { merge: true });
-    });
-
-  } else {
-    console.log("🚪 Logged out, clearing local data");
-    localStorage.clear();
-    workData = {};
-    if (typeof renderDays === "function") renderDays();
-  }
-});
-
-// 🔹 Manual Save Button (optional)
-function saveToCloud() {
-  const user = auth.currentUser;
-  if (user && userRef) {
-    userRef.set({ workData }, { merge: true })
-      .then(() => alert("✅ Synced to Firestore!"));
-  } else {
-    alert("Login first!");
-  }
-}
-
-// 🔹 Logout
-document.getElementById("logoutBtn").addEventListener("click", () => {
-  auth.signOut().then(() => {
-    localStorage.clear();
-    location.reload();
-  });
-});
-
-
-
-
-
-
-
-document.addEventListener("DOMContentLoaded", function(){
-  const auth = firebase.auth();
-  const forgotLink = document.getElementById("forgotPassword"); // your link/button id
-  
-  if(forgotLink){
-    forgotLink.addEventListener("click", async (e)=>{
-      e.preventDefault();
-
-      const emailInput = document.getElementById("email");
-      const email = emailInput.value.trim();
-
-      if(!email){
-        alert("⚠️ Please enter your email first.");
-        return;
-      }
-
-      try {
-        await auth.sendPasswordResetEmail(email);
-        alert("✅ Password reset email sent successfully! Please check your inbox.");
-      } catch(err){
-        if (err.code === "auth/user-not-found") {
-          alert("❌ No user found with this email.");
-        } else if (err.code === "auth/invalid-email") {
-          alert("⚠️ Invalid email format.");
-        } else {
-          alert("❌ Error: " + err.message);
-        }
-      }
-    });
-  }
-});
-
-
-
+        const createInput = (label, field, type, placeholder = '', value = '') => `
+            <div class="flex flex-col">
+                <label class="font-medium text-sm mb-1.5 text-gray-700 dark:text-gray-300">${label}</label>
+                <input type="${type}" placeholder="${placeholder}" value="${value || ''}" data-key="${dateKey}" data-field="${field}" class="p-2 border border-gray-300 rounded-lg bg-gray-50/50 transition duration-200 premium-input dark:bg-gray-800/50 dark:border-gray-700 dark:text-gray-200 dark:placeholder-gray-400" />
+            </div>`;
         
-    </script>
+        const createSelect = (label, field, options, value = '') => `
+            <div class="flex flex-col">
+                <label class="font-medium text-sm mb-1.5 text-gray-700 dark:text-gray-300">${label}</label>
+                <select data-key="${dateKey}" data-field="${field}" class="p-2 border border-gray-300 rounded-lg bg-gray-50/50 transition duration-200 premium-select dark:bg-gray-800/50 dark:border-gray-700 dark:text-gray-200">
+                    ${options.map(opt => `<option value="${opt}" ${opt === value ? 'selected' : ''}>${opt || "Select..."}</option>`).join('')}
+                </select>
+            </div>`;
+
+        return `
+            <div data-day="${day}" class="day-box bg-white dark:bg-gray-900 rounded-2xl p-5 shadow-lg dark:shadow-black/20 border border-gray-200/50 dark:border-gray-800/50 border-b-4 border-b-blue-500 transition-all duration-300 hover:shadow-2xl hover:-translate-y-1">
+                <h3 class="text-lg font-semibold ${weekend ? 'text-red-500 dark:text-red-400' : 'text-gray-900 dark:text-gray-100'} mb-4 pb-4 border-b border-gray-200 dark:border-gray-800">${dayName}, ${months[month]} ${day}, ${year}</h3>
+                
+                <div class="space-y-5">
+                    <!-- Time Tracking Section -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-4">
+                            ${createInput('In Time', 'inTime', 'time', '', dayData.inTime)}
+                            ${createInput('Out Time', 'outTime', 'time', '', dayData.outTime)}
+                        </div>
+                        <div class="space-y-4">
+                            ${createInput('Movement Out', 'movementOut', 'time', '', dayData.movementOut)}
+                            ${createInput('Movement In', 'movementIn', 'time', '', dayData.movementIn)}
+                        </div>
+                    </div>
+
+                    <!-- Work Details Section -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        ${createInput('Team Members', 'teamMembers', 'text', 'e.g., John, Jane', dayData.teamMembers)}
+                        ${createInput('Work Location', 'workLocation', 'text', 'e.g., Office', dayData.workLocation)}
+                        ${createInput('Vehicle Number', 'vehicleNumber', 'text', 'e.g., ABC-1234', dayData.vehicleNumber)}
+                        ${createInput('KM Reading', 'km', 'number', 'e.g., 50', dayData.km)}
+                    </div>
+
+                    <!-- Status & Leave Section -->
+                    <div class="pt-4 border-t border-gray-200 dark:border-gray-800 space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            ${createSelect('Special Day', 'specialDays', ['', 'Poya Day', 'Public Holiday'], dayData.specialDays)}
+                            ${createSelect('Leave Status', 'leaveStatus', ['No', 'Yes'], dayData.leaveStatus || 'No')}
+                        </div>
+                        <div class="pl-4 border-l-2 border-blue-200 dark:border-blue-700 space-y-4 -ml-1">
+                            ${dayData.leaveStatus === 'Yes' ? createSelect('Leave Reason', 'leaveReason', leaveReasonOptions, dayData.leaveReason) : ''}
+                            ${(dayData.leaveStatus === 'Yes' && dayData.leaveReason === 'Custom Reason') ? createInput('Custom Reason Details', 'customReasonDetails', 'text', 'Specify reason', dayData.customReasonDetails) : ''}
+                            ${(dayData.leaveStatus === 'Yes' && dayData.leaveReason === 'Own Leave') ? createInput('Leave Reason Details', 'leaveReasonText', 'text', 'Specify details', dayData.leaveReasonText) : ''}
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+    };
+
+    const renderDays = () => {
+        const daysInMonth = getDaysInMonth(currentDate.getFullYear(), currentDate.getMonth());
+        daysContainer.innerHTML = Array.from({ length: daysInMonth }, (_, i) => createDayCardHTML(i + 1)).join('');
+        addDayCardEventListeners();
+    };
+
+    // Summary Component
+    const renderSummary = () => {
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
+        const monthPrefix = `${year}-${month}`;
+
+        let regularLeaves = 0, specialDays = 0, weekendLeaveDays = 0;
+        let weekendOtHours = 0, satSunOtHours = 0, poyaPublicOtHours = 0;
+
+        Object.keys(workData).forEach(key => {
+            if (key.startsWith(monthPrefix)) {
+                const data = workData[key];
+                const day = parseInt(key.split('-')[2], 10);
+                const weekend = isWeekend(year, month, day);
+                const isSpecial = data.specialDays === "Poya Day" || data.specialDays === "Public Holiday";
+                const workingHours = calculateHoursDifference(data.inTime, data.outTime);
+
+                if (workingHours > 0) {
+                     if (isSpecial) poyaPublicOtHours += workingHours;
+                     else if (weekend) satSunOtHours += workingHours;
+                     else if (workingHours > 9) weekendOtHours += workingHours - 9;
+                }
+               
+                if (data.leaveReason === "Own Leave" || (data.leaveReason === "Custom Reason" && !weekend && !isSpecial)) regularLeaves++;
+                else if (data.leaveReason === "Poya Day" || data.leaveReason === "Public Holiday" || (data.leaveReason === "Custom Reason" && (weekend || isSpecial))) specialDays++;
+                
+                if (weekend && data.leaveReason === "Normal Leave Day") weekendLeaveDays++;
+            }
+        });
+        const totalOtHours = weekendOtHours + satSunOtHours + poyaPublicOtHours;
+
+        summaryContainer.innerHTML = `
+            <div class="mt-8 p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-800/50">
+                <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-4">Monthly Summary</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3 text-gray-600 dark:text-gray-300">
+                    <p>Leave Days (Regular): <span class="font-semibold text-gray-800 dark:text-gray-100">${regularLeaves}</span></p>
+                    <p>Leave Days (Poya/Public): <span class="font-semibold text-gray-800 dark:text-gray-100">${specialDays}</span></p>
+                    <p>Leave Days (Weekend): <span class="font-semibold text-gray-800 dark:text-gray-100">${weekendLeaveDays}</span></p>
+                    <div class="md:col-span-2 my-2 border-t border-gray-200 dark:border-gray-800"></div>
+                    <p>Weekday OT Hours: <span class="font-semibold text-gray-800 dark:text-gray-100">${weekendOtHours.toFixed(2)}</span> hours</p>
+                    <p>Weekend OT Hours: <span class="font-semibold text-gray-800 dark:text-gray-100">${satSunOtHours.toFixed(2)}</span> hours</p>
+                    <p>Poya/Public OT Hours: <span class="font-semibold text-gray-800 dark:text-gray-100">${poyaPublicOtHours.toFixed(2)}</span> hours</p>
+                    <p class="md:col-span-2 text-lg font-bold text-blue-600 dark:text-blue-400">Total OT Hours: <span id="totalOtHours">${totalOtHours.toFixed(2)}</span> hours</p>
+                </div>
+                <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-800 flex flex-col sm:flex-row gap-4">
+                    <button id="backup-btn" class="w-full sm:w-auto flex-1 bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 font-semibold px-4 py-2 rounded-lg border border-blue-200 dark:border-blue-900 hover:bg-blue-100 dark:hover:bg-blue-950 transition">Backup Month Data</button>
+                    <label class="w-full sm:w-auto flex-1 bg-green-50 dark:bg-green-950/50 text-green-700 dark:text-green-300 font-semibold px-4 py-2 rounded-lg border border-green-200 dark:border-green-900 hover:bg-green-100 dark:hover:bg-green-950 transition text-center cursor-pointer">
+                        Restore Month Data
+                        <input type="file" id="restore-file-input" class="hidden" accept=".json" />
+                    </label>
+                    <button id="clear-month-btn" class="w-full sm:w-auto flex-1 bg-red-50 dark:bg-red-950/50 text-red-700 dark:text-red-300 font-semibold px-4 py-2 rounded-lg border border-red-200 dark:border-red-900 hover:bg-red-100 dark:hover:bg-red-950 transition">Clear Month Data</button>
+                </div>
+            </div>`;
+        addSummaryEventListeners();
+    };
+
+    // -----------------------------------------------------------------------------
+    // DATA HANDLING & STATE UPDATES
+    // -----------------------------------------------------------------------------
+    const updateWorkData = (dateKey, field, value) => {
+        workData[dateKey] = workData[dateKey] || {};
+        workData[dateKey][field] = value;
+
+        // Conditional logic from original app
+        if (field === 'leaveStatus' && value !== 'Yes') {
+            delete workData[dateKey].leaveReason;
+            delete workData[dateKey].customReasonDetails;
+            delete workData[dateKey].leaveReasonText;
+        }
+        if (field === 'leaveReason' && value !== 'Custom Reason') {
+            delete workData[dateKey].customReasonDetails;
+        }
+        if (field === 'leaveReason' && value !== 'Own Leave') {
+            delete workData[dateKey].leaveReasonText;
+        }
+
+        // Save and re-render
+        saveLocalData();
+        syncToCloud();
+        
+        // Full re-render is needed if leave status changes to show/hide fields
+        if(field === 'leaveStatus' || field === 'leaveReason') {
+            renderAll();
+        } else {
+            renderSummary();
+        }
+    };
+    
+    const saveLocalData = () => {
+        if (!user) { // Only save to local storage if not logged in
+            localStorage.setItem('workData', JSON.stringify(workData));
+        }
+        localStorage.setItem('reminders', JSON.stringify(reminders));
+    };
+
+    // -----------------------------------------------------------------------------
+    // EVENT LISTENERS
+    // -----------------------------------------------------------------------------
+    const handleThemeToggle = () => {
+        const currentTheme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+        applyTheme(currentTheme === 'light' ? 'dark' : 'light');
+    }
+
+    const addHeaderEventListeners = () => {
+        document.getElementById('prev-month-btn').addEventListener('click', () => navigateMonth(-1));
+        document.getElementById('next-month-btn').addEventListener('click', () => navigateMonth(1));
+        document.getElementById('monthDropdown').addEventListener('change', (e) => {
+            currentDate.setMonth(parseInt(e.target.value));
+            renderAll();
+        });
+        document.getElementById('yearDropdown').addEventListener('change', (e) => {
+            currentDate.setFullYear(parseInt(e.target.value));
+            renderAll();
+        });
+        document.getElementById('theme-toggle-btn').addEventListener('click', handleThemeToggle);
+        document.getElementById('reminder-btn').addEventListener('click', showReminderModal);
+        document.getElementById('share-btn').addEventListener('click', showShareModal);
+        document.getElementById('date-picker-btn').addEventListener('click', showDatePickerModal);
+    };
+
+    const addDayCardEventListeners = () => {
+        daysContainer.querySelectorAll('input, select').forEach(el => {
+            el.addEventListener('change', (e) => {
+                const { key, field } = e.target.dataset;
+                updateWorkData(key, field, e.target.value);
+            });
+        });
+    };
+
+    const addSummaryEventListeners = () => {
+        document.getElementById('clear-month-btn').addEventListener('click', handleClearMonthData);
+        document.getElementById('backup-btn').addEventListener('click', handleBackup);
+        document.getElementById('restore-file-input').addEventListener('change', handleRestore);
+    };
+
+    // Scroll button listeners
+    window.addEventListener('scroll', () => {
+        const isAtTop = window.scrollY < 100;
+        const isAtBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 100;
+        scrollUpButton.classList.toggle('hidden', isAtTop);
+        scrollDownButton.classList.toggle('hidden', isAtBottom);
+    });
+    scrollUpButton.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+    scrollDownButton.addEventListener('click', () => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'smooth' }));
+
+    // -----------------------------------------------------------------------------
+    // ACTION HANDLERS (Modals, Backup, etc.)
+    // -----------------------------------------------------------------------------
+    const navigateMonth = (direction) => {
+        currentDate.setMonth(currentDate.getMonth() + direction);
+        renderAll();
+    };
+
+    const handleClearMonthData = () => {
+        if (window.confirm("Are you sure you want to clear all data for this month? This action cannot be undone.")) {
+            const monthPrefix = `${currentDate.getFullYear()}-${currentDate.getMonth()}`;
+            Object.keys(workData).forEach(key => {
+                if (key.startsWith(monthPrefix)) delete workData[key];
+            });
+            saveLocalData();
+            syncToCloud();
+            renderAll();
+        }
+    };
+    
+    const handleBackup = () => {
+        const monthPrefix = `${currentDate.getFullYear()}-${currentDate.getMonth()}`;
+        const monthData = Object.keys(workData)
+            .filter(key => key.startsWith(monthPrefix))
+            .reduce((obj, key) => {
+                obj[key] = workData[key];
+                return obj;
+            }, {});
+        
+        if (Object.keys(monthData).length === 0) return alert("No data for this month to backup.");
+        const blob = new Blob([JSON.stringify(monthData, null, 2)], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `WorkData_${currentDate.getFullYear()}_${currentDate.getMonth() + 1}.json`;
+        a.click();
+        URL.revokeObjectURL(a.href);
+    };
+
+    const handleRestore = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            try {
+                const restoredData = JSON.parse(event.target.result);
+                workData = { ...workData, ...restoredData };
+                saveLocalData();
+                syncToCloud();
+                renderAll();
+                alert("Data restored successfully.");
+            } catch (err) {
+                alert("Error restoring data. Invalid file.");
+            }
+        };
+        reader.readAsText(file);
+        e.target.value = '';
+    };
+
+    // -----------------------------------------------------------------------------
+    // MODAL CONTENT AND LOGIC
+    // -----------------------------------------------------------------------------
+    
+    const showAuthModal = () => {
+        const content = `
+            <div class="space-y-4">
+                 <div>
+                    <label for="email" class="font-medium text-sm mb-1.5 text-gray-700 dark:text-gray-300">Email</label>
+                    <input id="auth-email" type="email" placeholder="Enter your email" class="p-2 w-full border border-gray-300 rounded-lg bg-gray-50/50 transition duration-200 premium-input dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200" />
+                </div>
+                <div>
+                    <label for="password" class="font-medium text-sm mb-1.5 text-gray-700 dark:text-gray-300">Password</label>
+                    <input id="auth-password" type="password" placeholder="Enter your password" class="p-2 w-full border border-gray-300 rounded-lg bg-gray-50/50 transition duration-200 premium-input dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200" />
+                    <div class="text-right mt-2">
+                        <button id="forgot-password-btn" class="text-xs font-medium text-blue-600 hover:underline dark:text-blue-400">Forgot Password?</button>
+                    </div>
+                </div>
+                <p id="auth-error" class="text-red-500 text-sm h-4"></p>
+                <button id="auth-submit" class="w-full px-5 py-2.5 rounded-lg font-semibold text-sm shadow-sm transition-all duration-200 transform hover:scale-[1.03] bg-blue-600 text-white hover:bg-blue-700">Login / Sign Up</button>
+                <div class="relative my-4"><div class="absolute inset-0 flex items-center"><div class="w-full border-t border-gray-300 dark:border-gray-700"></div></div><div class="relative flex justify-center text-sm"><span class="px-2 bg-white dark:bg-gray-900 text-gray-500">Or</span></div></div>
+                <button id="google-login" class="w-full flex items-center justify-center gap-3 px-5 py-2.5 rounded-lg font-semibold text-sm shadow-sm transition-all duration-200 transform hover:scale-[1.03] bg-white text-gray-800 border border-gray-300 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-700">
+                    <svg class="w-5 h-5" viewBox="0 0 48 48"><path fill="#4285F4" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path><path fill="#34A853" d="M46.98 24.55c0-1.57-.15-3.09-.42-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path><path fill="#EA4335" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path><path fill="none" d="M0 0h48v48H0z"></path></svg>
+                    Sign in with Google
+                </button>
+            </div>
+        `;
+        openModal(createModal('Login or Sign Up', content));
+        
+        // Add event listeners for the auth modal
+        document.getElementById('forgot-password-btn').addEventListener('click', async () => {
+            const email = document.getElementById('auth-email').value;
+            const errorEl = document.getElementById('auth-error');
+            errorEl.classList.remove('text-green-500', 'dark:text-green-400');
+            errorEl.classList.add('text-red-500');
+
+            if (!email) {
+                errorEl.textContent = 'Please enter your email to reset password.';
+                return;
+            }
+
+            try {
+                await auth.sendPasswordResetEmail(email);
+                errorEl.textContent = 'Password reset email sent! Check your inbox.';
+                errorEl.classList.remove('text-red-500');
+                errorEl.classList.add('text-green-500', 'dark:text-green-400');
+            } catch (error) {
+                errorEl.textContent = error.message;
+            }
+        });
+
+        document.getElementById('auth-submit').addEventListener('click', async () => {
+            const email = document.getElementById('auth-email').value;
+            const password = document.getElementById('auth-password').value;
+            const errorEl = document.getElementById('auth-error');
+            errorEl.textContent = '';
+            errorEl.classList.remove('text-green-500', 'dark:text-green-400');
+            errorEl.classList.add('text-red-500');
+            
+            try {
+                await auth.signInWithEmailAndPassword(email, password);
+                closeModal();
+            } catch (e) {
+                if (e.code === 'auth/user-not-found' || e.code === 'auth/wrong-password') {
+                     try {
+                        await auth.createUserWithEmailAndPassword(email, password);
+                        closeModal();
+                    } catch (signUpError) {
+                        errorEl.textContent = signUpError.message;
+                    }
+                } else {
+                    errorEl.textContent = e.message;
+                }
+            }
+        });
+
+        document.getElementById('google-login').addEventListener('click', async () => {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            try {
+                await auth.signInWithPopup(provider);
+                closeModal();
+            } catch (e) {
+                document.getElementById('auth-error').textContent = e.message;
+            }
+        });
+    };
+    
+    const showReminderModal = () => {
+        // This function will render the list view or the form view inside the modal
+        const renderReminderContent = (isAdding = false, editingIndex = null) => {
+            let content = '';
+            if (isAdding) {
+                const reminder = editingIndex !== null ? reminders[editingIndex] : {};
+                content = `
+                    <div class="space-y-4" id="reminder-form">
+                        <div>
+                            <label class="font-medium text-sm mb-1.5 text-gray-700 dark:text-gray-300">Category</label>
+                            <select id="reminder-category" class="w-full p-2 border border-gray-300 rounded-lg bg-gray-50/50 transition duration-200 premium-select dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200">
+                                ${reminderCategories.map(c => `<option value="${c}" ${c === reminder.category ? 'selected' : ''}>${c}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div id="custom-details-container" class="${reminder.category === 'Other' ? '' : 'hidden'}">
+                             <label class="font-medium text-sm mb-1.5 text-gray-700 dark:text-gray-300">Custom Details</label>
+                             <input type="text" id="reminder-custom" placeholder="Specify your reminder" value="${reminder.customDetails || ''}" class="w-full p-2 border border-gray-300 rounded-lg bg-gray-50/50 transition duration-200 premium-input dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200" />
+                        </div>
+                        <div>
+                            <label class="font-medium text-sm mb-1.5 text-gray-700 dark:text-gray-300">Date</label>
+                            <input type="date" id="reminder-date" value="${reminder.date || ''}" class="w-full p-2 border border-gray-300 rounded-lg bg-gray-50/50 transition duration-200 premium-input dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200" />
+                        </div>
+                        <div class="flex gap-3 mt-4">
+                            <button id="cancel-reminder" class="w-full px-5 py-2.5 rounded-lg font-semibold text-sm shadow-sm transition-all duration-200 transform hover:scale-[1.03] bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700">Cancel</button>
+                            <button id="save-reminder" class="w-full px-5 py-2.5 rounded-lg font-semibold text-sm shadow-sm transition-all duration-200 transform hover:scale-[1.03] bg-blue-600 text-white hover:bg-blue-700">${editingIndex !== null ? 'Save Changes' : 'Save Reminder'}</button>
+                        </div>
+                    </div>
+                `;
+            } else {
+                content = `
+                    <div id="reminderList" class="space-y-3 max-h-96 overflow-y-auto pr-2">
+                        ${reminders.length > 0 ? reminders.map((r, i) => `
+                            <div class="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg border dark:border-gray-700">
+                                <div>
+                                    <p class="font-semibold text-gray-800 dark:text-gray-200">${r.category}</p>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">${new Date(r.date).toLocaleDateString()}</p>
+                                    ${r.category === 'Other' ? `<p class="text-sm text-gray-500 dark:text-gray-400 italic">${r.customDetails}</p>` : ''}
+                                </div>
+                                <div class="flex gap-2">
+                                    <button class="edit-reminder-btn text-sm text-blue-600 dark:text-blue-400 hover:underline" data-index="${i}">Edit</button>
+                                    <button class="remove-reminder-btn text-sm text-red-600 dark:text-red-400 hover:underline" data-index="${i}">Remove</button>
+                                </div>
+                            </div>
+                        `).join('') : '<p class="text-gray-500 text-center py-4">No reminders set.</p>'}
+                    </div>
+                    <button id="add-reminder-btn" class="mt-4 w-full px-5 py-2.5 rounded-lg font-semibold text-sm shadow-sm transition-all duration-200 transform hover:scale-[1.03] bg-blue-600 text-white hover:bg-blue-700">Add New Reminder</button>
+                `;
+            }
+            openModal(createModal('Your Reminders', content, 'reminder-modal'));
+
+            // Add event listeners for this specific modal content
+            if (isAdding) {
+                document.getElementById('cancel-reminder').addEventListener('click', () => renderReminderContent());
+                document.getElementById('save-reminder').addEventListener('click', () => {
+                    const newReminder = {
+                        category: document.getElementById('reminder-category').value,
+                        date: document.getElementById('reminder-date').value,
+                        customDetails: document.getElementById('reminder-custom').value,
+                    };
+                    if (!newReminder.date) return alert('Please select a date.');
+                    if (editingIndex !== null) {
+                        reminders[editingIndex] = newReminder;
+                    } else {
+                        reminders.push(newReminder);
+                    }
+                    saveLocalData();
+                    renderReminderContent(); // Re-render list view
+                });
+                 document.getElementById('reminder-category').addEventListener('change', (e) => {
+                    document.getElementById('custom-details-container').classList.toggle('hidden', e.target.value !== 'Other');
+                });
+            } else {
+                document.getElementById('add-reminder-btn').addEventListener('click', () => renderReminderContent(true));
+                document.querySelectorAll('.edit-reminder-btn').forEach(btn => btn.addEventListener('click', (e) => renderReminderContent(true, e.target.dataset.index)));
+                document.querySelectorAll('.remove-reminder-btn').forEach(btn => btn.addEventListener('click', (e) => {
+                    reminders.splice(e.target.dataset.index, 1);
+                    saveLocalData();
+                    renderReminderContent(); // Re-render list
+                }));
+            }
+        };
+        renderReminderContent(); // Initial render of the modal
+    };
+
+    const showDatePickerModal = () => {
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
+        const today = new Date();
+        const isCurrentMonthView = today.getFullYear() === year && today.getMonth() === month;
+
+        const firstDayOfMonth = (new Date(year, month, 1).getDay() + 6) % 7; // 0=Mon, 6=Sun
+        const daysInMonth = getDaysInMonth(year, month);
+
+        const dayLabels = ['M', 'T', 'W', 'T', 'F', 'S', 'S'].map(label => `
+            <div class="text-center font-bold text-xs text-gray-500 dark:text-gray-400">${label}</div>
+        `).join('');
+
+        let daysGrid = '';
+
+        // Add padding for days before the start of the month
+        for (let i = 0; i < firstDayOfMonth; i++) {
+            daysGrid += '<div></div>';
+        }
+
+        // Add days of the month
+        for (let day = 1; day <= daysInMonth; day++) {
+            const dateKey = `${year}-${month}-${day}`;
+            const hasData = workData[dateKey] && Object.keys(workData[dateKey]).length > 0;
+            const isToday = isCurrentMonthView && day === today.getDate();
+            
+            const highlightClass = isToday ? 'bg-blue-600 text-white' : 'hover:bg-blue-100 dark:hover:bg-gray-700';
+            
+            daysGrid += `
+                <button data-day="${day}" class="date-select-btn relative flex items-center justify-center h-10 w-10 rounded-full text-sm font-medium text-gray-700 dark:text-gray-300 ${highlightClass} transition-colors">
+                    ${day}
+                    ${hasData ? '<div class="absolute bottom-1.5 h-1.5 w-1.5 bg-green-500 rounded-full"></div>' : ''}
+                </button>
+            `;
+        }
+
+        const content = `
+            <div class="grid grid-cols-7 gap-y-2 gap-x-1 items-center">
+                ${dayLabels}
+                ${daysGrid}
+            </div>
+        `;
+        
+        openModal(createModal('Go to Date', content));
+        
+        document.querySelectorAll('.date-select-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const day = e.currentTarget.dataset.day;
+                const dayEl = document.querySelector(`.day-box[data-day="${day}"]`);
+                if (dayEl) {
+                    dayEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                closeModal();
+            });
+        });
+    };
+
+    const showShareModal = () => {
+        const totalOt = document.getElementById('totalOtHours')?.textContent || 'N/A';
+        const summaryText = `Work Report Summary for ${months[currentDate.getMonth()]} ${currentDate.getFullYear()}:\n- Total OT Hours: ${totalOt} hours.`;
+        
+        const content = `
+            <div class="space-y-4">
+                <div class="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg border dark:border-gray-700">
+                    <h3 class="font-semibold text-gray-800 dark:text-gray-200 mb-2">Summary Preview</h3>
+                    <pre class="text-sm text-gray-600 dark:text-gray-300 whitespace-pre-wrap">${summaryText}</pre>
+                </div>
+                <button id="copy-summary-btn" class="w-full px-5 py-2.5 rounded-lg font-semibold text-sm shadow-sm transition-all bg-blue-600 text-white hover:bg-blue-700">Copy Summary as Text</button>
+                <button id="export-pdf-btn" class="w-full px-5 py-2.5 rounded-lg font-semibold text-sm shadow-sm transition-all bg-white text-gray-800 border border-gray-300 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-700">Export Month Data as PDF</button>
+            </div>
+        `;
+        openModal(createModal('Share & Export', content));
+
+        document.getElementById('copy-summary-btn').addEventListener('click', () => {
+             navigator.clipboard.writeText(summaryText)
+                .then(() => alert('Summary copied to clipboard!'))
+                .catch(() => alert('Failed to copy summary.'));
+        });
+        document.getElementById('export-pdf-btn').addEventListener('click', showExportPreview);
+    };
+
+    const showExportPreview = () => {
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
+        const daysInMonth = getDaysInMonth(year, month);
+
+        const tableRows = Array.from({ length: daysInMonth }, (_, i) => {
+            const day = i + 1;
+            const dateKey = `${year}-${month}-${day}`;
+            const dayData = workData[dateKey] || {};
+            const formattedDate = `${String(day).padStart(2, '0')}.${String(month + 1).padStart(2, '0')}.${year}`;
+            const leaveStatusText = dayData.leaveStatus || 'No';
+            const weekend = isWeekend(year, month, day);
+
+            let rowClass = 'border-b border-gray-200';
+            if (leaveStatusText === 'Yes') {
+                rowClass += ' bg-blue-100'; // Light blue for leave days
+            }
+            
+            const dateClass = weekend ? 'text-red-500 font-bold' : '';
+            const leaveStatusHTML = leaveStatusText === 'Yes' 
+                ? `<span class="text-blue-600 font-bold">${leaveStatusText}</span>` 
+                : leaveStatusText;
+
+            return `
+                <tr class="${rowClass}">
+                    <td class="p-2 border-x border-gray-200 ${dateClass}">${formattedDate}</td>
+                    <td class="p-2 border-x border-gray-200">${dayData.inTime || '-'}</td>
+                    <td class="p-2 border-x border-gray-200">${dayData.outTime || '-'}</td>
+                    <td class="p-2 border-x border-gray-200">${dayData.movementOut || '-'}</td>
+                    <td class="p-2 border-x border-gray-200">${dayData.movementIn || '-'}</td>
+                    <td class="p-2 border-x border-gray-200 truncate max-w-[60px]">${dayData.teamMembers || '-'}</td>
+                    <td class="p-2 border-x border-gray-200 truncate max-w-[60px]">${dayData.workLocation || '-'}</td>
+                    <td class="p-2 border-x border-gray-200">${dayData.vehicleNumber || '-'}</td>
+                    <td class="p-2 border-x border-gray-200">${dayData.km || '-'}</td>
+                    <td class="p-2 border-x border-gray-200">${dayData.specialDays || '-'}</td>
+                    <td class="p-2 border-x border-gray-200">${leaveStatusHTML}</td>
+                    <td class="p-2 border-x border-gray-200 truncate max-w-[70px]">${dayData.leaveReason || '-'}</td>
+                </tr>`;
+        }).join('');
+
+        const previewHTML = `
+            <div class="fixed inset-0 bg-gray-900 bg-opacity-70 flex justify-center items-center z-50 p-4 overflow-auto modal-bg-animate" data-dismiss="modal">
+                <div class="bg-white rounded-lg shadow-2xl w-full max-w-7xl transform transition-all modal-content-animate" onclick="event.stopPropagation()">
+                    <div class="p-4 sm:p-6 sticky top-0 bg-white border-b z-10 flex flex-col sm:flex-row justify-between items-center gap-3">
+                        <h2 class="text-xl font-bold text-center sm:text-left">Export Preview: ${months[month]} ${year}</h2>
+                        <div class="flex gap-3">
+                            <button id="generate-pdf-btn" class="px-5 py-2.5 rounded-lg font-semibold text-sm shadow-sm transition-all bg-blue-600 text-white hover:bg-blue-700">Download as PDF</button>
+                            <button data-dismiss="modal" class="px-5 py-2.5 rounded-lg font-semibold text-sm shadow-sm transition-all bg-white text-gray-800 border border-gray-300 hover:bg-gray-100">Close</button>
+                        </div>
+                    </div>
+                    <div id="export-content" class="p-6 bg-white text-black">
+                        <div class="text-center mb-4">
+                            <h2 class="text-xl font-bold">Work Data Sheet</h2>
+                            <p class="text-md font-semibold">Name: T.Jeyaraman | Service No: 016696</p>
+                            <h3 class="text-lg font-semibold">${months[month]} ${year}</h3>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full text-xs border-collapse border-y border-gray-200">
+                                <thead class="bg-gray-100 text-gray-700">
+                                    <tr>
+                                        ${['Day', 'In', 'Out', 'Mov Out', 'Mov In', 'Team', 'Location', 'Vehicle', 'KM', 'Special', 'Leave', 'Reason'].map(h => 
+                                            `<th class="p-2 border-x border-gray-200 font-semibold">${h}</th>`
+                                        ).join('')}
+                                    </tr>
+                                </thead>
+                                <tbody class="text-black text-center">${tableRows}</tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+        openModal(previewHTML);
+
+        document.getElementById('generate-pdf-btn').addEventListener('click', () => {
+            const el = document.getElementById('export-content');
+            const spinner = document.getElementById('loading-spinner');
+            spinner.style.display = 'flex';
+
+            html2canvas(el, { scale: 3, useCORS: true, backgroundColor: '#ffffff' }).then(canvas => {
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+                const imgData = canvas.toDataURL('image/png');
+                const pdfWidth = pdf.internal.pageSize.getWidth();
+                const pdfHeight = pdf.internal.pageSize.getHeight();
+                
+                const pdfRatio = pdfWidth / pdfHeight;
+                const canvasRatio = canvas.width / canvas.height;
+                let imgWidth, imgHeight;
+
+                if (canvasRatio > pdfRatio) {
+                    // Canvas is wider than the PDF page, so fit to width
+                    imgWidth = pdfWidth;
+                    imgHeight = pdfWidth / canvasRatio;
+                } else {
+                    // Canvas is taller than or has the same ratio as the PDF page, so fit to height
+                    imgHeight = pdfHeight;
+                    imgWidth = pdfHeight * canvasRatio;
+                }
+
+                const x = (pdfWidth - imgWidth) / 2;
+                const y = (pdfHeight - imgHeight) / 2;
+
+                pdf.addImage(imgData, 'PNG', x, y, imgWidth, imgHeight);
+                pdf.save(`Work_Report_${year}_${month + 1}.pdf`);
+                spinner.style.display = 'none';
+
+            }).catch(err => {
+                console.error('PDF generation failed:', err);
+                alert('Sorry, there was an error generating the PDF.');
+                spinner.style.display = 'none';
+            });
+        });
+    };
+
+    // -----------------------------------------------------------------------------
+    // FIREBASE & INITIALIZATION
+    // -----------------------------------------------------------------------------
+    const firebaseConfig = {
+      apiKey: "AIzaSyDzaAqT7NRAyQhTNDh8GsMKlTKNmttzIWo",
+      authDomain: "work-report-fe3da.firebaseapp.com",
+      projectId: "work-report-fe3da",
+      storageBucket: "work-report-fe3da.appspot.com",
+      messagingSenderId: "879340317679",
+      appId: "1:879340317679:web:a28e2d3906bca3e927a41a",
+      measurementId: "G-ZR8RGLKB77"
+    };
+
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    let userRefUnsubscribe = null;
+
+    const syncToCloud = () => {
+        if (user) {
+            db.collection("users").doc(user.uid).set({ workData }, { merge: true })
+                .catch(err => console.error("Firestore write error:", err));
+        }
+    };
+
+    auth.onAuthStateChanged(currentUser => {
+        user = currentUser;
+
+        if (userRefUnsubscribe) {
+            userRefUnsubscribe(); // Detach previous listener
+            userRefUnsubscribe = null;
+        }
+
+        if (user) {
+            const userRef = db.collection("users").doc(user.uid);
+            userRefUnsubscribe = userRef.onSnapshot(doc => {
+                if (doc.exists) {
+                    workData = doc.data()?.workData || {};
+                }
+                initializeApp(); // Re-render with user data
+            }, err => {
+                console.error("Firestore snapshot error: ", err);
+                initializeApp(); // Continue with local data on error
+            });
+        } else {
+            // Not logged in, load from local storage
+            workData = JSON.parse(localStorage.getItem('workData') || '{}');
+            initializeApp();
+        }
+    });
+    
+    // Main Render Function
+    const renderAll = () => {
+        renderAuthArea();
+        renderHeader();
+        renderDays();
+        renderSummary();
+    };
+
+    const initializeApp = () => {
+        reminders = JSON.parse(localStorage.getItem('reminders') || '[]');
+        renderAll();
+        loadingSpinner.style.display = 'none';
+        appContainer.classList.add('fade-in');
+        appContainer.style.opacity = '1';
+    };
+});
+</script>
+<script type="module" src="/index.tsx"></script>
 </body>
 </html>
