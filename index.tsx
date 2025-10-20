@@ -7,7 +7,7 @@ declare global {
 }
 
 // Directly use the API key provided by the user.
-const apiKey = "AIzaSyCppq-j59GI9USv1Y0v2miQEn9y_7NfIWM";
+const apiKey = "AIzaSyDzaAqT7NRAyQhTNDh8GsMKlTKNmttzIWo";
 const ai = new GoogleGenAI({ apiKey: apiKey });
 
 window.generateProfessionalMessage = async (userInput: string) => {
