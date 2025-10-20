@@ -6,30 +6,26 @@ declare global {
   }
 }
 
-// Defensive check in case the API key is not provided by the environment
-if (!process.env.API_KEY) {
-  console.error("Gemini API key is not available.");
-  // Provide a fallback function so the app doesn't crash when the button is clicked
-  window.generateProfessionalMessage = async () => {
-    alert("AI Assistant is not configured correctly (API key is missing).");
-    return "AI Assistant is currently unavailable.";
-  };
-} else {
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// Directly use the API key provided by the user.
+const apiKey = "AIzaSyCppq-j59GI9USv1Y0v2miQEn9y_7NfIWM";
+const ai = new GoogleGenAI({ apiKey: apiKey });
 
-  window.generateProfessionalMessage = async (userInput: string) => {
-    try {
-      const prompt = `You are an expert in converting informal 'Tanglish' (a mix of Tamil and English) text into professional, formal English. Convert the following message into a polite and professional English sentence suitable for a workplace context. Do not add any explanations, preamble, or markdown formatting. Just provide the converted sentence as plain text. Tanglish message: "${userInput}"`;
+window.generateProfessionalMessage = async (userInput: string) => {
+  try {
+    const prompt = `You are an expert in converting informal 'Tanglish' (a mix of Tamil and English) text into professional, formal English. Convert the following message into a polite and professional English sentence suitable for a workplace context. Do not add any explanations, preamble, or markdown formatting. Just provide the converted sentence as plain text. Tanglish message: "${userInput}"`;
 
-      const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
-        contents: prompt,
-      });
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: prompt,
+    });
 
-      return response.text.trim();
-    } catch (error) {
-      console.error("Error calling Gemini API:", error);
-      return "Sorry, there was an error processing your request. Please try again.";
+    return response.text.trim();
+  } catch (error) {
+    console.error("Error calling Gemini API:", error);
+    // Provide a more specific error message if the API key is invalid.
+    if (error.toString().includes('API key not valid')) {
+        return "The provided API key is not valid. Please check the key and try again.";
     }
-  };
-}
+    return "Sorry, there was an error processing your request. Please try again.";
+  }
+};
