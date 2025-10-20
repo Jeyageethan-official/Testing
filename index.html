@@ -1,0 +1,1308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Work Journal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class', // enable dark mode based on class
+        }
+    </script>
+    
+    <!-- Firebase Libraries -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+    
+    <!-- PDF/Image Export Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <style>
+        :root {
+            --bg-light: #f8f9fa; /* A clean, near-white */
+            --bg-dark-start: #111827;
+            --bg-dark-end: #000000;
+        }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            transition: background 0.3s ease;
+        }
+        /* Smoother theme transitions */
+        body, .bg-white, .bg-gray-50, .dark .dark\:bg-gray-900, .dark .dark\:bg-gray-950, .premium-input, .premium-select {
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+        html:not(.dark) body {
+            background-color: var(--bg-light);
+        }
+        html.dark body {
+            background: linear-gradient(135deg, var(--bg-dark-start) 0%, var(--bg-dark-end) 100%);
+        }
+
+        /* Webkit scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #c3cfe2;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8b8d0;
+        }
+        html.dark ::-webkit-scrollbar-track {
+            background: #111827;
+        }
+        html.dark ::-webkit-scrollbar-thumb {
+            background: #374151;
+        }
+        html.dark ::-webkit-scrollbar-thumb:hover {
+            background: #4b5563;
+        }
+
+        /* Page fade-in animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        /* Modal animations */
+        @keyframes modal-in {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .modal-content-animate {
+            animation: modal-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .modal-bg-animate {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+
+        /* Premium input focus glow */
+        .premium-input:focus,
+        .premium-select:focus {
+             border-color: #1559b3;
+             box-shadow: 0 0 0 3px rgba(21, 89, 179, 0.2);
+             outline: none;
+        }
+        html.dark .premium-input:focus,
+        html.dark .premium-select:focus {
+             border-color: #60a5fa; /* blue-400 */
+             box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2);
+        }
+
+        /* Hide default time/date input icons */
+        input[type="time"]::-webkit-calendar-picker-indicator,
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            display: none;
+        }
+        
+        /* Custom select arrow */
+        .premium-select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+            padding-right: 2.5rem;
+        }
+        html.dark .premium-select {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+        }
+        .hidden {
+            display: none;
+        }
+
+        /* Animated Loader Logo */
+        @keyframes logo-pop {
+            0% { transform: scale(0.8); opacity: 0; }
+            50% { transform: scale(1.05); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        @keyframes page-turn {
+            0% { transform: rotateY(0deg); }
+            100% { transform: rotateY(-180deg); }
+        }
+        .loader-logo {
+            animation: logo-pop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            width: 80px;
+            height: 80px;
+            position: relative;
+        }
+        .loader-logo .page {
+            width: 50%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: #4A90E2;
+            transform-origin: left center;
+            animation: page-turn 1.5s ease-in-out infinite alternate;
+            border-top-right-radius: 8px;
+            border-bottom-right-radius: 8px;
+        }
+        .loader-logo .binder {
+            width: 100%;
+            height: 100%;
+            background: #fff;
+            border-radius: 8px;
+            border: 4px solid #4A90E2;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        html.dark .loader-logo .binder {
+            background: #1f2937;
+            border-color: #60a5fa;
+        }
+        html.dark .loader-logo .page {
+            background: #60a5fa;
+        }
+
+        .break-words {
+            word-break: break-word;
+        }
+
+        /* Kebab menu styles */
+        .day-card-menu-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            z-index: 10;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            padding: 6px;
+            min-width: 150px;
+            animation: fadeIn 0.1s ease-out;
+            border: 1px solid #e5e7eb;
+        }
+         html.dark .day-card-menu-dropdown {
+            background: #1f2937;
+            border-color: #374151;
+        }
+        .day-card-menu-item {
+             padding: 8px 12px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background-color 0.2s;
+        }
+        .day-card-menu-item:hover {
+             background: #f1f5f9;
+        }
+        html.dark .day-card-menu-item:hover {
+             background: #374151;
+        }
+
+        /* AI Assistant Button Pulse */
+        @keyframes pulse-glow {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(96, 165, 250, 0.7);
+            }
+            50% {
+                box-shadow: 0 0 0 6px rgba(96, 165, 250, 0);
+            }
+        }
+        .ai-btn-pulse {
+            animation: pulse-glow 2.5s infinite;
+        }
+
+        /* Small inline loader for AI modal */
+        .loader-small {
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #3498db;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        html.dark .loader-small {
+            border-top-color: #60a5fa;
+        }
+    </style>
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "firebase/": "https://aistudiocdn.com/firebase@^12.4.0/",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^0.14.0"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+<body class="bg-gray-50 dark:bg-gray-950">
+
+    <div id="app-container" class="relative max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 text-gray-800 dark:text-gray-200 opacity-0 transition-opacity duration-500">
+        <!-- Auth Area -->
+        <div id="auth-area" class="absolute top-4 right-4 sm:top-6 sm:right-6 lg:top-8 lg:right-8 z-20"></div>
+
+        <!-- Header will be rendered here -->
+        <header id="header-container"></header>
+
+        <main class="mt-8">
+            <!-- Day cards will be rendered here -->
+            <div id="daysContainer" class="space-y-8"></div>
+            <!-- Summary will be rendered here -->
+            <div id="summary-container"></div>
+        </main>
+    </div>
+
+    <!-- Modals Portal -->
+    <div id="modal-root"></div>
+
+    <!-- Scroll Buttons -->
+    <div class="fixed bottom-6 right-6 flex flex-col gap-3 z-40">
+        <button id="floating-date-picker-btn" title="Go to Date" class="w-12 h-12 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm text-gray-700 dark:text-gray-200 rounded-full shadow-lg flex items-center justify-center hover:bg-white dark:hover:bg-gray-700 hover:text-blue-600 transition-all duration-200 hidden">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </button>
+        <button id="scrollUpButton" class="w-12 h-12 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm text-gray-700 dark:text-gray-200 rounded-full shadow-lg flex items-center justify-center hover:bg-white dark:hover:bg-gray-700 hover:text-blue-600 transition-all duration-200 hidden">↑</button>
+        <button id="scrollDownButton" class="w-12 h-12 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm text-gray-700 dark:text-gray-200 rounded-full shadow-lg flex items-center justify-center hover:bg-white dark:hover:bg-gray-700 hover:text-blue-600 transition-all duration-200">↓</button>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div id="loading-spinner" class="fixed inset-0 bg-white/80 dark:bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 transition-opacity duration-300">
+        <div class="loader-logo">
+            <div class="binder"></div>
+            <div class="page"></div>
+        </div>
+    </div>
+
+
+<script>
+// ===================================================================================
+//
+//                          WORK JOURNAL - VANILLA JS APP
+//
+// ===================================================================================
+
+const applyTheme = (theme) => {
+    const sunIcon = document.getElementById('theme-icon-sun');
+    const moonIcon = document.getElementById('theme-icon-moon');
+    if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+        sunIcon?.classList.remove('hidden');
+        moonIcon?.classList.add('hidden');
+    } else {
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem('theme', 'light');
+        sunIcon?.classList.add('hidden');
+        moonIcon?.classList.remove('hidden');
+    }
+}
+
+const initTheme = () => {
+    const savedTheme = localStorage.getItem('theme');
+    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    if (savedTheme) {
+        applyTheme(savedTheme);
+    } else if (systemPrefersDark) {
+        applyTheme('dark');
+    } else {
+        applyTheme('light');
+    }
+}
+
+initTheme();
+
+document.addEventListener('DOMContentLoaded', () => {
+
+    // -----------------------------------------------------------------------------
+    // STATE MANAGEMENT & GLOBAL VARIABLES
+    // -----------------------------------------------------------------------------
+    let user = null;
+    let currentDate = new Date();
+    let workData = {};
+    let reminders = [];
+    
+    const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    const reminderCategories = ['Wedding', 'Nobility Ceremony', 'Birthday', 'House Warming Ceremony', 'Other'];
+    
+    // DOM Elements
+    const authArea = document.getElementById('auth-area');
+    const headerContainer = document.getElementById('header-container');
+    const daysContainer = document.getElementById('daysContainer');
+    const summaryContainer = document.getElementById('summary-container');
+    const modalRoot = document.getElementById('modal-root');
+    const loadingSpinner = document.getElementById('loading-spinner');
+    const appContainer = document.getElementById('app-container');
+    const scrollUpButton = document.getElementById('scrollUpButton');
+    const scrollDownButton = document.getElementById('scrollDownButton');
+    const floatingDatePickerBtn = document.getElementById('floating-date-picker-btn');
+
+    // -----------------------------------------------------------------------------
+    // ALL FUNCTION DEFINITIONS
+    // -----------------------------------------------------------------------------
+
+    // UTILITY & HELPER FUNCTIONS
+    const getDaysInMonth = (year, month) => new Date(year, month + 1, 0).getDate();
+    const isWeekend = (year, month, day) => {
+        const d = new Date(year, month, day).getDay();
+        return d === 0 || d === 6;
+    };
+    const calculateHoursDifference = (inTime, outTime) => {
+        if (!inTime || !outTime) return 0;
+        const [inH, inM] = inTime.split(':').map(Number);
+        const [outH, outM] = outTime.split(':').map(Number);
+        const inMinutes = inH * 60 + inM;
+        const outMinutes = outH * 60 + outM;
+        if (outMinutes < inMinutes) return 0;
+        return (outMinutes - inMinutes) / 60;
+    };
+
+    // MODAL RENDERING & MANAGEMENT
+    const openModal = (modalHTML) => {
+        modalRoot.innerHTML = modalHTML;
+        // Attach close listeners to all elements with data-dismiss="modal"
+        modalRoot.querySelectorAll('[data-dismiss="modal"]').forEach(el => {
+            el.addEventListener('click', closeModal);
+        });
+    };
+    
+    const closeModal = () => {
+        modalRoot.innerHTML = '';
+    };
+
+    const createModal = (title, content, id = '') => {
+        return `
+            <div id="${id}" class="fixed inset-0 bg-gray-900 bg-opacity-50 backdrop-blur-sm flex justify-center items-center z-50 p-4 modal-bg-animate" data-dismiss="modal">
+                <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-md transform transition-all modal-content-animate" onclick="event.stopPropagation()">
+                    <div class="flex justify-between items-center p-6 border-b border-gray-200 dark:border-gray-800">
+                        <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100">${title}</h2>
+                        <button data-dismiss="modal" class="text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        </button>
+                    </div>
+                    <div class="p-6">${content}</div>
+                </div>
+            </div>
+        `;
+    };
+
+    // COMPONENT RENDERING (as HTML strings)
+    const renderAuthArea = () => {
+        authArea.innerHTML = `
+            ${user 
+                ? `<div class="flex items-center gap-2">
+                        <span class="text-sm text-gray-600 dark:text-gray-400 hidden sm:block">Welcome, ${user.email}</span>
+                        <button id="logout-btn" class="flex items-center gap-2 text-sm font-semibold bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 px-3 py-2 rounded-lg shadow-sm border border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                            <span class="hidden sm:inline">Logout</span>
+                        </button>
+                   </div>`
+                : `<button id="login-btn" class="text-sm font-semibold bg-blue-600 text-white px-4 py-1.5 rounded-lg shadow-sm hover:bg-blue-700 transition-all duration-200">Login</button>`
+            }
+        `;
+        document.getElementById('login-btn')?.addEventListener('click', showAuthModal);
+        document.getElementById('logout-btn')?.addEventListener('click', () => auth.signOut());
+    }
+
+    const renderHeader = () => {
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
+        const years = Array.from({ length: 11 }, (_, i) => new Date().getFullYear() - 5 + i);
+        const isDarkMode = document.documentElement.classList.contains('dark');
+
+        headerContainer.innerHTML = `
+            <div class="text-center pb-4 border-b border-gray-200 dark:border-gray-800">
+                <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-50 tracking-tight">Work Journal</h1>
+            </div>
+            <div class="mt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div class="flex items-center gap-2 bg-white dark:bg-gray-900 p-1 rounded-lg border border-gray-200 dark:border-gray-800 shadow-sm">
+                    <button id="prev-month-btn" class="p-2 text-gray-500 hover:bg-gray-100 hover:text-blue-600 dark:text-gray-400 dark:hover:bg-gray-800 rounded-md transition-colors">←</button>
+                    <select id="monthDropdown" class="bg-transparent text-lg font-semibold text-gray-800 dark:text-gray-200 border-none focus:ring-0 premium-select">
+                        ${months.map((m, i) => `<option value="${i}" ${i === month ? "selected" : ""}>${m}</option>`).join("")}
+                    </select>
+                    <select id="yearDropdown" class="bg-transparent text-lg font-semibold text-gray-800 dark:text-gray-200 border-none focus:ring-0 premium-select">
+                        ${years.map(y => `<option value="${y}" ${y === year ? "selected" : ""}>${y}</option>`).join("")}
+                    </select>
+                    <button id="next-month-btn" class="p-2 text-gray-500 hover:bg-gray-100 hover:text-blue-600 dark:text-gray-400 dark:hover:bg-gray-800 rounded-md transition-colors">→</button>
+                </div>
+                <div class="flex items-center gap-2 bg-white dark:bg-gray-900 p-2 rounded-full border border-gray-200 dark:border-gray-800 shadow-sm">
+                    <button id="ai-assistant-btn" title="AI Assistant" class="p-2 text-gray-500 hover:bg-gray-100 hover:text-blue-600 dark:text-gray-400 dark:hover:bg-gray-800 rounded-full transition-colors ai-btn-pulse">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/></svg>
+                    </button>
+                    <button id="date-picker-btn" title="Go to Date" class="p-2 text-gray-500 hover:bg-gray-100 hover:text-blue-600 dark:text-gray-400 dark:hover:bg-gray-800 rounded-full transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></button>
+                    <button id="theme-toggle-btn" title="Toggle Theme" class="p-2 text-gray-500 hover:bg-gray-100 hover:text-blue-600 dark:text-gray-400 dark:hover:bg-gray-800 rounded-full transition-colors">
+                        <svg id="theme-icon-sun" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 ${isDarkMode ? '' : 'hidden'}"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                        <svg id="theme-icon-moon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 ${isDarkMode ? 'hidden' : ''}"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    </button>
+                    <button id="reminder-btn" title="Reminders" class="p-2 text-gray-500 hover:bg-gray-100 hover:text-blue-600 dark:text-gray-400 dark:hover:bg-gray-800 rounded-full transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg></button>
+                    <button id="share-btn" title="Share or Export" class="p-2 text-gray-500 hover:bg-gray-100 hover:text-blue-600 dark:text-gray-400 dark:hover:bg-gray-800 rounded-full transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></button>
+                </div>
+            </div>
+        `;
+        addHeaderEventListeners();
+    };
+    
+    const createDayCardHTML = (day) => {
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
+        const dateKey = `${year}-${month}-${day}`;
+        const dayData = workData[dateKey] || {};
+        const dayName = new Date(year, month, day).toLocaleDateString("en-US", { weekday: "long" });
+        const weekend = isWeekend(year, month, day);
+        const leaveReasonOptions = weekend
+            ? ["", "Poya Day", "Public Holiday", "Custom Reason", "Own Leave", "Normal Leave Day"]
+            : ["", "Poya Day", "Public Holiday", "Custom Reason", "Own Leave"];
+
+        const createInput = (label, field, type, placeholder = '', value = '') => `
+            <div class="flex flex-col">
+                <label class="font-medium text-sm mb-1.5 text-gray-700 dark:text-gray-300">${label}</label>
+                <input type="${type}" placeholder="${placeholder}" value="${value || ''}" data-key="${dateKey}" data-field="${field}" class="p-2 border border-gray-300 rounded-lg bg-gray-50/50 transition duration-200 premium-input dark:bg-gray-800/50 dark:border-gray-700 dark:text-gray-200 dark:placeholder-gray-400" />
+            </div>`;
+        
+        const createSelect = (label, field, options, value = '') => `
+            <div class="flex flex-col">
+                <label class="font-medium text-sm mb-1.5 text-gray-700 dark:text-gray-300">${label}</label>
+                <select data-key="${dateKey}" data-field="${field}" class="p-2 border border-gray-300 rounded-lg bg-gray-50/50 transition duration-200 premium-select dark:bg-gray-800/50 dark:border-gray-700 dark:text-gray-200">
+                    ${options.map(opt => `<option value="${opt}" ${opt === value ? 'selected' : ''}>${opt || "Select..."}</option>`).join('')}
+                </select>
+            </div>`;
+
+        return `
+            <div data-day="${day}" class="day-box bg-white dark:bg-gray-900 rounded-2xl p-5 shadow-lg dark:shadow-black/20 border border-gray-200/50 dark:border-gray-800/50 border-b-4 border-b-blue-500 transition-all duration-300 hover:shadow-2xl hover:-translate-y-1">
+                <div class="flex justify-between items-center mb-4 pb-4 border-b border-gray-200 dark:border-gray-800">
+                    <h3 class="text-lg font-semibold ${weekend ? 'text-red-500 dark:text-red-400' : 'text-gray-900 dark:text-gray-100'}">${dayName}, ${months[month]} ${day}, ${year}</h3>
+                    <div class="relative">
+                        <button class="day-card-menu-btn p-1 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+                        </button>
+                        <div class="day-card-menu-dropdown hidden">
+                            <div class="day-card-menu-item clear-all-btn">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 2.5a.5.5 0 0 0 0 1h1.841l1.643 3.594a.5.5 0 0 0 .445.306h10.122a.5.5 0 0 0 .445-.306l1.643-3.594H20.5a.5.5 0 0 0 0-1H2.5Z"/><path d="M5.625 7.5 7.5 20h9l1.875-12.5H5.625Z"/></svg>
+                                <span>Clear All</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="space-y-5">
+                    <!-- Time Tracking Section -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-4">
+                            ${createInput('In Time', 'inTime', 'time', '', dayData.inTime)}
+                            ${createInput('Out Time', 'outTime', 'time', '', dayData.outTime)}
+                        </div>
+                        <div class="space-y-4">
+                            ${createInput('Movement Out', 'movementOut', 'time', '', dayData.movementOut)}
+                            ${createInput('Movement In', 'movementIn', 'time', '', dayData.movementIn)}
+                        </div>
+                    </div>
+
+                    <!-- Work Details Section -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        ${createInput('Team Members', 'teamMembers', 'text', 'e.g., John, Jane', dayData.teamMembers)}
+                        ${createInput('Work Location', 'workLocation', 'text', 'e.g., Office', dayData.workLocation)}
+                        ${createInput('Vehicle Number', 'vehicleNumber', 'text', 'e.g., ABC-1234', dayData.vehicleNumber)}
+                        ${createInput('KM Reading', 'km', 'number', 'e.g., 50', dayData.km)}
+                    </div>
+
+                    <!-- Status & Leave Section -->
+                    <div class="pt-4 border-t border-gray-200 dark:border-gray-800 space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            ${createSelect('Special Day', 'specialDays', ['', 'Poya Day', 'Public Holiday'], dayData.specialDays)}
+                            ${createSelect('Leave Status', 'leaveStatus', ['No', 'Yes'], dayData.leaveStatus || 'No')}
+                        </div>
+                        <div class="pl-4 border-l-2 border-blue-200 dark:border-blue-700 space-y-4 -ml-1">
+                            ${dayData.leaveStatus === 'Yes' ? createSelect('Leave Reason', 'leaveReason', leaveReasonOptions, dayData.leaveReason) : ''}
+                            ${(dayData.leaveStatus === 'Yes' && dayData.leaveReason === 'Custom Reason') ? createInput('Custom Reason Details', 'customReasonDetails', 'text', 'Specify reason', dayData.customReasonDetails) : ''}
+                            ${(dayData.leaveStatus === 'Yes' && dayData.leaveReason === 'Own Leave') ? createInput('Leave Reason Details', 'leaveReasonText', 'text', 'Specify details', dayData.leaveReasonText) : ''}
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+    };
+
+    const renderDays = () => {
+        const daysInMonth = getDaysInMonth(currentDate.getFullYear(), currentDate.getMonth());
+        daysContainer.innerHTML = Array.from({ length: daysInMonth }, (_, i) => createDayCardHTML(i + 1)).join('');
+        addDayCardEventListeners();
+        scrollToToday();
+    };
+
+    const renderSummary = () => {
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
+        const monthPrefix = `${year}-${month}`;
+
+        let regularLeaves = 0, specialDays = 0, weekendLeaveDays = 0;
+        let weekendOtHours = 0, satSunOtHours = 0, poyaPublicOtHours = 0;
+
+        Object.keys(workData).forEach(key => {
+            if (key.startsWith(monthPrefix)) {
+                const data = workData[key];
+                const day = parseInt(key.split('-')[2], 10);
+                const weekend = isWeekend(year, month, day);
+                const isSpecial = data.specialDays === "Poya Day" || data.specialDays === "Public Holiday";
+                const workingHours = calculateHoursDifference(data.inTime, data.outTime);
+
+                if (workingHours > 0) {
+                     if (isSpecial) poyaPublicOtHours += workingHours;
+                     else if (weekend) satSunOtHours += workingHours;
+                     else if (workingHours > 9) weekendOtHours += workingHours - 9;
+                }
+               
+                if (data.leaveReason === "Own Leave" || (data.leaveReason === "Custom Reason" && !weekend && !isSpecial)) regularLeaves++;
+                else if (data.leaveReason === "Poya Day" || data.leaveReason === "Public Holiday" || (data.leaveReason === "Custom Reason" && (weekend || isSpecial))) specialDays++;
+                
+                if (weekend && data.leaveReason === "Normal Leave Day") weekendLeaveDays++;
+            }
+        });
+        const totalOtHours = weekendOtHours + satSunOtHours + poyaPublicOtHours;
+
+        summaryContainer.innerHTML = `
+            <div class="mt-8 p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-800/50">
+                <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-4">Monthly Summary</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3 text-gray-600 dark:text-gray-300">
+                    <p>Leave Days (Regular): <span class="font-semibold text-gray-800 dark:text-gray-100">${regularLeaves}</span></p>
+                    <p>Leave Days (Poya/Public): <span class="font-semibold text-gray-800 dark:text-gray-100">${specialDays}</span></p>
+                    <p>Leave Days (Weekend): <span class="font-semibold text-gray-800 dark:text-gray-100">${weekendLeaveDays}</span></p>
+                    <div class="md:col-span-2 my-2 border-t border-gray-200 dark:border-gray-800"></div>
+                    <p>Weekday OT Hours: <span class="font-semibold text-gray-800 dark:text-gray-100">${weekendOtHours.toFixed(2)}</span> hours</p>
+                    <p>Weekend OT Hours: <span class="font-semibold text-gray-800 dark:text-gray-100">${satSunOtHours.toFixed(2)}</span> hours</p>
+                    <p>Poya/Public OT Hours: <span class="font-semibold text-gray-800 dark:text-gray-100">${poyaPublicOtHours.toFixed(2)}</span> hours</p>
+                    <p class="md:col-span-2 text-lg font-bold text-blue-600 dark:text-blue-400">Total OT Hours: <span id="totalOtHours">${totalOtHours.toFixed(2)}</span> hours</p>
+                </div>
+                <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-800 flex flex-col sm:flex-row gap-4">
+                    <button id="backup-btn" class="w-full sm:w-auto flex-1 bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 font-semibold px-4 py-2 rounded-lg border border-blue-200 dark:border-blue-900 hover:bg-blue-100 dark:hover:bg-blue-950 transition">Backup Month Data</button>
+                    <label class="w-full sm:w-auto flex-1 bg-green-50 dark:bg-green-950/50 text-green-700 dark:text-green-300 font-semibold px-4 py-2 rounded-lg border border-green-200 dark:border-green-900 hover:bg-green-100 dark:hover:bg-green-950 transition text-center cursor-pointer">
+                        Restore Month Data
+                        <input type="file" id="restore-file-input" class="hidden" accept=".json" />
+                    </label>
+                    <button id="clear-month-btn" class="w-full sm:w-auto flex-1 bg-red-50 dark:bg-red-950/50 text-red-700 dark:text-red-300 font-semibold px-4 py-2 rounded-lg border border-red-200 dark:border-red-900 hover:bg-red-100 dark:hover:bg-red-950 transition">Clear Month Data</button>
+                </div>
+            </div>`;
+        addSummaryEventListeners();
+    };
+
+    // DATA HANDLING & STATE UPDATES
+    const updateWorkData = (dateKey, field, value) => {
+        workData[dateKey] = workData[dateKey] || {};
+        workData[dateKey][field] = value;
+
+        // Conditional logic from original app
+        if (field === 'leaveStatus' && value !== 'Yes') {
+            delete workData[dateKey].leaveReason;
+            delete workData[dateKey].customReasonDetails;
+            delete workData[dateKey].leaveReasonText;
+        }
+        if (field === 'leaveReason' && value !== 'Custom Reason') {
+            delete workData[dateKey].customReasonDetails;
+        }
+        if (field === 'leaveReason' && value !== 'Own Leave') {
+            delete workData[dateKey].leaveReasonText;
+        }
+
+        // Save and re-render
+        saveLocalData();
+        syncToCloud();
+        
+        // Full re-render is needed if leave status changes to show/hide fields
+        if(field === 'leaveStatus' || field === 'leaveReason') {
+            renderAll();
+        } else {
+            renderSummary();
+        }
+    };
+    
+    const saveLocalData = () => {
+        if (!user) { // Only save to local storage if not logged in
+            localStorage.setItem('workData', JSON.stringify(workData));
+        }
+        localStorage.setItem('reminders', JSON.stringify(reminders));
+    };
+
+    const clearDayData = (day) => {
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
+        const dateKey = `${year}-${month}-${day}`;
+        if (workData[dateKey]) {
+            delete workData[dateKey];
+            saveLocalData();
+            syncToCloud();
+            renderAll(); // Re-render to show the cleared card
+        }
+    };
+
+    // EVENT LISTENER DEFINITIONS
+    const handleThemeToggle = () => {
+        const currentTheme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+        applyTheme(currentTheme === 'light' ? 'dark' : 'light');
+    }
+
+    const addHeaderEventListeners = () => {
+        document.getElementById('prev-month-btn').addEventListener('click', () => navigateMonth(-1));
+        document.getElementById('next-month-btn').addEventListener('click', () => navigateMonth(1));
+        document.getElementById('monthDropdown').addEventListener('change', (e) => {
+            currentDate.setMonth(parseInt(e.target.value));
+            renderAll();
+        });
+        document.getElementById('yearDropdown').addEventListener('change', (e) => {
+            currentDate.setFullYear(parseInt(e.target.value));
+            renderAll();
+        });
+        document.getElementById('theme-toggle-btn').addEventListener('click', handleThemeToggle);
+        document.getElementById('reminder-btn').addEventListener('click', showReminderModal);
+        document.getElementById('share-btn').addEventListener('click', showShareModal);
+        document.getElementById('date-picker-btn').addEventListener('click', showDatePickerModal);
+        document.getElementById('ai-assistant-btn').addEventListener('click', showAiModal);
+    };
+
+    const addDayCardEventListeners = () => {
+        daysContainer.querySelectorAll('.day-box').forEach(dayBox => {
+            const day = dayBox.dataset.day;
+
+            // Kebab menu logic
+            const menuBtn = dayBox.querySelector('.day-card-menu-btn');
+            const dropdown = dayBox.querySelector('.day-card-menu-dropdown');
+            menuBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                // Close all other menus first
+                document.querySelectorAll('.day-card-menu-dropdown').forEach(d => {
+                    if (d !== dropdown) d.classList.add('hidden');
+                });
+                dropdown.classList.toggle('hidden');
+            });
+
+            // "Clear All" button logic
+            const clearAllBtn = dayBox.querySelector('.clear-all-btn');
+            clearAllBtn.addEventListener('click', () => {
+                if (confirm('Are you sure you want to clear all data for this day?')) {
+                    clearDayData(day);
+                }
+                dropdown.classList.add('hidden');
+            });
+        });
+
+        // Add change listeners for all inputs/selects
+        daysContainer.querySelectorAll('input, select').forEach(el => {
+            el.addEventListener('change', (e) => {
+                const { key, field } = e.target.dataset;
+                updateWorkData(key, field, e.target.value);
+            });
+        });
+
+        // Global click listener to close open menus
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.day-card-menu-btn')) {
+                document.querySelectorAll('.day-card-menu-dropdown').forEach(d => d.classList.add('hidden'));
+            }
+        });
+    };
+
+    const addSummaryEventListeners = () => {
+        document.getElementById('clear-month-btn').addEventListener('click', handleClearMonthData);
+        document.getElementById('backup-btn').addEventListener('click', handleBackup);
+        document.getElementById('restore-file-input').addEventListener('change', handleRestore);
+    };
+
+    // ACTION HANDLERS
+    const navigateMonth = (direction) => {
+        currentDate.setMonth(currentDate.getMonth() + direction);
+        renderAll();
+    };
+
+    const handleClearMonthData = () => {
+        if (window.confirm("Are you sure you want to clear all data for this month? This action cannot be undone.")) {
+            const monthPrefix = `${currentDate.getFullYear()}-${currentDate.getMonth()}`;
+            Object.keys(workData).forEach(key => {
+                if (key.startsWith(monthPrefix)) delete workData[key];
+            });
+            saveLocalData();
+            syncToCloud();
+            renderAll();
+        }
+    };
+    
+    const handleBackup = () => {
+        const monthPrefix = `${currentDate.getFullYear()}-${currentDate.getMonth()}`;
+        const monthData = Object.keys(workData)
+            .filter(key => key.startsWith(monthPrefix))
+            .reduce((obj, key) => {
+                obj[key] = workData[key];
+                return obj;
+            }, {});
+        
+        if (Object.keys(monthData).length === 0) return alert("No data for this month to backup.");
+        const blob = new Blob([JSON.stringify(monthData, null, 2)], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `WorkData_${currentDate.getFullYear()}_${currentDate.getMonth() + 1}.json`;
+        a.click();
+        URL.revokeObjectURL(a.href);
+    };
+
+    const handleRestore = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            try {
+                const restoredData = JSON.parse(event.target.result);
+                workData = { ...workData, ...restoredData };
+                saveLocalData();
+                syncToCloud();
+                renderAll();
+                alert("Data restored successfully.");
+            } catch (err) {
+                alert("Error restoring data. Invalid file.");
+            }
+        };
+        reader.readAsText(file);
+        e.target.value = '';
+    };
+
+    const scrollToToday = () => {
+        const today = new Date();
+        const isCurrentMonthView = today.getFullYear() === currentDate.getFullYear() && today.getMonth() === currentDate.getMonth();
+
+        if (isCurrentMonthView) {
+            const todayEl = document.querySelector(`.day-box[data-day="${today.getDate()}"]`);
+            if (todayEl) {
+                setTimeout(() => {
+                    todayEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 500); // Delay to allow page to render fully
+            }
+        }
+    };
+
+    // MODAL CONTENT AND LOGIC
+    const showAuthModal = () => {
+        const content = `
+            <div class="space-y-4">
+                 <div>
+                    <label for="email" class="font-medium text-sm mb-1.5 text-gray-700 dark:text-gray-300">Email</label>
+                    <input id="auth-email" type="email" placeholder="Enter your email" class="p-2 w-full border border-gray-300 rounded-lg bg-gray-50/50 transition duration-200 premium-input dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200" />
+                </div>
+                <div>
+                    <label for="password" class="font-medium text-sm mb-1.5 text-gray-700 dark:text-gray-300">Password</label>
+                    <input id="auth-password" type="password" placeholder="Enter your password" class="p-2 w-full border border-gray-300 rounded-lg bg-gray-50/50 transition duration-200 premium-input dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200" />
+                    <div class="text-right mt-2">
+                        <button id="forgot-password-btn" class="text-xs font-medium text-blue-600 hover:underline dark:text-blue-400">Forgot Password?</button>
+                    </div>
+                </div>
+                <p id="auth-error" class="text-red-500 text-sm h-4"></p>
+                <button id="auth-submit" class="w-full px-5 py-2.5 rounded-lg font-semibold text-sm shadow-sm transition-all duration-200 transform hover:scale-[1.03] bg-blue-600 text-white hover:bg-blue-700">Login / Sign Up</button>
+                <div class="relative my-4"><div class="absolute inset-0 flex items-center"><div class="w-full border-t border-gray-300 dark:border-gray-700"></div></div><div class="relative flex justify-center text-sm"><span class="px-2 bg-white dark:bg-gray-900 text-gray-500">Or</span></div></div>
+                <button id="google-login" class="w-full flex items-center justify-center gap-3 px-5 py-2.5 rounded-lg font-semibold text-sm shadow-sm transition-all duration-200 transform hover:scale-[1.03] bg-white text-gray-800 border border-gray-300 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-700">
+                    <svg class="w-5 h-5" viewBox="0 0 48 48"><path fill="#4285F4" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path><path fill="#34A853" d="M46.98 24.55c0-1.57-.15-3.09-.42-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path><path fill="#EA4335" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path><path fill="none" d="M0 0h48v48H0z"></path></svg>
+                    Sign in with Google
+                </button>
+            </div>
+        `;
+        openModal(createModal('Login or Sign Up', content));
+        
+        // Add event listeners for the auth modal
+        document.getElementById('forgot-password-btn').addEventListener('click', async () => {
+            const email = document.getElementById('auth-email').value;
+            const errorEl = document.getElementById('auth-error');
+            errorEl.classList.remove('text-green-500', 'dark:text-green-400');
+            errorEl.classList.add('text-red-500');
+
+            if (!email) {
+                errorEl.textContent = 'Please enter your email to reset password.';
+                return;
+            }
+
+            try {
+                await auth.sendPasswordResetEmail(email);
+                errorEl.textContent = 'Password reset email sent! Check your inbox.';
+                errorEl.classList.remove('text-red-500');
+                errorEl.classList.add('text-green-500', 'dark:text-green-400');
+            } catch (error) {
+                errorEl.textContent = error.message;
+            }
+        });
+
+        document.getElementById('auth-submit').addEventListener('click', async () => {
+            const email = document.getElementById('auth-email').value;
+            const password = document.getElementById('auth-password').value;
+            const errorEl = document.getElementById('auth-error');
+            errorEl.textContent = '';
+            errorEl.classList.remove('text-green-500', 'dark:text-green-400');
+            errorEl.classList.add('text-red-500');
+            
+            try {
+                await auth.setPersistence(firebase.auth.Auth.Persistence.SESSION);
+                await auth.signInWithEmailAndPassword(email, password);
+                closeModal();
+            } catch (e) {
+                if (e.code === 'auth/user-not-found' || e.code === 'auth/wrong-password') {
+                     try {
+                        await auth.setPersistence(firebase.auth.Auth.Persistence.SESSION);
+                        await auth.createUserWithEmailAndPassword(email, password);
+                        closeModal();
+                    } catch (signUpError) {
+                        errorEl.textContent = signUpError.message;
+                    }
+                } else {
+                    errorEl.textContent = e.message;
+                }
+            }
+        });
+
+        document.getElementById('google-login').addEventListener('click', async () => {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            try {
+                await auth.setPersistence(firebase.auth.Auth.Persistence.SESSION);
+                await auth.signInWithPopup(provider);
+                closeModal();
+            } catch (e) {
+                document.getElementById('auth-error').textContent = e.message;
+            }
+        });
+    };
+    
+    const showReminderModal = () => {
+        // This function will render the list view or the form view inside the modal
+        const renderReminderContent = (isAdding = false, editingIndex = null) => {
+            let content = '';
+            if (isAdding) {
+                const reminder = editingIndex !== null ? reminders[editingIndex] : {};
+                content = `
+                    <div class="space-y-4" id="reminder-form">
+                        <div>
+                            <label class="font-medium text-sm mb-1.5 text-gray-700 dark:text-gray-300">Category</label>
+                            <select id="reminder-category" class="w-full p-2 border border-gray-300 rounded-lg bg-gray-50/50 transition duration-200 premium-select dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200">
+                                ${reminderCategories.map(c => `<option value="${c}" ${c === reminder.category ? 'selected' : ''}>${c}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div id="custom-details-container" class="${reminder.category === 'Other' ? '' : 'hidden'}">
+                             <label class="font-medium text-sm mb-1.5 text-gray-700 dark:text-gray-300">Custom Details</label>
+                             <input type="text" id="reminder-custom" placeholder="Specify your reminder" value="${reminder.customDetails || ''}" class="w-full p-2 border border-gray-300 rounded-lg bg-gray-50/50 transition duration-200 premium-input dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200" />
+                        </div>
+                        <div>
+                            <label class="font-medium text-sm mb-1.5 text-gray-700 dark:text-gray-300">Date</label>
+                            <input type="date" id="reminder-date" value="${reminder.date || ''}" class="w-full p-2 border border-gray-300 rounded-lg bg-gray-50/50 transition duration-200 premium-input dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200" />
+                        </div>
+                        <div class="flex gap-3 mt-4">
+                            <button id="cancel-reminder" class="w-full px-5 py-2.5 rounded-lg font-semibold text-sm shadow-sm transition-all duration-200 transform hover:scale-[1.03] bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700">Cancel</button>
+                            <button id="save-reminder" class="w-full px-5 py-2.5 rounded-lg font-semibold text-sm shadow-sm transition-all duration-200 transform hover:scale-[1.03] bg-blue-600 text-white hover:bg-blue-700">${editingIndex !== null ? 'Save Changes' : 'Save Reminder'}</button>
+                        </div>
+                    </div>
+                `;
+            } else {
+                content = `
+                    <div id="reminderList" class="space-y-3 max-h-96 overflow-y-auto pr-2">
+                        ${reminders.length > 0 ? reminders.map((r, i) => `
+                            <div class="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg border dark:border-gray-700">
+                                <div>
+                                    <p class="font-semibold text-gray-800 dark:text-gray-200">${r.category}</p>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">${new Date(r.date).toLocaleDateString()}</p>
+                                    ${r.category === 'Other' ? `<p class="text-sm text-gray-500 dark:text-gray-400 italic">${r.customDetails}</p>` : ''}
+                                </div>
+                                <div class="flex gap-2">
+                                    <button class="edit-reminder-btn text-sm text-blue-600 dark:text-blue-400 hover:underline" data-index="${i}">Edit</button>
+                                    <button class="remove-reminder-btn text-sm text-red-600 dark:text-red-400 hover:underline" data-index="${i}">Remove</button>
+                                </div>
+                            </div>
+                        `).join('') : '<p class="text-gray-500 text-center py-4">No reminders set.</p>'}
+                    </div>
+                    <button id="add-reminder-btn" class="mt-4 w-full px-5 py-2.5 rounded-lg font-semibold text-sm shadow-sm transition-all duration-200 transform hover:scale-[1.03] bg-blue-600 text-white hover:bg-blue-700">Add New Reminder</button>
+                `;
+            }
+            openModal(createModal('Your Reminders', content, 'reminder-modal'));
+
+            // Add event listeners for this specific modal content
+            if (isAdding) {
+                document.getElementById('cancel-reminder').addEventListener('click', () => renderReminderContent());
+                document.getElementById('save-reminder').addEventListener('click', () => {
+                    const newReminder = {
+                        category: document.getElementById('reminder-category').value,
+                        date: document.getElementById('reminder-date').value,
+                        customDetails: document.getElementById('reminder-custom').value,
+                    };
+                    if (!newReminder.date) return alert('Please select a date.');
+                    if (editingIndex !== null) {
+                        reminders[editingIndex] = newReminder;
+                    } else {
+                        reminders.push(newReminder);
+                    }
+                    saveLocalData();
+                    renderReminderContent(); // Re-render list view
+                });
+                 document.getElementById('reminder-category').addEventListener('change', (e) => {
+                    document.getElementById('custom-details-container').classList.toggle('hidden', e.target.value !== 'Other');
+                });
+            } else {
+                document.getElementById('add-reminder-btn').addEventListener('click', () => renderReminderContent(true));
+                document.querySelectorAll('.edit-reminder-btn').forEach(btn => btn.addEventListener('click', (e) => renderReminderContent(true, e.target.dataset.index)));
+                document.querySelectorAll('.remove-reminder-btn').forEach(btn => btn.addEventListener('click', (e) => {
+                    reminders.splice(e.target.dataset.index, 1);
+                    saveLocalData();
+                    renderReminderContent(); // Re-render list
+                }));
+            }
+        };
+        renderReminderContent(); // Initial render of the modal
+    };
+
+    const showDatePickerModal = () => {
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
+        const today = new Date();
+        const isCurrentMonthView = today.getFullYear() === year && today.getMonth() === month;
+
+        const firstDayOfMonth = (new Date(year, month, 1).getDay() + 6) % 7; // 0=Mon, 6=Sun
+        const daysInMonth = getDaysInMonth(year, month);
+
+        const dayLabels = ['M', 'T', 'W', 'T', 'F', 'S', 'S'].map(label => `
+            <div class="text-center font-bold text-xs text-gray-500 dark:text-gray-400">${label}</div>
+        `).join('');
+
+        let daysGrid = '';
+
+        // Add padding for days before the start of the month
+        for (let i = 0; i < firstDayOfMonth; i++) {
+            daysGrid += '<div></div>';
+        }
+
+        // Add days of the month
+        for (let day = 1; day <= daysInMonth; day++) {
+            const dateKey = `${year}-${month}-${day}`;
+            const hasData = workData[dateKey] && Object.keys(workData[dateKey]).length > 0;
+            const isToday = isCurrentMonthView && day === today.getDate();
+            
+            const highlightClass = isToday ? 'bg-blue-600 text-white' : 'hover:bg-blue-100 dark:hover:bg-gray-700';
+            
+            daysGrid += `
+                <button data-day="${day}" class="date-select-btn relative flex items-center justify-center h-10 w-10 rounded-full text-sm font-medium text-gray-700 dark:text-gray-300 ${highlightClass} transition-colors">
+                    ${day}
+                    ${hasData ? '<div class="absolute bottom-1.5 h-1.5 w-1.5 bg-green-500 rounded-full"></div>' : ''}
+                </button>
+            `;
+        }
+
+        const content = `
+            <div class="grid grid-cols-7 gap-y-2 gap-x-1 items-center">
+                ${dayLabels}
+                ${daysGrid}
+            </div>
+        `;
+        
+        openModal(createModal('Go to Date', content));
+        
+        document.querySelectorAll('.date-select-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const day = e.currentTarget.dataset.day;
+                const dayEl = document.querySelector(`.day-box[data-day="${day}"]`);
+                if (dayEl) {
+                    dayEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                closeModal();
+            });
+        });
+    };
+
+    const showShareModal = () => {
+        const totalOt = document.getElementById('totalOtHours')?.textContent || 'N/A';
+        const summaryText = `Work Report Summary for ${months[currentDate.getMonth()]} ${currentDate.getFullYear()}:\n- Total OT Hours: ${totalOt} hours.`;
+        
+        const content = `
+            <div class="space-y-4">
+                <div class="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg border dark:border-gray-700">
+                    <h3 class="font-semibold text-gray-800 dark:text-gray-200 mb-2">Summary Preview</h3>
+                    <pre class="text-sm text-gray-600 dark:text-gray-300 whitespace-pre-wrap">${summaryText}</pre>
+                </div>
+                <button id="copy-summary-btn" class="w-full px-5 py-2.5 rounded-lg font-semibold text-sm shadow-sm transition-all bg-blue-600 text-white hover:bg-blue-700">Copy Summary as Text</button>
+                <button id="export-pdf-btn" class="w-full px-5 py-2.5 rounded-lg font-semibold text-sm shadow-sm transition-all bg-white text-gray-800 border border-gray-300 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-700">Export Month Data as PDF</button>
+            </div>
+        `;
+        openModal(createModal('Share & Export', content));
+
+        document.getElementById('copy-summary-btn').addEventListener('click', () => {
+             navigator.clipboard.writeText(summaryText)
+                .then(() => alert('Summary copied to clipboard!'))
+                .catch(() => alert('Failed to copy summary.'));
+        });
+        document.getElementById('export-pdf-btn').addEventListener('click', showExportPreview);
+    };
+
+     const showAiModal = () => {
+        const content = `
+            <div class="space-y-4">
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                    Type your leave reason or message in Tanglish (Tamil + English). The AI will convert it into a professional English message.
+                </p>
+                <div>
+                    <label for="ai-input" class="font-medium text-sm mb-1.5 text-gray-700 dark:text-gray-300">Your Message</label>
+                    <textarea id="ai-input" rows="4" placeholder="e.g., sir naan inniku office varamudiyathu health illa" class="w-full p-2 border border-gray-300 rounded-lg bg-gray-50/50 transition duration-200 premium-input dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200"></textarea>
+                </div>
+                <button id="generate-ai-message-btn" class="w-full flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg font-semibold text-sm shadow-sm transition-all duration-200 transform hover:scale-[1.03] bg-blue-600 text-white hover:bg-blue-700">
+                    <span>Convert to Professional English</span>
+                    <div id="ai-spinner" class="loader-small hidden"></div>
+                </button>
+                <div id="ai-output-container" class="hidden space-y-2 pt-4 border-t border-gray-200 dark:border-gray-700">
+                    <label class="font-medium text-sm text-gray-700 dark:text-gray-300">Generated Message</label>
+                    <div class="relative">
+                        <p id="ai-output" class="p-4 bg-gray-100 dark:bg-gray-800/50 rounded-lg text-gray-800 dark:text-gray-200 whitespace-pre-wrap min-h-[50px]"></p>
+                        <button id="copy-ai-output-btn" title="Copy to clipboard" class="absolute top-2 right-2 p-1.5 text-gray-500 hover:bg-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 rounded-md">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+        openModal(createModal('AI Professional Message Assistant', content));
+        
+        document.getElementById('generate-ai-message-btn').addEventListener('click', async () => {
+            const inputEl = document.getElementById('ai-input');
+            const outputContainer = document.getElementById('ai-output-container');
+            const outputEl = document.getElementById('ai-output');
+            const spinner = document.getElementById('ai-spinner');
+            const button = document.getElementById('generate-ai-message-btn');
+            
+            const userInput = inputEl.value.trim();
+            if (!userInput) {
+                alert('Please enter a message.');
+                return;
+            }
+
+            spinner.classList.remove('hidden');
+            button.disabled = true;
+
+            try {
+                // This function is defined in a module script below and attached to window
+                const result = await window.generateProfessionalMessage(userInput);
+                outputEl.textContent = result;
+                outputContainer.classList.remove('hidden');
+            } catch (error) {
+                console.error(error);
+                outputEl.textContent = 'Sorry, an error occurred. Please try again.';
+                outputContainer.classList.remove('hidden');
+            } finally {
+                spinner.classList.add('hidden');
+                button.disabled = false;
+            }
+        });
+
+        document.querySelector('#modal-root').addEventListener('click', (e) => {
+            const copyBtn = e.target.closest('#copy-ai-output-btn');
+            if (copyBtn) {
+                const textToCopy = document.getElementById('ai-output').textContent;
+                navigator.clipboard.writeText(textToCopy).then(() => {
+                    alert('Copied to clipboard!');
+                }, () => {
+                    alert('Failed to copy.');
+                });
+            }
+        });
+    };
+
+    const showExportPreview = () => {
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
+        const daysInMonth = getDaysInMonth(year, month);
+
+        const tableRows = Array.from({ length: daysInMonth }, (_, i) => {
+            const day = i + 1;
+            const dateKey = `${year}-${month}-${day}`;
+            const dayData = workData[dateKey] || {};
+            const formattedDate = `${String(day).padStart(2, '0')}.${String(month + 1).padStart(2, '0')}.${year}`;
+            const leaveStatusText = dayData.leaveStatus || 'No';
+            const weekend = isWeekend(year, month, day);
+
+            const rowClass = 'border-b border-gray-200';
+            
+            const dateClass = weekend ? 'text-red-500 font-bold' : '';
+            const leaveStatusHTML = leaveStatusText === 'Yes' 
+                ? `<span class="font-bold text-blue-700">${leaveStatusText}</span>`
+                : leaveStatusText;
+
+            return `
+                <tr class="${rowClass}">
+                    <td class="p-3 border-x border-gray-200 ${dateClass}">${formattedDate}</td>
+                    <td class="p-3 border-x border-gray-200">${dayData.inTime || '-'}</td>
+                    <td class="p-3 border-x border-gray-200">${dayData.outTime || '-'}</td>
+                    <td class="p-3 border-x border-gray-200">${dayData.movementOut || '-'}</td>
+                    <td class="p-3 border-x border-gray-200">${dayData.movementIn || '-'}</td>
+                    <td class="p-3 border-x border-gray-200 break-words">${dayData.teamMembers || '-'}</td>
+                    <td class="p-3 border-x border-gray-200 break-words">${dayData.workLocation || '-'}</td>
+                    <td class="p-3 border-x border-gray-200">${dayData.vehicleNumber || '-'}</td>
+                    <td class="p-3 border-x border-gray-200">${dayData.km || '-'}</td>
+                    <td class="p-3 border-x border-gray-200">${dayData.specialDays || '-'}</td>
+                    <td class="p-3 border-x border-gray-200">${leaveStatusHTML}</td>
+                    <td class="p-3 border-x border-gray-200 break-words">${dayData.leaveReason || '-'}</td>
+                </tr>`;
+        }).join('');
+
+        const previewHTML = `
+            <div class="fixed inset-0 bg-gray-900 bg-opacity-70 flex justify-center items-center z-50 p-4 overflow-auto modal-bg-animate" data-dismiss="modal">
+                <div class="bg-white rounded-lg shadow-2xl w-full max-w-4xl transform transition-all modal-content-animate" onclick="event.stopPropagation()">
+                    <div class="p-4 sm:p-6 sticky top-0 bg-white border-b z-10 flex flex-col sm:flex-row justify-between items-center gap-3">
+                        <h2 class="text-xl font-bold text-center sm:text-left">Export Preview: ${months[month]} ${year}</h2>
+                        <div class="flex gap-3">
+                            <button id="generate-pdf-btn" class="px-5 py-2.5 rounded-lg font-semibold text-sm shadow-sm transition-all bg-blue-600 text-white hover:bg-blue-700">Download as PDF</button>
+                            <button data-dismiss="modal" class="px-5 py-2.5 rounded-lg font-semibold text-sm shadow-sm transition-all bg-white text-gray-800 border border-gray-300 hover:bg-gray-100">Close</button>
+                        </div>
+                    </div>
+                    <div id="export-content" class="p-4 bg-white text-black" style="font-size: 18px;">
+                        <div class="text-center mb-4" style="font-size: 20px;">
+                            <h2 class="text-xl font-bold">Work Data Sheet</h2>
+                            <p class="text-md font-semibold">Name: T.Jeyaraman | Service No: 016696</p>
+                            <h3 class="text-lg font-semibold">${months[month]} ${year}</h3>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full border-collapse border-y border-gray-200">
+                                <thead class="bg-gray-100 text-gray-700">
+                                    <tr>
+                                        ${['Day', 'In', 'Out', 'Mov Out', 'Mov In', 'Team', 'Location', 'Vehicle', 'KM', 'Special', 'Leave', 'Reason'].map(h => 
+                                            `<th class="p-3 border-x border-gray-200 font-semibold">${h}</th>`
+                                        ).join('')}
+                                    </tr>
+                                </thead>
+                                <tbody class="text-black text-center">${tableRows}</tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+        openModal(previewHTML);
+
+        document.getElementById('generate-pdf-btn').addEventListener('click', () => {
+            const el = document.getElementById('export-content');
+            const spinner = document.getElementById('loading-spinner');
+            spinner.style.display = 'flex';
+
+            // To ensure consistent rendering across devices, especially on mobile where the table might
+            // render very wide, we temporarily set a fixed width before capturing with html2canvas.
+            const originalWidth = el.style.width;
+            el.style.width = '1200px';
+
+            html2canvas(el, { scale: 3, useCORS: true, backgroundColor: '#ffffff' }).then(canvas => {
+                // Restore the original width after capture
+                el.style.width = originalWidth;
+
+                const { jsPDF } = window.jspdf;
+                // Explicitly create a portrait A4 document
+                const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+                
+                const imgData = canvas.toDataURL('image/png');
+                const pdfWidth = pdf.internal.pageSize.getWidth();
+                const pdfHeight = pdf.internal.pageSize.getHeight();
+                
+                // Add the image to fill the entire page, which will remove vertical gaps
+                // but may stretch the content slightly. This fulfills the user request.
+                pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+                pdf.save(`Work_Report_${year}_${month + 1}.pdf`);
+                spinner.style.display = 'none';
+
+            }).catch(err => {
+                el.style.width = originalWidth; // Also restore on error
+                console.error('PDF generation failed:', err);
+                alert('Sorry, there was an error generating the PDF.');
+                spinner.style.display = 'none';
+            });
+        });
+    };
+    
+    // FIREBASE-RELATED FUNCTIONS
+    const syncToCloud = () => {
+        if (user) {
+            db.collection("users").doc(user.uid).set({ workData }, { merge: true })
+                .catch(err => console.error("Firestore write error:", err));
+        }
+    };
+
+    // MAIN RENDER/INITIALIZATION FUNCTIONS
+    const renderAll = () => {
+        renderAuthArea();
+        renderHeader();
+        renderDays();
+        renderSummary();
+    };
+
+    const initializeApp = () => {
+        reminders = JSON.parse(localStorage.getItem('reminders') || '[]');
+        renderAll();
+        loadingSpinner.style.opacity = '0';
+        setTimeout(() => {
+            loadingSpinner.style.display = 'none';
+        }, 300);
+        appContainer.classList.add('fade-in');
+        appContainer.style.opacity = '1';
+    };
+
+    // -----------------------------------------------------------------------------
+    // SCRIPT EXECUTION & EVENT BINDING
+    // -----------------------------------------------------------------------------
+    
+    // Scroll button listeners
+    window.addEventListener('scroll', () => {
+        const isAtTop = window.scrollY < 100;
+        const isAtBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 100;
+        scrollUpButton.classList.toggle('hidden', isAtTop);
+        floatingDatePickerBtn.classList.toggle('hidden', isAtTop);
+        scrollDownButton.classList.toggle('hidden', isAtBottom);
+    });
+    scrollUpButton.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+    scrollDownButton.addEventListener('click', () => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'smooth' }));
+    floatingDatePickerBtn.addEventListener('click', showDatePickerModal);
+
+    // Firebase setup and authentication handling
+    const firebaseConfig = {
+      apiKey: "AIzaSyDzaAqT7NRAyQhTNDh8GsMKlTKNmttzIWo",
+      authDomain: "work-report-fe3da.firebaseapp.com",
+      projectId: "work-report-fe3da",
+      storageBucket: "work-report-fe3da.appspot.com",
+      messagingSenderId: "879340317679",
+      appId: "1:879340317679:web:a28e2d3906bca3e927a41a",
+      measurementId: "G-ZR8RGLKB77"
+    };
+
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    let userRefUnsubscribe = null;
+
+    auth.onAuthStateChanged(currentUser => {
+        user = currentUser;
+
+        if (userRefUnsubscribe) {
+            userRefUnsubscribe(); // Detach previous listener
+            userRefUnsubscribe = null;
+        }
+
+        if (user) {
+            const userRef = db.collection("users").doc(user.uid);
+            userRefUnsubscribe = userRef.onSnapshot(doc => {
+                if (doc.exists) {
+                    workData = doc.data()?.workData || {};
+                }
+                initializeApp(); // Re-render with user data
+            }, err => {
+                console.error("Firestore snapshot error: ", err);
+                initializeApp(); // Continue with local data on error
+            });
+        } else {
+            // Not logged in, load from local storage
+            workData = JSON.parse(localStorage.getItem('workData') || '{}');
+            initializeApp();
+        }
+    });
+});
+</script>
+<script type="module" src="/index.tsx"></script>
+</body>
+</html>
