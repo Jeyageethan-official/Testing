@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -28,10 +27,11 @@
             --bg-dark-end: #000000;
             --slt-blue: #3b82f6; /* A corporate blue */
         }
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         body {
             font-family: 'Inter', sans-serif;
             transition: background 0.3s ease;
+            overflow-x: hidden;
         }
         /* Smoother theme transitions */
         body, .bg-white, .bg-gray-50, .dark .dark\:bg-gray-900, .dark .dark\:bg-gray-950, .premium-input, .premium-select {
@@ -45,47 +45,68 @@
         }
 
         /* Webkit scrollbar styling */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #f1f1f1; }
-        ::-webkit-scrollbar-thumb { background: #c3cfe2; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #a8b8d0; }
-        html.dark ::-webkit-scrollbar-track { background: #111827; }
-        html.dark ::-webkit-scrollbar-thumb { background: #374151; }
-        html.dark ::-webkit-scrollbar-thumb:hover { background: #4b5563; }
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #c3cfe2;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8b8d0;
+        }
+        html.dark ::-webkit-scrollbar-track {
+            background: #111827;
+        }
+        html.dark ::-webkit-scrollbar-thumb {
+            background: #374151;
+        }
+        html.dark ::-webkit-scrollbar-thumb:hover {
+            background: #4b5563;
+        }
 
         /* Page fade-in animation */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(-10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        .fade-in { animation: fadeIn 0.5s ease-out forwards; }
-        @keyframes fadeOut {
-            to { opacity: 0; visibility: hidden; }
+        .fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
         }
-        .fade-out { animation: fadeOut 0.5s ease-out forwards; }
-
 
         /* Modal animations */
         @keyframes modal-in {
             from { opacity: 0; transform: scale(0.95); }
             to { opacity: 1; transform: scale(1); }
         }
-        .modal-content-animate { animation: modal-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-        .modal-bg-animate { animation: fadeIn 0.3s ease-out forwards; }
+        .modal-content-animate {
+            animation: modal-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .modal-bg-animate {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
 
         /* Premium input focus glow */
-        .premium-input:focus, .premium-select:focus {
+        .premium-input:focus,
+        .premium-select:focus {
              border-color: var(--slt-blue);
              box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
              outline: none;
         }
-        html.dark .premium-input:focus, html.dark .premium-select:focus {
+        html.dark .premium-input:focus,
+        html.dark .premium-select:focus {
              border-color: #60a5fa; /* blue-400 */
              box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2);
         }
 
         /* Hide default time/date input icons */
-        input[type="time"]::-webkit-calendar-picker-indicator, input[type="date"]::-webkit-calendar-picker-indicator { display: none; }
+        input[type="time"]::-webkit-calendar-picker-indicator,
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            display: none;
+        }
         
         /* Custom select arrow */
         .premium-select {
@@ -99,211 +120,427 @@
         html.dark .premium-select {
             background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
         }
-        .hidden { display: none; }
-        .break-words { word-break: break-word; }
+        .hidden {
+            display: none;
+        }
+
+        /* New Corporate Doodle Loading Animation */
+        .loader-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+        .animated-logo-svg {
+            width: 80px;
+            height: 80px;
+        }
+        .animated-logo-svg .draw-stroke {
+            stroke-dasharray: 500;
+            stroke-dashoffset: 500;
+            animation: draw 0.3s ease-out forwards;
+        }
+        html.dark .animated-logo-svg .logo-stroke-color {
+             stroke: #60a5fa;
+        }
+        html.dark .animated-logo-svg .logo-fill-color {
+             fill: #60a5fa;
+        }
+        
+        /* Animation Sequence Delays */
+        .animated-logo-svg .doc-outline { animation-delay: 0s; }
+        .animated-logo-svg .doc-corner { animation-delay: 0.05s; }
+        .animated-logo-svg .text-line1 { animation-delay: 0.1s; }
+        .animated-logo-svg .text-line2 { animation-delay: 0.15s; }
+        .animated-logo-svg .text-line3 { animation-delay: 0.2s; }
+        .animated-logo-svg .checkmark { animation-delay: 0.25s; }
+        
+        @keyframes draw {
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+        .loader-text {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #4b5563; /* gray-600 */
+            opacity: 0;
+            animation: fadeIn 0.2s ease-out 0.3s forwards;
+        }
+        html.dark .loader-text {
+             color: #d1d5db; /* gray-300 */
+        }
+
+        .break-words {
+            word-break: break-word;
+        }
 
         /* Kebab menu styles */
         .day-card-menu-dropdown {
-            position: absolute; top: 100%; right: 0; z-index: 10; background: white; border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15); padding: 6px; min-width: 150px;
-            animation: fadeIn 0.1s ease-out; border: 1px solid #e5e7eb;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            z-index: 10;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            padding: 6px;
+            min-width: 150px;
+            animation: fadeIn 0.1s ease-out;
+            border: 1px solid #e5e7eb;
         }
-         html.dark .day-card-menu-dropdown { background: #1f2937; border-color: #374151; }
+         html.dark .day-card-menu-dropdown {
+            background: #1f2937;
+            border-color: #374151;
+        }
         .day-card-menu-item {
-             padding: 8px 12px; cursor: pointer; border-radius: 4px; font-size: 14px;
-             display: flex; align-items: center; gap: 8px; transition: background-color: 0.2s;
+             padding: 8px 12px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background-color: 0.2s;
         }
-        .day-card-menu-item:hover { background: #f1f5f9; }
-        html.dark .day-card-menu-item:hover { background: #374151; }
+        .day-card-menu-item:hover {
+             background: #f1f5f9;
+        }
+        html.dark .day-card-menu-item:hover {
+             background: #374151;
+        }
 
         /* AI Assistant Button Pulse */
         @keyframes pulse-glow {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(96, 165, 250, 0.7); }
-            50% { box-shadow: 0 0 0 6px rgba(96, 165, 250, 0); }
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(96, 165, 250, 0.7);
+            }
+            50% {
+                box-shadow: 0 0 0 6px rgba(96, 165, 250, 0);
+            }
         }
-        .ai-btn-pulse { animation: pulse-glow 2.5s infinite; }
+        .ai-btn-pulse {
+            animation: pulse-glow 2.5s infinite;
+        }
 
         /* Small inline loader for AI modal */
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
         .loader-small {
-            border: 2px solid #f3f3f3; border-top: 2px solid #3498db; border-radius: 50%;
-            width: 16px; height: 16px; animation: spin 1s linear infinite;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #3498db;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            animation: spin 1s linear infinite;
         }
-        html.dark .loader-small { border-top-color: #60a5fa; }
-        
-        /* New Dashboard Styles */
-        .glass-card {
-            background: rgba(255, 255, 255, 0.5);
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+        html.dark .loader-small {
+            border-top-color: #60a5fa;
         }
-        html.dark .glass-card {
-            background: rgba(31, 41, 55, 0.5); /* gray-800/50 */
-            border: 1px solid rgba(55, 65, 81, 0.5); /* gray-700/50 */
-        }
-        @keyframes slide-in-up {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .dashboard-card, .dashboard-quick-action {
-            animation: slide-in-up 0.5s ease-out forwards;
-            opacity: 0;
-        }
-        #dashboard-card-1 { animation-delay: 0.1s; }
-        #dashboard-card-2 { animation-delay: 0.2s; }
-        #dashboard-card-3 { animation-delay: 0.3s; }
-        #dashboard-action-1 { animation-delay: 0.4s; }
-        #dashboard-action-2 { animation-delay: 0.45s; }
-        #dashboard-action-3 { animation-delay: 0.5s; }
-        #dashboard-action-4 { animation-delay: 0.55s; }
-        #dashboard-action-5 { animation-delay: 0.6s; }
 
-        @keyframes welcome-text-in {
-            from { opacity: 0; transform: translateY(30px) scale(0.9); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
+        /* AI Voice Input Button */
+        @keyframes pulse-mic {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
         }
-        #welcome-text {
-            animation: welcome-text-in 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        .voice-btn-listening svg {
+            color: #ef4444; /* red-500 */
+            animation: pulse-mic 1.5s infinite ease-in-out;
+        }
+        html.dark .voice-btn-listening svg {
+            color: #f87171; /* red-400 */
+        }
+        
+        /* Custom iOS-style Time Picker */
+        @keyframes slide-up {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+        .time-picker-content {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: #f9f9f9;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            padding: 16px;
+            padding-bottom: calc(16px + env(safe-area-inset-bottom)); /* For iPhone X+ */
+            animation: slide-up 0.3s ease-out;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+            max-width: 420px;
+            margin: 0 auto;
+        }
+        html.dark .time-picker-content {
+            background-color: #1c1c1e;
+        }
+        .time-picker-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #dcdcdc;
+        }
+        html.dark .time-picker-header {
+            border-bottom-color: #3a3a3c;
+        }
+        .time-picker-wheels {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+            position: relative;
+            overflow: hidden;
+            margin: 16px 0;
+        }
+        .time-picker-selection-indicator {
+            position: absolute;
+            top: 50%;
+            left: 16px;
+            right: 16px;
+            height: 40px;
+            transform: translateY(-50%);
+            background-color: rgba(0, 0, 0, 0.05);
+            border-top: 1px solid #d1d1d6;
+            border-bottom: 1px solid #d1d1d6;
+            border-radius: 8px;
+            pointer-events: none;
+            z-index: 1;
+        }
+        html.dark .time-picker-selection-indicator {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-color: #444;
+        }
+        .time-picker-wheel {
+            flex: 1;
+            height: 100%;
+            overflow-y: scroll;
+            scrollbar-width: none; /* Firefox */
+        }
+        .time-picker-wheel::-webkit-scrollbar {
+            display: none; /* Webkit */
+        }
+        .time-picker-wheel-col {
+            padding: 0;
+            margin: 0;
+            list-style: none;
+        }
+        .time-picker-item {
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 22px;
+            font-weight: 400;
+        }
+        .time-picker-spacer {
+            font-size: 22px;
+            font-weight: 500;
+            padding: 0 10px;
+            align-self: center;
+        }
+
+        /* ========== NEW APPLE-STYLE DESIGN STYLES ========== */
+
+        /* Sign-in Page */
+        #signin-page {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #e0f7fa 0%, #ffffff 100%);
+            transition: opacity 0.5s ease-out;
+            opacity: 1;
+            z-index: 100;
+        }
+        html.dark #signin-page {
+            background: linear-gradient(135deg, #0f172a 0%, #000000 100%);
+        }
+        #signin-page.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .signin-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+            animation: fadeIn 0.6s ease-out;
+        }
+        html.dark .signin-card {
+            background: rgba(23, 31, 44, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+        }
+        .signin-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid #d1d5db; /* gray-300 */
+            background-color: #f9fafb; /* gray-50 */
+            transition: all 0.2s ease;
+            font-size: 1rem;
+        }
+        html.dark .signin-input {
+            border-color: #4b5563; /* gray-600 */
+            background-color: #1f2937; /* gray-800 */
+            color: #e5e7eb; /* gray-200 */
+        }
+        .signin-input:focus {
+            border-color: #3b82f6; /* blue-500 */
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+            outline: none;
+        }
+        .signin-button-glow {
+            box-shadow: 0 0 15px 0 rgba(59, 130, 246, 0.4);
+        }
+
+        /* Dashboard */
+        #dashboard-page {
+            display: none;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        #dashboard-nav {
+            position: sticky;
+            top: 0;
+            z-index: 30;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid #e5e7eb; /* gray-200 */
+            padding: 0.75rem 2rem;
+        }
+        html.dark #dashboard-nav {
+            background: rgba(17, 24, 39, 0.8); /* gray-900 */
+            border-bottom-color: #374151; /* gray-700 */
+        }
+        .nav-link.active {
+            background-color: #e0e7ff; /* indigo-100 */
+            color: #3730a3; /* indigo-800 */
+        }
+        html.dark .nav-link.active {
+            background-color: #3730a3; /* indigo-800 */
+            color: #e0e7ff; /* indigo-100 */
+        }
+        #user-menu-dropdown {
+            position: absolute;
+            top: calc(100% + 0.5rem);
+            right: 0;
+            background: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1);
+            border: 1px solid #e5e7eb;
+            width: 220px;
+            z-index: 40;
+            animation: fadeIn 0.15s ease-out;
+        }
+        html.dark #user-menu-dropdown {
+            background: #1f2937; /* gray-800 */
+            border-color: #374151; /* gray-700 */
+        }
+        #dashboard-content {
+            flex-grow: 1;
+        }
+        /* Override app-container styles for dashboard integration */
+        #app-container {
+            max-width: none;
+            margin: 0;
+            padding: 0; /* Let the dashboard content add padding */
         }
     </style>
-<script type="importmap">
-{
-  "imports": {
-    "react": "https://aistudiocdn.com/react@^19.2.0",
-    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
-    "react/": "https://aistudiocdn.com/react@^19.2.0/",
-    "firebase/": "https://aistudiocdn.com/firebase@^12.4.0/",
-    "@google/genai": "https://aistudiocdn.com/@google/genai@^0.14.0"
-  }
-}
-</script>
-<link rel="stylesheet" href="/index.css">
 </head>
-<body class="bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-200">
-
-    <!-- Login Page -->
-    <div id="login-page" class="hidden min-h-screen flex items-center justify-center p-4 fade-in">
-        <div class="w-full max-w-md space-y-8">
-            <div class="text-center">
-                <svg class="mx-auto h-12 w-auto text-blue-600" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                    <g stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none">
-                        <path d="M25,15 h50 a5,5 0 0 1 5,5 v60 a5,5 0 0 1 -5,5 h-50 a5,5 0 0 1 -5,-5 v-60 a5,5 0 0 1 5,-5 z" />
-                        <path d="M35 35 H 75" /> <path d="M35 48 H 75" /> <path d="M35 61 H 60" />
-                    </g>
-                </svg>
-                <h2 class="mt-6 text-3xl font-extrabold text-gray-900 dark:text-white">Sign in to your account</h2>
+<body class="bg-gray-50 dark:bg-gray-950">
+    <!-- Sign-In Page -->
+    <div id="signin-page" class="fixed inset-0 flex items-center justify-center p-4">
+        <div class="signin-card">
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-bold text-gray-800 dark:text-white">Welcome Back</h1>
+                <p class="text-gray-600 dark:text-gray-400 mt-2">Sign in to access your Work Report</p>
             </div>
-            <div id="login-form-container" class="mt-8 space-y-6 bg-white dark:bg-gray-900/50 p-8 rounded-2xl shadow-2xl">
-                <!-- Login/Signup forms will be rendered here -->
-            </div>
+            <form id="signin-form" autocomplete="on" class="space-y-6">
+                <div>
+                    <input id="auth-email" type="email" placeholder="Email" autocomplete="email" required class="signin-input" />
+                </div>
+                <div>
+                    <input id="auth-password" type="password" placeholder="Password" autocomplete="current-password" required class="signin-input" />
+                </div>
+                <p id="signin-error" class="text-red-500 text-sm h-4 text-center"></p>
+                <button type="submit" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 transition-all duration-300 transform hover:-translate-y-0.5 signin-button-glow">
+                    Sign In
+                </button>
+                 <div class="relative my-4"><div class="absolute inset-0 flex items-center"><div class="w-full border-t border-gray-300 dark:border-gray-700"></div></div><div class="relative flex justify-center text-sm"><span class="px-2 bg-white/0 backdrop-blur-sm text-gray-500">Or</span></div></div>
+                 <button type="button" id="google-signin-btn" class="w-full flex items-center justify-center gap-3 py-2.5 px-4 rounded-lg font-semibold text-sm transition-all duration-200 bg-white text-gray-800 border border-gray-300 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-700">
+                    <svg class="w-5 h-5" viewBox="0 0 48 48"><path fill="#4285F4" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path><path fill="#34A853" d="M46.98 24.55c0-1.57-.15-3.09-.42-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path><path fill="#EA4335" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path><path fill="none" d="M0 0h48v48H0z"></path></svg>
+                    Sign in with Google
+                </button>
+                 <p class="text-center text-sm text-gray-600 dark:text-gray-400 pt-4">
+                    Don’t have an account? 
+                    <button type="button" id="show-signup-btn" class="font-semibold text-blue-600 hover:underline dark:text-blue-400">Sign up</button>
+                </p>
+            </form>
         </div>
     </div>
     
-    <!-- Welcome Overlay -->
-    <div id="welcome-overlay" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-gray-50 dark:bg-gray-950">
-        <h1 id="welcome-text" class="text-4xl sm:text-5xl md:text-6xl font-bold text-gray-800 dark:text-gray-200"></h1>
-    </div>
-
-    <!-- Main Dashboard View (for logged-in users) -->
-    <div id="dashboard-view" class="hidden max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
-        <!-- Dashboard Header -->
-        <header class="flex justify-between items-center py-4 border-b border-gray-200 dark:border-gray-800">
-            <div class="flex items-center gap-3">
-                 <svg class="h-8 w-8 text-blue-600" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                    <g stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none">
-                        <path d="M25,15 h50 a5,5 0 0 1 5,5 v60 a5,5 0 0 1 -5,5 h-50 a5,5 0 0 1 -5,-5 v-60 a5,5 0 0 1 5,-5 z" />
-                        <path d="M35 35 H 75" /> <path d="M35 48 H 75" /> <path d="M35 61 H 60" />
-                    </g>
-                </svg>
-                <span class="text-xl font-bold text-gray-800 dark:text-gray-200">Work Report</span>
+    <!-- Dashboard Page -->
+    <div id="dashboard-page">
+        <!-- Top Navigation -->
+        <nav id="dashboard-nav" class="flex items-center justify-between">
+            <div class="flex items-center gap-8">
+                <!-- Logo -->
+                <div class="flex items-center gap-2 text-xl font-bold text-gray-800 dark:text-white">
+                    <svg class="w-8 h-8 text-blue-600" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                         <g stroke="currentColor" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none">
+                            <path d="M25,15 h50 a5,5 0 0 1 5,5 v60 a5,5 0 0 1 -5,5 h-50 a5,5 0 0 1 -5,-5 v-60 a5,5 0 0 1 5,-5 z" />
+                            <path d="M35 35 H 75" />
+                            <path d="M35 50 H 75" />
+                            <path d="M35 65 H 60" />
+                        </g>
+                    </svg>
+                    <span>Work Report</span>
+                </div>
+                <!-- Navigation Links -->
+                <div class="hidden md:flex items-center gap-2 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg">
+                    <a href="#" class="nav-link active px-4 py-1.5 text-sm font-semibold rounded-md transition-colors">Report</a>
+                </div>
             </div>
-            <div class="flex items-center gap-4">
-                <span id="dashboard-user-name" class="hidden sm:block font-semibold"></span>
-                <img id="dashboard-user-avatar" class="w-10 h-10 rounded-full object-cover border-2 border-white dark:border-gray-700 shadow-sm" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='gray'%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E" alt="User Avatar"/>
-                <button id="dashboard-logout-btn" title="Logout" class="p-2 text-gray-500 hover:bg-gray-100 hover:text-red-600 dark:text-gray-400 dark:hover:bg-gray-800 rounded-full transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-                </button>
+            <div id="dashboard-auth-area" class="relative">
+                <!-- User menu will be rendered here by JS -->
             </div>
-        </header>
+        </nav>
         
-        <!-- Main Content -->
-        <main class="mt-8">
-            <div class="mb-12">
-                <h1 id="dashboard-greeting" class="text-4xl font-extrabold text-gray-900 dark:text-white"></h1>
-                <p id="dashboard-datetime" class="mt-2 text-lg text-gray-500 dark:text-gray-400"></p>
-            </div>
+        <!-- Main Content (houses the original app) -->
+        <main id="dashboard-content" class="p-4 sm:p-6 lg:p-8">
+            <div id="app-container" class="relative text-gray-800 dark:text-gray-200 opacity-0 transition-opacity duration-500">
+                <!-- Auth Area IS GONE, moved to nav -->
+                
+                <!-- Header will be rendered here -->
+                <header id="header-container"></header>
 
-            <!-- Dashboard Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div id="dashboard-card-1" class="dashboard-card glass-card p-6 rounded-2xl shadow-lg">
-                    <h3 class="font-bold text-xl mb-2">Today's Report</h3>
-                    <p class="text-gray-600 dark:text-gray-300 mb-4">Jump directly to today's entry to log your work.</p>
-                    <button id="view-today-btn" class="font-semibold text-blue-600 dark:text-blue-400 hover:underline">View Today →</button>
-                </div>
-                <div id="dashboard-card-2" class="dashboard-card glass-card p-6 rounded-2xl shadow-lg">
-                    <h3 class="font-bold text-xl mb-2">Reminders</h3>
-                    <p id="reminders-summary" class="text-gray-600 dark:text-gray-300 mb-4">You have no upcoming reminders.</p>
-                    <button id="view-reminders-btn" class="font-semibold text-blue-600 dark:text-blue-400 hover:underline">Manage Reminders →</button>
-                </div>
-                <div id="dashboard-card-3" class="dashboard-card glass-card p-6 rounded-2xl shadow-lg">
-                     <h3 class="font-bold text-xl mb-2">Monthly Summary</h3>
-                    <p id="summary-ot-hours" class="text-gray-600 dark:text-gray-300 mb-4">Total OT hours this month: 0.00</p>
-                    <button id="view-full-report-btn" class="font-semibold text-blue-600 dark:text-blue-400 hover:underline">View Full Report →</button>
-                </div>
-            </div>
-
-            <!-- Quick Actions -->
-            <div class="mt-12">
-                <h2 class="text-2xl font-bold mb-6">Quick Actions</h2>
-                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 text-center">
-                    <button id="dashboard-action-1" data-action="ai" class="dashboard-quick-action group space-y-3 p-4 bg-white dark:bg-gray-900 rounded-2xl shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
-                        <div class="w-16 h-16 flex items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/50 mx-auto transition-transform group-hover:scale-110">
-                           <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-600 dark:text-blue-400"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
-                        </div>
-                        <span class="font-semibold">AI Assistant</span>
-                    </button>
-                    <button id="dashboard-action-2" data-action="backup" class="dashboard-quick-action group space-y-3 p-4 bg-white dark:bg-gray-900 rounded-2xl shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
-                        <div class="w-16 h-16 flex items-center justify-center rounded-full bg-green-100 dark:bg-green-900/50 mx-auto transition-transform group-hover:scale-110">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-600 dark:text-green-400"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                        </div>
-                        <span class="font-semibold">Backup</span>
-                    </button>
-                    <button id="dashboard-action-3" data-action="restore" class="dashboard-quick-action group space-y-3 p-4 bg-white dark:bg-gray-900 rounded-2xl shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
-                        <div class="w-16 h-16 flex items-center justify-center rounded-full bg-yellow-100 dark:bg-yellow-900/50 mx-auto transition-transform group-hover:scale-110">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-yellow-600 dark:text-yellow-400"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                        </div>
-                        <span class="font-semibold">Restore</span>
-                    </button>
-                    <button id="dashboard-action-4" data-action="share" class="dashboard-quick-action group space-y-3 p-4 bg-white dark:bg-gray-900 rounded-2xl shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
-                        <div class="w-16 h-16 flex items-center justify-center rounded-full bg-purple-100 dark:bg-purple-900/50 mx-auto transition-transform group-hover:scale-110">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-purple-600 dark:text-purple-400"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-                        </div>
-                        <span class="font-semibold">Share</span>
-                    </button>
-                     <button id="dashboard-action-5" data-action="theme" class="dashboard-quick-action group space-y-3 p-4 bg-white dark:bg-gray-900 rounded-2xl shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
-                        <div class="w-16 h-16 flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800 mx-auto transition-transform group-hover:scale-110">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-600 dark:text-gray-400"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-                        </div>
-                        <span class="font-semibold">Toggle Theme</span>
-                    </button>
-                </div>
+                <main class="mt-8">
+                    <!-- Day cards will be rendered here -->
+                    <div id="daysContainer" class="space-y-8"></div>
+                    <!-- Summary will be rendered here -->
+                    <div id="summary-container"></div>
+                </main>
             </div>
         </main>
-    </div>
 
-    <!-- Original Report View (now hidden by default) -->
-    <div id="report-view" class="hidden">
-        <div id="app-container" class="relative max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
-            <!-- Auth Area is now handled by the dashboard header -->
-            <div id="auth-area" class="absolute top-4 right-4 sm:top-6 sm:right-6 lg:top-8 lg:right-8 z-20"></div>
-            <!-- Header will be rendered here -->
-            <header id="header-container"></header>
-            <main class="mt-8">
-                <!-- Day cards will be rendered here -->
-                <div id="daysContainer" class="space-y-8"></div>
-                <!-- Summary will be rendered here -->
-                <div id="summary-container"></div>
-            </main>
+        <!-- Scroll Buttons -->
+        <div class="fixed bottom-6 right-6 flex flex-col gap-3 z-40">
+            <button id="floating-date-picker-btn" title="Go to Date" class="w-12 h-12 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm text-gray-700 dark:text-gray-200 rounded-full shadow-lg flex items-center justify-center hover:bg-white dark:hover:bg-gray-700 hover:text-blue-600 transition-all duration-200 hidden">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            </button>
+            <button id="scrollUpButton" class="w-12 h-12 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm text-gray-700 dark:text-gray-200 rounded-full shadow-lg flex items-center justify-center hover:bg-white dark:hover:bg-gray-700 hover:text-blue-600 transition-all duration-200 hidden">↑</button>
+            <button id="scrollDownButton" class="w-12 h-12 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm text-gray-700 dark:text-gray-200 rounded-full shadow-lg flex items-center justify-center hover:bg-white dark:hover:bg-gray-700 hover:text-blue-600 transition-all duration-200">↓</button>
         </div>
     </div>
 
@@ -311,19 +548,25 @@
     <!-- Modals Portal -->
     <div id="modal-root"></div>
 
-    <!-- Scroll Buttons (for report view) -->
-    <div id="report-scroll-buttons" class="fixed bottom-6 right-6 flex-col gap-3 z-40 hidden">
-        <button id="floating-date-picker-btn" title="Go to Date" class="w-12 h-12 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm text-gray-700 dark:text-gray-200 rounded-full shadow-lg flex items-center justify-center hover:bg-white dark:hover:bg-gray-700 hover:text-blue-600 transition-all duration-200 hidden">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-        </button>
-        <button id="scrollUpButton" class="w-12 h-12 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm text-gray-700 dark:text-gray-200 rounded-full shadow-lg flex items-center justify-center hover:bg-white dark:hover:bg-gray-700 hover:text-blue-600 transition-all duration-200 hidden">↑</button>
-        <button id="scrollDownButton" class="w-12 h-12 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm text-gray-700 dark:text-gray-200 rounded-full shadow-lg flex items-center justify-center hover:bg-white dark:hover:bg-gray-700 hover:text-blue-600 transition-all duration-200">↓</button>
+    <!-- Loading Spinner -->
+    <div id="loading-spinner" class="fixed inset-0 bg-white/80 dark:bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 transition-opacity duration-300">
+        <div class="loader-content">
+            <svg class="animated-logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <g class="logo-stroke-color" stroke="var(--slt-blue)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none">
+                    <!-- Document Outline -->
+                    <path class="draw-stroke doc-outline" d="M25,15 h50 a5,5 0 0 1 5,5 v60 a5,5 0 0 1 -5,5 h-50 a5,5 0 0 1 -5,-5 v-60 a5,5 0 0 1 5,-5 z" />
+                    <!-- Text Lines -->
+                    <path class="draw-stroke text-line1" d="M35 35 H 75" />
+                    <path class="draw-stroke text-line2" d="M35 48 H 75" />
+                    <path class="draw-stroke text-line3" d="M35 61 H 60" />
+                    <!-- Checkmark -->
+                    <path class="draw-stroke checkmark" d="M40 75 L50 82 L70 65" />
+                </g>
+            </svg>
+            <span class="loader-text dark:text-gray-300">Work Report</span>
+        </div>
     </div>
 
-    <!-- Loading Spinner (reused for general loading) -->
-    <div id="loading-spinner" class="fixed inset-0 bg-white/80 dark:bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 transition-opacity duration-300">
-        <!-- Spinner content removed, will be added by JS if needed -->
-    </div>
 
 <script>
 // ===================================================================================
@@ -333,22 +576,33 @@
 // ===================================================================================
 
 const applyTheme = (theme) => {
+    const sunIcon = document.getElementById('theme-icon-sun');
+    const moonIcon = document.getElementById('theme-icon-moon');
     if (theme === 'dark') {
         document.documentElement.classList.add('dark');
         localStorage.setItem('theme', 'dark');
+        sunIcon?.classList.remove('hidden');
+        moonIcon?.classList.add('hidden');
     } else {
         document.documentElement.classList.remove('dark');
         localStorage.setItem('theme', 'light');
+        sunIcon?.classList.add('hidden');
+        moonIcon?.classList.remove('hidden');
     }
 }
 
 const initTheme = () => {
     const savedTheme = localStorage.getItem('theme');
     const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    if (savedTheme) applyTheme(savedTheme);
-    else if (systemPrefersDark) applyTheme('dark');
-    else applyTheme('light');
+    if (savedTheme) {
+        applyTheme(savedTheme);
+    } else if (systemPrefersDark) {
+        applyTheme('dark');
+    } else {
+        applyTheme('light');
+    }
 }
+
 initTheme();
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -361,20 +615,14 @@ document.addEventListener('DOMContentLoaded', () => {
     let workData = {};
     let reminders = [];
     let isInitialLoad = true;
-    let dateTimeInterval = null;
     
     const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
     const reminderCategories = ['Wedding', 'Nobility Ceremony', 'Birthday', 'House Warming Ceremony', 'Other'];
     
     // DOM Elements
-    const loginPage = document.getElementById('login-page');
-    const loginFormContainer = document.getElementById('login-form-container');
-    const welcomeOverlay = document.getElementById('welcome-overlay');
-    const welcomeText = document.getElementById('welcome-text');
-    const dashboardView = document.getElementById('dashboard-view');
-    const reportView = document.getElementById('report-view');
-    
-    const authArea = document.getElementById('auth-area'); // Keep for guest view
+    const signinPage = document.getElementById('signin-page');
+    const dashboardPage = document.getElementById('dashboard-page');
+    const dashboardAuthArea = document.getElementById('dashboard-auth-area');
     const headerContainer = document.getElementById('header-container');
     const daysContainer = document.getElementById('daysContainer');
     const summaryContainer = document.getElementById('summary-container');
@@ -384,7 +632,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const scrollUpButton = document.getElementById('scrollUpButton');
     const scrollDownButton = document.getElementById('scrollDownButton');
     const floatingDatePickerBtn = document.getElementById('floating-date-picker-btn');
-    const reportScrollButtons = document.getElementById('report-scroll-buttons');
 
     // -----------------------------------------------------------------------------
     // ALL FUNCTION DEFINITIONS
@@ -409,11 +656,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // MODAL RENDERING & MANAGEMENT
     const openModal = (modalHTML) => {
         modalRoot.innerHTML = modalHTML;
+        // Attach close listeners to all elements with data-dismiss="modal"
         modalRoot.querySelectorAll('[data-dismiss="modal"]').forEach(el => {
             el.addEventListener('click', closeModal);
         });
     };
-    const closeModal = () => { modalRoot.innerHTML = ''; };
+    
+    const closeModal = () => {
+        modalRoot.innerHTML = '';
+    };
+
     const createModal = (title, content, id = '') => {
         return `
             <div id="${id}" class="fixed inset-0 bg-gray-900 bg-opacity-50 backdrop-blur-sm flex justify-center items-center z-50 p-4 modal-bg-animate" data-dismiss="modal">
@@ -429,116 +681,51 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
         `;
     };
+    
     const showInfoModal = (title, message) => {
         const content = `<p class="text-gray-600 dark:text-gray-400 text-center">${message}</p>`;
         openModal(createModal(title, content));
     };
 
-    // --- NEW UI RENDERING ---
-
-    const showView = (view) => {
-        loginPage.classList.add('hidden');
-        dashboardView.classList.add('hidden');
-        reportView.classList.add('hidden');
-        reportScrollButtons.classList.add('hidden');
-
-        if (view === 'login') {
-            loginPage.classList.remove('hidden');
-        } else if (view === 'dashboard') {
-            dashboardView.classList.remove('hidden');
-            dashboardView.classList.add('fade-in');
-        } else if (view === 'report') {
-            reportView.classList.remove('hidden');
-            reportView.classList.add('fade-in');
-            reportScrollButtons.classList.remove('hidden');
-            reportScrollButtons.style.display = 'flex';
-        }
-    };
-
-    const playWelcomeAnimation = (user) => {
-        welcomeText.textContent = `Welcome, ${user.displayName || 'User'}`;
-        welcomeOverlay.classList.remove('hidden');
-        
-        setTimeout(() => {
-            welcomeOverlay.classList.add('fade-out');
-            showView('dashboard');
-            renderDashboard(user);
-        }, 2000); // Show for 2 seconds
-
-        setTimeout(() => {
-            welcomeOverlay.classList.add('hidden');
-            welcomeOverlay.classList.remove('fade-out');
-        }, 2500); // Hide after fade out completes
-    };
-
-    const renderDashboard = (user) => {
-        // Populate user info
-        document.getElementById('dashboard-user-name').textContent = user.displayName;
-        document.getElementById('dashboard-user-avatar').src = user.photoURL || `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='gray'%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E`;
-        
-        // Greeting
-        const hour = new Date().getHours();
-        let greeting = 'Good Evening';
-        if (hour < 12) greeting = 'Good Morning';
-        else if (hour < 18) greeting = 'Good Afternoon';
-        document.getElementById('dashboard-greeting').textContent = `${greeting}, ${user.displayName.split(' ')[0]}!`;
-        
-        // Date & Time
-        const dateTimeEl = document.getElementById('dashboard-datetime');
-        const updateTime = () => {
-            dateTimeEl.textContent = new Date().toLocaleString('en-US', {
-                weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
-            });
-        };
-        updateTime();
-        if (dateTimeInterval) clearInterval(dateTimeInterval);
-        dateTimeInterval = setInterval(updateTime, 1000);
-
-        // Reminders Summary
-        const upcomingReminders = reminders.filter(r => new Date(r.date) >= new Date()).length;
-        document.getElementById('reminders-summary').textContent = upcomingReminders > 0 
-            ? `You have ${upcomingReminders} upcoming reminder${upcomingReminders > 1 ? 's' : ''}.` 
-            : 'You have no upcoming reminders.';
-
-        // OT Summary
-        const year = currentDate.getFullYear();
-        const month = currentDate.getMonth();
-        const monthPrefix = `${year}-${month}`;
-        let totalOtHours = 0;
-        Object.keys(workData).forEach(key => {
-            if (key.startsWith(monthPrefix)) {
-                const data = workData[key];
-                const day = parseInt(key.split('-')[2], 10);
-                const weekend = isWeekend(year, month, day);
-                const isSpecial = data.specialDays === "Poya Day" || data.specialDays === "Public Holiday";
-                const workingHours = calculateHoursDifference(data.inTime, data.outTime);
-                if (workingHours > 0) {
-                     if (isSpecial || weekend) totalOtHours += workingHours;
-                     else if (workingHours > 9) totalOtHours += workingHours - 9;
-                }
-            }
-        });
-        document.getElementById('summary-ot-hours').textContent = `Total OT hours this month: ${totalOtHours.toFixed(2)}`;
-        
-        addDashboardEventListeners();
-    };
-
-    // --- END NEW UI RENDERING ---
-
     // COMPONENT RENDERING (as HTML strings)
-    const renderAuthArea = () => { // For guest view
-        authArea.innerHTML = `<button id="login-btn" class="text-sm font-semibold bg-blue-600 text-white px-4 py-1.5 rounded-lg shadow-sm hover:bg-blue-700 transition-all duration-200">Login</button>`;
-        document.getElementById('login-btn')?.addEventListener('click', () => showView('login'));
+    const renderDashboardNav = (user) => {
+        const userInitial = (user.displayName || user.email || 'U').charAt(0).toUpperCase();
+        dashboardAuthArea.innerHTML = `
+            <button id="user-menu-btn" class="w-10 h-10 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center text-gray-600 dark:text-gray-300 font-semibold text-lg">
+                ${userInitial}
+            </button>
+            <div id="user-menu-dropdown" class="hidden">
+                <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+                    <p class="text-sm font-semibold text-gray-900 dark:text-white truncate">${user.displayName || 'User'}</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 truncate">${user.email}</p>
+                </div>
+                <div class="p-2">
+                    <button id="logout-btn" class="w-full text-left flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                        <span>Logout</span>
+                    </button>
+                </div>
+            </div>
+        `;
+
+        const menuBtn = document.getElementById('user-menu-btn');
+        const dropdown = document.getElementById('user-menu-dropdown');
+        menuBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            dropdown.classList.toggle('hidden');
+        });
+        document.addEventListener('click', () => dropdown.classList.add('hidden'));
+        document.getElementById('logout-btn').addEventListener('click', showLogoutConfirmationModal);
     }
 
     const renderHeader = () => {
         const year = currentDate.getFullYear();
         const month = currentDate.getMonth();
         const years = Array.from({ length: 11 }, (_, i) => new Date().getFullYear() - 5 + i);
+        const isDarkMode = document.documentElement.classList.contains('dark');
 
         headerContainer.innerHTML = `
-            <div class="flex justify-between items-center pb-4 border-b border-gray-200 dark:border-gray-800">
-                <button id="back-to-dashboard-btn" class="p-2 text-gray-500 hover:bg-gray-100 hover:text-blue-600 dark:text-gray-400 dark:hover:bg-gray-800 rounded-md transition-colors">← Back to Dashboard</button>
+            <div class="text-center pb-4 border-b border-gray-200 dark:border-gray-800">
                 <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-50 tracking-tight">Work Report</h1>
             </div>
             <div class="mt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
@@ -552,13 +739,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     </select>
                     <button id="next-month-btn" class="p-2 text-gray-500 hover:bg-gray-100 hover:text-blue-600 dark:text-gray-400 dark:hover:bg-gray-800 rounded-md transition-colors">→</button>
                 </div>
-                 <div class="flex items-center gap-2 bg-white dark:bg-gray-900 p-2 rounded-full border border-gray-200 dark:border-gray-800 shadow-sm">
+                <div class="flex items-center gap-2 bg-white dark:bg-gray-900 p-2 rounded-full border border-gray-200 dark:border-gray-800 shadow-sm">
                     <button id="ai-assistant-btn" title="AI Assistant" class="p-2 text-gray-500 hover:bg-gray-100 hover:text-blue-600 dark:text-gray-400 dark:hover:bg-gray-800 rounded-full transition-colors ai-btn-pulse">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/></svg>
                     </button>
                     <button id="date-picker-btn" title="Go to Date" class="p-2 text-gray-500 hover:bg-gray-100 hover:text-blue-600 dark:text-gray-400 dark:hover:bg-gray-800 rounded-full transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></button>
                     <button id="theme-toggle-btn" title="Toggle Theme" class="p-2 text-gray-500 hover:bg-gray-100 hover:text-blue-600 dark:text-gray-400 dark:hover:bg-gray-800 rounded-full transition-colors">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                        <svg id="theme-icon-sun" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 ${isDarkMode ? '' : 'hidden'}"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                        <svg id="theme-icon-moon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 ${isDarkMode ? 'hidden' : ''}"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
                     </button>
                     <button id="reminder-btn" title="Reminders" class="p-2 text-gray-500 hover:bg-gray-100 hover:text-blue-600 dark:text-gray-400 dark:hover:bg-gray-800 rounded-full transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg></button>
                     <button id="share-btn" title="Share or Export" class="p-2 text-gray-500 hover:bg-gray-100 hover:text-blue-600 dark:text-gray-400 dark:hover:bg-gray-800 rounded-full transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></button>
@@ -568,8 +756,6 @@ document.addEventListener('DOMContentLoaded', () => {
         addHeaderEventListeners();
     };
     
-    // Day card and summary rendering functions (createDayCardHTML, renderDays, renderSummary) are unchanged...
-    // [The long functions for createDayCardHTML, renderDays, renderSummary, etc., are omitted for brevity but remain in the actual file]
     const createDayCardHTML = (day) => {
         const year = currentDate.getFullYear();
         const month = currentDate.getMonth();
@@ -659,11 +845,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             </div>`;
     };
+
     const renderDays = () => {
         const daysInMonth = getDaysInMonth(currentDate.getFullYear(), currentDate.getMonth());
         daysContainer.innerHTML = Array.from({ length: daysInMonth }, (_, i) => createDayCardHTML(i + 1)).join('');
         addDayCardEventListeners();
     };
+
     const renderSummary = () => {
         const year = currentDate.getFullYear();
         const month = currentDate.getMonth();
@@ -721,101 +909,123 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // DATA HANDLING & STATE UPDATES
     const updateWorkData = (dateKey, field, value) => {
+        // 1. Prepare local update
         workData[dateKey] = workData[dateKey] || {};
-        if (field === 'leaveStatus' && value !== 'Yes') {
-            delete workData[dateKey].leaveReason; delete workData[dateKey].customReasonDetails; delete workData[dateKey].leaveReasonText;
-        }
-        if (field === 'leaveReason' && value !== 'Custom Reason') delete workData[dateKey].customReasonDetails;
-        if (field === 'leaveReason' && value !== 'Own Leave') delete workData[dateKey].leaveReasonText;
-        if (value) workData[dateKey][field] = value; else delete workData[dateKey][field];
 
+        // 2. Handle cascading changes locally first
+        if (field === 'leaveStatus' && value !== 'Yes') {
+            delete workData[dateKey].leaveReason;
+            delete workData[dateKey].customReasonDetails;
+            delete workData[dateKey].leaveReasonText;
+        }
+        if (field === 'leaveReason' && value !== 'Custom Reason') {
+            delete workData[dateKey].customReasonDetails;
+        }
+        if (field === 'leaveReason' && value !== 'Own Leave') {
+            delete workData[dateKey].leaveReasonText;
+        }
+
+        // 3. Apply the primary change locally
+        if (value) {
+            workData[dateKey][field] = value;
+        } else {
+            delete workData[dateKey][field];
+        }
+
+        // 4. Prepare and send cloud update if logged in
         if (user) {
             const userRef = db.collection("users").doc(user.uid);
             const updatePayload = {};
             const baseFieldPath = `workData.${dateKey}`;
+
+            // Add primary change to payload
             updatePayload[`${baseFieldPath}.${field}`] = value ? value : firebase.firestore.FieldValue.delete();
+
+            // Add cascading changes to payload
             if (field === 'leaveStatus' && value !== 'Yes') {
                 updatePayload[`${baseFieldPath}.leaveReason`] = firebase.firestore.FieldValue.delete();
                 updatePayload[`${baseFieldPath}.customReasonDetails`] = firebase.firestore.FieldValue.delete();
                 updatePayload[`${baseFieldPath}.leaveReasonText`] = firebase.firestore.FieldValue.delete();
             }
-            if (field === 'leaveReason' && value !== 'Custom Reason') updatePayload[`${baseFieldPath}.customReasonDetails`] = firebase.firestore.FieldValue.delete();
-            if (field === 'leaveReason' && value !== 'Own Leave') updatePayload[`${baseFieldPath}.leaveReasonText`] = firebase.firestore.FieldValue.delete();
+            if (field === 'leaveReason' && value !== 'Custom Reason') {
+                updatePayload[`${baseFieldPath}.customReasonDetails`] = firebase.firestore.FieldValue.delete();
+            }
+            if (field === 'leaveReason' && value !== 'Own Leave') {
+                updatePayload[`${baseFieldPath}.leaveReasonText`] = firebase.firestore.FieldValue.delete();
+            }
+            
             userRef.update(updatePayload).catch(err => console.error("Firestore update error:", err));
         } else {
+            // 5. Save locally if not logged in
             saveLocalData();
         }
 
+        // 6. Re-render UI
         if (field === 'leaveStatus' || field === 'leaveReason') {
             const day = dateKey.split('-')[2];
             const dayBox = daysContainer.querySelector(`.day-box[data-day="${day}"]`);
             if (dayBox) {
-                dayBox.outerHTML = createDayCardHTML(day);
+                const newDayCardHTML = createDayCardHTML(day);
+                dayBox.outerHTML = newDayCardHTML;
                 const newDayBox = daysContainer.querySelector(`.day-box[data-day="${day}"]`);
                 addSingleDayCardEventListeners(newDayBox);
             }
         }
         renderSummary();
     };
+
+    
     const saveLocalData = () => {
         localStorage.setItem('workData', JSON.stringify(workData));
         localStorage.setItem('reminders', JSON.stringify(reminders));
     };
+
     const clearDayData = (day) => {
-        const dateKey = `${currentDate.getFullYear()}-${currentDate.getMonth()}-${day}`;
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
+        const dateKey = `${year}-${month}-${day}`;
         if (workData[dateKey]) {
             delete workData[dateKey];
+            
             if (user) {
-                db.collection("users").doc(user.uid).update({ [`workData.${dateKey}`]: firebase.firestore.FieldValue.delete() });
-            } else { saveLocalData(); }
+                const userRef = db.collection("users").doc(user.uid);
+                const fieldPath = `workData.${dateKey}`;
+                userRef.update({
+                    [fieldPath]: firebase.firestore.FieldValue.delete()
+                }).catch(err => {
+                    console.error("Firestore field delete error:", err);
+                });
+            } else {
+                saveLocalData();
+            }
+
             const dayBox = daysContainer.querySelector(`.day-box[data-day="${day}"]`);
             if (dayBox) {
-                dayBox.outerHTML = createDayCardHTML(day);
-                addSingleDayCardEventListeners(daysContainer.querySelector(`.day-box[data-day="${day}"]`));
+                const newDayCardHTML = createDayCardHTML(day);
+                dayBox.outerHTML = newDayCardHTML;
+                const newDayBox = daysContainer.querySelector(`.day-box[data-day="${day}"]`);
+                addSingleDayCardEventListeners(newDayBox);
             }
             renderSummary();
         }
     };
+
     // EVENT LISTENER DEFINITIONS
-    const handleThemeToggle = () => applyTheme(document.documentElement.classList.contains('dark') ? 'light' : 'dark');
-    
-    // Most event listeners (addHeaderEventListeners, addDayCardEventListeners, etc.) are unchanged...
-    // [The long functions for event listeners are omitted for brevity but remain in the actual file]
-    const addDashboardEventListeners = () => {
-        document.getElementById('dashboard-logout-btn').addEventListener('click', showLogoutConfirmationModal);
-        document.getElementById('view-today-btn').addEventListener('click', () => {
-            const today = new Date();
-            currentDate = today; // Set current view to today's month
-            renderAllReportView();
-            showView('report');
-            setTimeout(() => {
-                const todayEl = document.querySelector(`.day-box[data-day="${today.getDate()}"]`);
-                if (todayEl) todayEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }, 100);
-        });
-        document.getElementById('view-reminders-btn').addEventListener('click', showReminderModal);
-        document.getElementById('view-full-report-btn').addEventListener('click', () => {
-            renderAllReportView();
-            showView('report');
-        });
-        document.getElementById('dashboard-action-1').addEventListener('click', showAiModal);
-        document.getElementById('dashboard-action-2').addEventListener('click', handleBackup);
-        document.getElementById('dashboard-action-3').addEventListener('click', () => document.getElementById('restore-file-input')?.click());
-        document.getElementById('dashboard-action-4').addEventListener('click', showShareModal);
-        document.getElementById('dashboard-action-5').addEventListener('click', handleThemeToggle);
-    };
+    const handleThemeToggle = () => {
+        const currentTheme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+        applyTheme(currentTheme === 'light' ? 'dark' : 'light');
+    }
 
     const addHeaderEventListeners = () => {
-        document.getElementById('back-to-dashboard-btn').addEventListener('click', () => showView('dashboard'));
         document.getElementById('prev-month-btn').addEventListener('click', () => navigateMonth(-1));
         document.getElementById('next-month-btn').addEventListener('click', () => navigateMonth(1));
         document.getElementById('monthDropdown').addEventListener('change', (e) => {
             currentDate.setMonth(parseInt(e.target.value));
-            renderAllReportView();
+            renderAll();
         });
         document.getElementById('yearDropdown').addEventListener('change', (e) => {
             currentDate.setFullYear(parseInt(e.target.value));
-            renderAllReportView();
+            renderAll();
         });
         document.getElementById('theme-toggle-btn').addEventListener('click', handleThemeToggle);
         document.getElementById('reminder-btn').addEventListener('click', showReminderModal);
@@ -848,6 +1058,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (el.classList.contains('custom-time-input')) {
                 el.addEventListener('click', (e) => showTimePickerModal(e.target));
             }
+            // All inputs need this listener for data binding
             const eventType = el.tagName === 'SELECT' ? 'change' : 'input';
             el.addEventListener(eventType, (e) => {
                 const { key, field } = e.target.dataset;
@@ -857,7 +1068,10 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const addDayCardEventListeners = () => {
-        daysContainer.querySelectorAll('.day-box').forEach(addSingleDayCardEventListeners);
+        daysContainer.querySelectorAll('.day-box').forEach(dayBox => {
+            addSingleDayCardEventListeners(dayBox);
+        });
+
         document.addEventListener('click', (e) => {
             if (!e.target.closest('.day-card-menu-btn')) {
                 document.querySelectorAll('.day-card-menu-dropdown').forEach(d => d.classList.add('hidden'));
@@ -874,23 +1088,33 @@ document.addEventListener('DOMContentLoaded', () => {
     // ACTION HANDLERS
     const navigateMonth = (direction) => {
         currentDate.setMonth(currentDate.getMonth() + direction);
-        renderAllReportView();
+        renderAll();
     };
+
     const handleClearMonthData = () => {
-        if (window.confirm("Are you sure you want to clear all data for this month?")) {
+        if (window.confirm("Are you sure you want to clear all data for this month? This action cannot be undone.")) {
             const monthPrefix = `${currentDate.getFullYear()}-${currentDate.getMonth()}`;
             Object.keys(workData).forEach(key => {
                 if (key.startsWith(monthPrefix)) delete workData[key];
             });
-            if(user) syncToCloud(); else saveLocalData();
-            renderAllReportView();
+            if(user) {
+                syncToCloud();
+            } else {
+                saveLocalData();
+            }
+            renderAll();
         }
     };
+    
     const handleBackup = () => {
         const monthPrefix = `${currentDate.getFullYear()}-${currentDate.getMonth()}`;
         const monthData = Object.keys(workData)
             .filter(key => key.startsWith(monthPrefix))
-            .reduce((obj, key) => { obj[key] = workData[key]; return obj; }, {});
+            .reduce((obj, key) => {
+                obj[key] = workData[key];
+                return obj;
+            }, {});
+        
         if (Object.keys(monthData).length === 0) return alert("No data for this month to backup.");
         const blob = new Blob([JSON.stringify(monthData, null, 2)], { type: 'application/json' });
         const a = document.createElement('a');
@@ -899,73 +1123,154 @@ document.addEventListener('DOMContentLoaded', () => {
         a.click();
         URL.revokeObjectURL(a.href);
     };
+
     const handleRestore = (e) => {
-        const file = e.target.files[0]; if (!file) return;
+        const file = e.target.files[0];
+        if (!file) return;
         const reader = new FileReader();
         reader.onload = (event) => {
             try {
-                workData = { ...workData, ...JSON.parse(event.target.result) };
-                if(user) syncToCloud(); else saveLocalData();
-                renderAllReportView();
+                const restoredData = JSON.parse(event.target.result);
+                workData = { ...workData, ...restoredData };
+                if(user) {
+                    syncToCloud();
+                } else {
+                    saveLocalData();
+                }
+                renderAll();
                 alert("Data restored successfully.");
-            } catch (err) { alert("Error restoring data. Invalid file."); }
+            } catch (err) {
+                alert("Error restoring data. Invalid file.");
+            }
         };
-        reader.readAsText(file); e.target.value = '';
+        reader.readAsText(file);
+        e.target.value = '';
+    };
+
+    const scrollToToday = () => {
+        if (!isInitialLoad) return;
+
+        const today = new Date();
+        const isCurrentMonthView = today.getFullYear() === currentDate.getFullYear() && today.getMonth() === currentDate.getMonth();
+
+        if (isCurrentMonthView) {
+            const todayEl = document.querySelector(`.day-box[data-day="${today.getDate()}"]`);
+            if (todayEl) {
+                setTimeout(() => {
+                    todayEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 500); 
+            }
+        }
+        isInitialLoad = false;
     };
 
     // MODAL CONTENT AND LOGIC
-    // showAuthModal and showSignUpModal now render into the login page container
-    const renderLoginForm = () => {
-        loginFormContainer.innerHTML = `
-            <form id="login-form" autocomplete="on" class="space-y-6">
-                 <div>
-                    <label for="email" class="sr-only">Email</label>
-                    <input id="auth-email" type="email" placeholder="Email address" autocomplete="email" required class="p-3 w-full border border-gray-300 rounded-lg bg-gray-50/50 transition duration-200 premium-input dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200" />
-                </div>
-                <div>
-                    <label for="password" class="sr-only">Password</label>
-                    <input id="auth-password" type="password" placeholder="Password" autocomplete="current-password" required class="p-3 w-full border border-gray-300 rounded-lg bg-gray-50/50 transition duration-200 premium-input dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200" />
-                </div>
-                <div class="flex items-center justify-end">
-                    <button type="button" id="forgot-password-btn" class="text-sm font-medium text-blue-600 hover:underline dark:text-blue-400">Forgot Password?</button>
-                </div>
-                <p id="auth-error" class="text-red-500 text-sm h-4 text-center"></p>
-                <button type="submit" class="w-full px-5 py-3 rounded-lg font-semibold text-sm shadow-sm transition-all duration-200 transform hover:scale-[1.03] bg-blue-600 text-white hover:bg-blue-700">Sign in</button>
-                <div class="relative my-2"><div class="absolute inset-0 flex items-center"><div class="w-full border-t border-gray-300 dark:border-gray-700"></div></div><div class="relative flex justify-center text-sm"><span class="px-2 bg-white dark:bg-gray-900/50 text-gray-500">Or continue with</span></div></div>
-                <button type="button" id="google-login" class="w-full flex items-center justify-center gap-3 px-5 py-3 rounded-lg font-semibold text-sm shadow-sm transition-all duration-200 transform hover:scale-[1.03] bg-white text-gray-800 border border-gray-300 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-700">
-                    <svg class="w-5 h-5" viewBox="0 0 48 48"><path fill="#4285F4" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path><path fill="#34A853" d="M46.98 24.55c0-1.57-.15-3.09-.42-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path><path fill="#EA4335" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path><path fill="none" d="M0 0h48v48H0z"></path></svg>
-                    Sign in with Google
-                </button>
-                <p class="text-center text-sm text-gray-600 dark:text-gray-400">
-                    Don’t have an account? 
-                    <button type="button" id="show-signup-btn" class="font-semibold text-blue-600 hover:underline dark:text-blue-400">Sign up</button>
-                </p>
-            </form>
-        `;
-        addLoginListeners();
+    const addSigninEventListeners = () => {
+        document.getElementById('show-signup-btn').addEventListener('click', showSignUpModal);
+
+        document.getElementById('signin-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('auth-email').value;
+            const password = document.getElementById('auth-password').value;
+            const errorEl = document.getElementById('signin-error');
+            errorEl.textContent = '';
+            
+            try {
+                await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+                const userCredential = await auth.signInWithEmailAndPassword(email, password);
+
+                if (!userCredential.user.emailVerified) {
+                    errorEl.textContent = 'Your email is not verified. Please check your inbox.';
+                    await auth.signOut();
+                    return;
+                }
+                
+                await promptToSavePassword(email, password);
+                // Auth state change will handle UI switch
+            } catch (err) {
+                errorEl.textContent = err.message;
+            }
+        });
+
+        document.getElementById('google-signin-btn').addEventListener('click', async () => {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            try {
+                await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+                const result = await auth.signInWithPopup(provider);
+                const email = result.user.email;
+                await promptToSavePassword(email, '******');
+                // Auth state change will handle UI switch
+            } catch (e) {
+                document.getElementById('signin-error').textContent = e.message;
+            }
+        });
     };
 
-    const renderSignupForm = () => {
-        loginFormContainer.innerHTML = `
-            <form id="signup-form" autocomplete="on" class="space-y-4">
-                <input id="signup-name" type="text" placeholder="Full Name" autocomplete="name" required class="p-3 w-full border rounded-lg premium-input dark:bg-gray-800 dark:border-gray-700" />
-                <input id="signup-email" type="email" placeholder="Email" autocomplete="email" required class="p-3 w-full border rounded-lg premium-input dark:bg-gray-800 dark:border-gray-700" />
-                <input id="signup-password" type="password" placeholder="Password" autocomplete="new-password" required class="p-3 w-full border rounded-lg premium-input dark:bg-gray-800 dark:border-gray-700" />
-                <input id="signup-confirm-password" type="password" placeholder="Confirm Password" autocomplete="new-password" required class="p-3 w-full border rounded-lg premium-input dark:bg-gray-800 dark:border-gray-700" />
-                <p id="signup-error" class="text-red-500 text-sm h-4 text-center"></p>
-                <button type="submit" class="w-full py-3 rounded-lg font-semibold bg-blue-600 text-white hover:bg-blue-700">Create Account</button>
-                <p class="text-center text-sm">
-                    Already have an account? 
-                    <button type="button" id="show-login-btn" class="font-semibold text-blue-600 hover:underline">Login</button>
-                </p>
+    const showSignUpModal = () => {
+        const content = `
+            <form id="signup-form" autocomplete="on">
+                <div class="space-y-4">
+                     <div>
+                        <label for="signup-name" class="font-medium text-sm mb-1.5 text-gray-700 dark:text-gray-300">Full Name</label>
+                        <input id="signup-name" type="text" placeholder="Enter your full name" autocomplete="name" required class="p-2 w-full border border-gray-300 rounded-lg bg-gray-50/50 transition duration-200 premium-input dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200" />
+                    </div>
+                     <div>
+                        <label for="signup-email" class="font-medium text-sm mb-1.5 text-gray-700 dark:text-gray-300">Email</label>
+                        <input id="signup-email" type="email" placeholder="Enter your email" autocomplete="email" required class="p-2 w-full border border-gray-300 rounded-lg bg-gray-50/50 transition duration-200 premium-input dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200" />
+                    </div>
+                    <div>
+                        <label for="signup-password" class="font-medium text-sm mb-1.5 text-gray-700 dark:text-gray-300">Password</label>
+                        <input id="signup-password" type="password" placeholder="Create a password" autocomplete="new-password" required class="p-2 w-full border border-gray-300 rounded-lg bg-gray-50/50 transition duration-200 premium-input dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200" />
+                    </div>
+                    <div>
+                        <label for="signup-confirm-password" class="font-medium text-sm mb-1.5 text-gray-700 dark:text-gray-300">Confirm Password</label>
+                        <input id="signup-confirm-password" type="password" placeholder="Confirm your password" autocomplete="new-password" required class="p-2 w-full border border-gray-300 rounded-lg bg-gray-50/50 transition duration-200 premium-input dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200" />
+                    </div>
+                    <p id="signup-error" class="text-red-500 text-sm h-4"></p>
+                    <button type="submit" class="w-full px-5 py-2.5 rounded-lg font-semibold text-sm shadow-sm transition-all duration-200 transform hover:scale-[1.03] bg-blue-600 text-white hover:bg-blue-700">Create Account</button>
+                    <p class="text-center text-sm text-gray-600 dark:text-gray-400">
+                        Already have an account? 
+                        <button type="button" id="show-login-btn" class="font-semibold text-blue-600 hover:underline dark:text-blue-400">Login</button>
+                    </p>
+                </div>
             </form>
         `;
-        addSignupListeners();
+        openModal(createModal('Sign Up', content));
+
+        document.getElementById('show-login-btn').addEventListener('click', () => {
+            closeModal();
+            // The sign-in page is already visible, so no action needed.
+        });
+
+        document.getElementById('signup-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const fullName = document.getElementById('signup-name').value;
+            const email = document.getElementById('signup-email').value;
+            const password = document.getElementById('signup-password').value;
+            const confirmPassword = document.getElementById('signup-confirm-password').value;
+            const errorEl = document.getElementById('signup-error');
+            errorEl.textContent = '';
+
+            if (password !== confirmPassword) {
+                errorEl.textContent = 'Passwords do not match.';
+                return;
+            }
+            try {
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                await userCredential.user.updateProfile({ displayName: fullName });
+                await userCredential.user.sendEmailVerification();
+                await auth.signOut();
+
+                await promptToSavePassword(email, password);
+                closeModal();
+                showInfoModal('Verification Required', 'A verification link has been sent to your email. Please verify your account before logging in.');
+            } catch (err) {
+                errorEl.textContent = err.message;
+            }
+        });
     };
-    
-    // Other modal functions (showLogoutConfirmationModal, showTimePickerModal, etc.) are unchanged...
-    // [The long functions for modals are omitted for brevity but remain in the actual file]
-    const showLogoutConfirmationModal = () => {
+
+     const showLogoutConfirmationModal = () => {
         const content = `
             <p class="text-center text-gray-600 dark:text-gray-400 mb-6">Are you sure you want to log out?</p>
             <div class="flex gap-4">
@@ -974,87 +1279,558 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
         `;
         openModal(createModal('Logout', content));
+
         document.getElementById('cancel-logout-btn').addEventListener('click', closeModal);
         document.getElementById('confirm-logout-btn').addEventListener('click', () => {
             auth.signOut().then(() => {
-                localStorage.removeItem('workData'); localStorage.removeItem('reminders');
-                isInitialLoad = true; closeModal();
+                localStorage.removeItem('workData');
+                localStorage.removeItem('reminders');
+                isInitialLoad = true; // Reset for next login
+                closeModal();
             });
         });
     };
-    const showTimePickerModal = (targetInput) => { /* ... existing implementation ... */ };
-    const showReminderModal = () => { /* ... existing implementation ... */ };
-    const showDatePickerModal = () => { /* ... existing implementation ... */ };
-    const showShareModal = () => { /* ... existing implementation ... */ };
-    const showAiModal = () => { /* ... existing implementation ... */ };
-    const showExportPreview = () => { /* ... existing implementation ... */ };
+    
+    const showTimePickerModal = (targetInput) => {
+        const itemHeight = 40;
+        const numVisibleItems = 5; // Corresponds to 200px height
+        const paddingItems = Math.floor(numVisibleItems / 2);
 
-    // FIREBASE-RELATED FUNCTIONS
-    const syncToCloud = () => {
-        if (user) db.collection("users").doc(user.uid).set({ workData, reminders }, { merge: true });
-    };
-    const promptToSavePassword = async (email, password) => {
-        if ('credentials' in navigator && navigator.credentials.store) {
-            try { await navigator.credentials.store(new PasswordCredential({ id: email, password: password, name: email })); } catch (err) { console.error('Error storing credential:', err); }
+        let currentHour, currentMinute;
+        const initialValue = targetInput.value;
+        if (initialValue && initialValue.includes(':')) {
+            [currentHour, currentMinute] = initialValue.split(':').map(Number);
+        } else {
+            const now = new Date();
+            currentHour = now.getHours();
+            currentMinute = now.getMinutes();
         }
+
+        const hours = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0'));
+        const minutes = Array.from({ length: 60 }, (_, i) => String(i).padStart(2, '0'));
+
+        const createWheelItems = (items) => {
+            let listItems = '';
+            for (let i = 0; i < paddingItems; i++) listItems += '<li class="time-picker-item">&nbsp;</li>';
+            items.forEach(item => listItems += `<li class="time-picker-item">${item}</li>`);
+            for (let i = 0; i < paddingItems; i++) listItems += '<li class="time-picker-item">&nbsp;</li>';
+            return listItems;
+        };
+        
+        const modalContent = `
+            <div class="time-picker-header">
+                <button id="clear-time-btn" class="text-blue-600 dark:text-blue-400 font-semibold px-2 py-1">Clear</button>
+                <h3 class="font-bold text-lg dark:text-gray-200">Select Time</h3>
+                <button id="done-time-btn" class="text-blue-600 dark:text-blue-400 font-bold px-2 py-1">Done</button>
+            </div>
+            <div class="time-picker-wheels">
+                <div class="time-picker-selection-indicator"></div>
+                <div id="hour-wheel" class="time-picker-wheel">
+                    <ul class="time-picker-wheel-col">${createWheelItems(hours)}</ul>
+                </div>
+                <div class="time-picker-spacer">:</div>
+                <div id="minute-wheel" class="time-picker-wheel">
+                    <ul class="time-picker-wheel-col">${createWheelItems(minutes)}</ul>
+                </div>
+            </div>
+        `;
+
+        const modalHTML = `<div class="fixed inset-0 bg-gray-900 bg-opacity-50 backdrop-blur-sm flex justify-center items-end z-50 p-0 modal-bg-animate" data-dismiss="modal">
+            <div class="time-picker-content" onclick="event.stopPropagation()">${modalContent}</div>
+        </div>`;
+        openModal(modalHTML);
+
+        const hourWheel = document.getElementById('hour-wheel');
+        const minuteWheel = document.getElementById('minute-wheel');
+
+        const snapToValue = (wheel, value) => {
+            wheel.scrollTo({ top: value * itemHeight, behavior: 'smooth' });
+        };
+
+        // Initial scroll
+        setTimeout(() => {
+            hourWheel.scrollTop = currentHour * itemHeight;
+            minuteWheel.scrollTop = currentMinute * itemHeight;
+        }, 10);
+
+
+        let scrollTimeout;
+        const setupSnapScroll = (wheel) => {
+            wheel.addEventListener('scroll', () => {
+                clearTimeout(scrollTimeout);
+                scrollTimeout = setTimeout(() => {
+                    const selectedIndex = Math.round(wheel.scrollTop / itemHeight);
+                    snapToValue(wheel, selectedIndex);
+                }, 150);
+            });
+        };
+
+        setupSnapScroll(hourWheel);
+        setupSnapScroll(minuteWheel);
+
+        document.getElementById('done-time-btn').addEventListener('click', () => {
+            const selectedHour = Math.round(hourWheel.scrollTop / itemHeight);
+            const selectedMinute = Math.round(minuteWheel.scrollTop / itemHeight);
+            const formattedTime = `${String(selectedHour).padStart(2, '0')}:${String(selectedMinute).padStart(2, '0')}`;
+            
+            targetInput.value = formattedTime;
+            targetInput.dispatchEvent(new Event('input', { bubbles: true }));
+            closeModal();
+        });
+
+        document.getElementById('clear-time-btn').addEventListener('click', () => {
+            targetInput.value = '';
+            targetInput.dispatchEvent(new Event('input', { bubbles: true }));
+            closeModal();
+        });
+    };
+
+    const showReminderModal = () => {
+        const renderReminderContent = (isAdding = false, editingIndex = null) => {
+            let content = '';
+            if (isAdding) {
+                const reminder = editingIndex !== null ? reminders[editingIndex] : {};
+                content = `
+                    <div class="space-y-4" id="reminder-form">
+                        <div>
+                            <label class="font-medium text-sm mb-1.5 text-gray-700 dark:text-gray-300">Category</label>
+                            <select id="reminder-category" class="w-full p-2 border border-gray-300 rounded-lg bg-gray-50/50 transition duration-200 premium-select dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200">
+                                ${reminderCategories.map(c => `<option value="${c}" ${c === reminder.category ? 'selected' : ''}>${c}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div id="custom-details-container" class="${reminder.category === 'Other' ? '' : 'hidden'}">
+                             <label class="font-medium text-sm mb-1.5 text-gray-700 dark:text-gray-300">Custom Details</label>
+                             <input type="text" id="reminder-custom" placeholder="Specify your reminder" value="${reminder.customDetails || ''}" class="w-full p-2 border border-gray-300 rounded-lg bg-gray-50/50 transition duration-200 premium-input dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200" />
+                        </div>
+                        <div>
+                            <label class="font-medium text-sm mb-1.5 text-gray-700 dark:text-gray-300">Date</label>
+                            <input type="date" id="reminder-date" value="${reminder.date || ''}" class="w-full p-2 border border-gray-300 rounded-lg bg-gray-50/50 transition duration-200 premium-input dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200" />
+                        </div>
+                        <div class="flex gap-3 mt-4">
+                            <button id="cancel-reminder" class="w-full px-5 py-2.5 rounded-lg font-semibold text-sm shadow-sm transition-all duration-200 transform hover:scale-[1.03] bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700">Cancel</button>
+                            <button id="save-reminder" class="w-full px-5 py-2.5 rounded-lg font-semibold text-sm shadow-sm transition-all duration-200 transform hover:scale-[1.03] bg-blue-600 text-white hover:bg-blue-700">${editingIndex !== null ? 'Save Changes' : 'Save Reminder'}</button>
+                        </div>
+                    </div>
+                `;
+            } else {
+                content = `
+                    <div id="reminderList" class="space-y-3 max-h-96 overflow-y-auto pr-2">
+                        ${reminders.length > 0 ? reminders.map((r, i) => `
+                            <div class="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg border dark:border-gray-700">
+                                <div>
+                                    <p class="font-semibold text-gray-800 dark:text-gray-200">${r.category}</p>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">${new Date(r.date).toLocaleDateString()}</p>
+                                    ${r.category === 'Other' ? `<p class="text-sm text-gray-500 dark:text-gray-400 italic">${r.customDetails}</p>` : ''}
+                                </div>
+                                <div class="flex gap-2">
+                                    <button class="edit-reminder-btn text-sm text-blue-600 dark:text-blue-400 hover:underline" data-index="${i}">Edit</button>
+                                    <button class="remove-reminder-btn text-sm text-red-600 dark:text-red-400 hover:underline" data-index="${i}">Remove</button>
+                                </div>
+                            </div>
+                        `).join('') : '<p class="text-gray-500 text-center py-4">No reminders set.</p>'}
+                    </div>
+                    <button id="add-reminder-btn" class="mt-4 w-full px-5 py-2.5 rounded-lg font-semibold text-sm shadow-sm transition-all duration-200 transform hover:scale-[1.03] bg-blue-600 text-white hover:bg-blue-700">Add New Reminder</button>
+                `;
+            }
+            openModal(createModal('Your Reminders', content, 'reminder-modal'));
+
+            if (isAdding) {
+                document.getElementById('cancel-reminder').addEventListener('click', () => renderReminderContent());
+                document.getElementById('save-reminder').addEventListener('click', () => {
+                    const newReminder = {
+                        category: document.getElementById('reminder-category').value,
+                        date: document.getElementById('reminder-date').value,
+                        customDetails: document.getElementById('reminder-custom').value,
+                    };
+                    if (!newReminder.date) return alert('Please select a date.');
+                    if (editingIndex !== null) {
+                        reminders[editingIndex] = newReminder;
+                    } else {
+                        reminders.push(newReminder);
+                    }
+                    if(user) {
+                      syncToCloud();
+                    } else {
+                      saveLocalData();
+                    }
+                    renderReminderContent();
+                });
+                 document.getElementById('reminder-category').addEventListener('change', (e) => {
+                    document.getElementById('custom-details-container').classList.toggle('hidden', e.target.value !== 'Other');
+                });
+            } else {
+                document.getElementById('add-reminder-btn').addEventListener('click', () => renderReminderContent(true));
+                document.querySelectorAll('.edit-reminder-btn').forEach(btn => btn.addEventListener('click', (e) => renderReminderContent(true, e.target.dataset.index)));
+                document.querySelectorAll('.remove-reminder-btn').forEach(btn => btn.addEventListener('click', (e) => {
+                    reminders.splice(e.target.dataset.index, 1);
+                    if(user) {
+                      syncToCloud();
+                    } else {
+                      saveLocalData();
+                    }
+                    renderReminderContent();
+                }));
+            }
+        };
+        renderReminderContent();
+    };
+
+    const showDatePickerModal = () => {
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
+        const today = new Date();
+        const isCurrentMonthView = today.getFullYear() === year && today.getMonth() === month;
+
+        const firstDayOfMonth = (new Date(year, month, 1).getDay() + 6) % 7;
+        const daysInMonth = getDaysInMonth(year, month);
+
+        const dayLabels = ['M', 'T', 'W', 'T', 'F', 'S', 'S'].map(label => `
+            <div class="text-center font-bold text-xs text-gray-500 dark:text-gray-400">${label}</div>
+        `).join('');
+
+        let daysGrid = '';
+        for (let i = 0; i < firstDayOfMonth; i++) {
+            daysGrid += '<div></div>';
+        }
+
+        for (let day = 1; day <= daysInMonth; day++) {
+            const dateKey = `${year}-${month}-${day}`;
+            const hasData = workData[dateKey] && Object.keys(workData[dateKey]).length > 0;
+            const isToday = isCurrentMonthView && day === today.getDate();
+            const highlightClass = isToday ? 'bg-blue-600 text-white' : 'hover:bg-blue-100 dark:hover:bg-gray-700';
+            daysGrid += `
+                <button data-day="${day}" class="date-select-btn relative flex items-center justify-center h-10 w-10 rounded-full text-sm font-medium text-gray-700 dark:text-gray-300 ${highlightClass} transition-colors">
+                    ${day}
+                    ${hasData ? '<div class="absolute bottom-1.5 h-1.5 w-1.5 bg-green-500 rounded-full"></div>' : ''}
+                </button>
+            `;
+        }
+
+        const content = `
+            <div class="grid grid-cols-7 gap-y-2 gap-x-1 items-center">
+                ${dayLabels}
+                ${daysGrid}
+            </div>
+        `;
+        openModal(createModal('Go to Date', content));
+        
+        document.querySelectorAll('.date-select-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const day = e.currentTarget.dataset.day;
+                const dayEl = document.querySelector(`.day-box[data-day="${day}"]`);
+                if (dayEl) {
+                    dayEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                closeModal();
+            });
+        });
+    };
+
+    const showShareModal = () => {
+        const totalOt = document.getElementById('totalOtHours')?.textContent || 'N/A';
+        const summaryText = `Work Report Summary for ${months[currentDate.getMonth()]} ${currentDate.getFullYear()}:\n- Total OT Hours: ${totalOt} hours.`;
+        
+        const content = `
+            <div class="space-y-4">
+                <div class="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg border dark:border-gray-700">
+                    <h3 class="font-semibold text-gray-800 dark:text-gray-200 mb-2">Summary Preview</h3>
+                    <pre class="text-sm text-gray-600 dark:text-gray-300 whitespace-pre-wrap">${summaryText}</pre>
+                </div>
+                <button id="copy-summary-btn" class="w-full px-5 py-2.5 rounded-lg font-semibold text-sm shadow-sm transition-all bg-blue-600 text-white hover:bg-blue-700">Copy Summary as Text</button>
+                <button id="export-pdf-btn" class="w-full px-5 py-2.5 rounded-lg font-semibold text-sm shadow-sm transition-all bg-white text-gray-800 border border-gray-300 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-700">Export Month Data as PDF</button>
+            </div>
+        `;
+        openModal(createModal('Share & Export', content));
+
+        document.getElementById('copy-summary-btn').addEventListener('click', () => {
+             navigator.clipboard.writeText(summaryText)
+                .then(() => alert('Summary copied to clipboard!'))
+                .catch(() => alert('Failed to copy summary.'));
+        });
+        document.getElementById('export-pdf-btn').addEventListener('click', showExportPreview);
+    };
+
+     const showAiModal = () => {
+        const content = `
+            <div class="space-y-4">
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                    Speak or type your leave reason in Tanglish (Tamil + English). The AI will convert it into a professional English message.
+                </p>
+                <div>
+                    <div class="flex justify-between items-center mb-1.5">
+                        <label for="ai-input" class="font-medium text-sm text-gray-700 dark:text-gray-300">Your Message</label>
+                        <button id="voice-input-btn" title="Speak your message" class="p-1.5 text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 rounded-full transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line></svg>
+                        </button>
+                    </div>
+                    <textarea id="ai-input" rows="4" placeholder="e.g., sir naan inniku office varamudiyathu health illa" class="w-full p-2 border border-gray-300 rounded-lg bg-gray-50/50 transition duration-200 premium-input dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200"></textarea>
+                </div>
+                <div id="ai-error-container" class="hidden text-sm text-red-600 dark:text-red-400 mt-2 p-3 bg-red-50 dark:bg-red-950/20 rounded-lg border border-red-200 dark:border-red-800/50"></div>
+                <button id="generate-ai-message-btn" class="w-full flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg font-semibold text-sm shadow-sm transition-all duration-200 transform hover:scale-[1.03] bg-blue-600 text-white hover:bg-blue-700">
+                    <span>Convert to Professional English</span>
+                    <div id="ai-spinner" class="loader-small hidden"></div>
+                </button>
+                <div id="ai-output-container" class="hidden space-y-2 pt-4 border-t border-gray-200 dark:border-gray-700">
+                    <label class="font-medium text-sm text-gray-700 dark:text-gray-300">Generated Message</label>
+                    <div class="relative">
+                        <p id="ai-output" class="p-4 bg-gray-100 dark:bg-gray-800/50 rounded-lg text-gray-800 dark:text-gray-200 whitespace-pre-wrap min-h-[50px]"></p>
+                        <button id="copy-ai-output-btn" title="Copy to clipboard" class="absolute top-2 right-2 p-1.5 text-gray-500 hover:bg-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 rounded-md">
+                            <span class="copy-icon-span"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+        openModal(createModal('AI Professional Message Assistant', content));
+        
+        const inputEl = document.getElementById('ai-input');
+        const outputContainer = document.getElementById('ai-output-container');
+        const outputEl = document.getElementById('ai-output');
+        const spinner = document.getElementById('ai-spinner');
+        const generateBtn = document.getElementById('generate-ai-message-btn');
+        const voiceBtn = document.getElementById('voice-input-btn');
+        const copyBtn = document.getElementById('copy-ai-output-btn');
+        const errorContainer = document.getElementById('ai-error-container');
+
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+            voiceBtn.style.display = 'none';
+        } else {
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'ta-IN';
+            recognition.interimResults = true;
+            recognition.continuous = true;
+            let isListening = false;
+
+            recognition.onresult = (event) => {
+                let interimTranscript = '';
+                let finalTranscript = '';
+                for (let i = event.resultIndex; i < event.results.length; ++i) {
+                    if (event.results[i].isFinal) {
+                        finalTranscript += event.results[i][0].transcript;
+                    } else {
+                        interimTranscript += event.results[i][0].transcript;
+                    }
+                }
+                inputEl.value = finalTranscript + interimTranscript;
+            };
+
+            recognition.onstart = () => {
+                isListening = true;
+                voiceBtn.classList.add('voice-btn-listening');
+            };
+
+            recognition.onend = () => {
+                isListening = false;
+                voiceBtn.classList.remove('voice-btn-listening');
+            };
+
+             recognition.onerror = (event) => {
+                console.error('Speech recognition error:', event.error);
+                isListening = false;
+                voiceBtn.classList.remove('voice-btn-listening');
+                
+                if (event.error === 'service-not-allowed' || event.error === 'not-allowed') {
+                    errorContainer.innerHTML = `
+                        <strong class="font-semibold">Microphone access denied.</strong><br>
+                        To use voice input, please allow microphone access in your browser's site settings.
+                    `;
+                    errorContainer.classList.remove('hidden');
+                } else {
+                    errorContainer.textContent = `Speech recognition error: ${event.error}. Please try again.`;
+                    errorContainer.classList.remove('hidden');
+                }
+            };
+
+            voiceBtn.addEventListener('click', () => {
+                errorContainer.classList.add('hidden');
+                if (isListening) {
+                    recognition.stop();
+                } else {
+                    try {
+                       recognition.start();
+                    } catch(e) {
+                         errorContainer.textContent = `Could not start voice recognition.`;
+                         errorContainer.classList.remove('hidden');
+                    }
+                }
+            });
+        }
+        
+        generateBtn.addEventListener('click', async () => {
+            errorContainer.classList.add('hidden');
+            const userInput = inputEl.value.trim();
+            if (!userInput) {
+                alert('Please enter a message.');
+                return;
+            }
+
+            spinner.classList.remove('hidden');
+            generateBtn.disabled = true;
+
+            try {
+                const result = await window.generateProfessionalMessage(userInput);
+                outputEl.textContent = result;
+                outputContainer.classList.remove('hidden');
+            } catch (error) {
+                console.error(error);
+                outputEl.textContent = 'Sorry, an error occurred. Please try again.';
+                outputContainer.classList.remove('hidden');
+            } finally {
+                spinner.classList.add('hidden');
+                generateBtn.disabled = false;
+            }
+        });
+
+        copyBtn.addEventListener('click', () => {
+            navigator.clipboard.writeText(outputEl.textContent).then(() => {
+                const originalIcon = copyBtn.innerHTML;
+                copyBtn.innerHTML = 'Copied!';
+                copyBtn.disabled = true;
+                setTimeout(() => {
+                    copyBtn.innerHTML = originalIcon;
+                    copyBtn.disabled = false;
+                }, 2000);
+            });
+        });
+    };
+
+    const showExportPreview = () => {
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
+        const daysInMonth = getDaysInMonth(year, month);
+
+        const tableRows = Array.from({ length: daysInMonth }, (_, i) => {
+            const day = i + 1;
+            const dateKey = `${year}-${month}-${day}`;
+            const dayData = workData[dateKey] || {};
+            const formattedDate = `${String(day).padStart(2, '0')}.${String(month + 1).padStart(2, '0')}.${year}`;
+            const leaveStatusText = dayData.leaveStatus || 'No';
+            const weekend = isWeekend(year, month, day);
+
+            const rowClass = 'border-b border-gray-200';
+            const dateClass = weekend ? 'text-red-500 font-bold' : '';
+            const leaveStatusHTML = leaveStatusText === 'Yes' ? `<span class="font-bold text-blue-700">${leaveStatusText}</span>` : leaveStatusText;
+
+            return `
+                <tr class="${rowClass}">
+                    <td class="p-3 border-x border-gray-200 ${dateClass}">${formattedDate}</td>
+                    <td class="p-3 border-x border-gray-200">${dayData.inTime || '-'}</td>
+                    <td class="p-3 border-x border-gray-200">${dayData.outTime || '-'}</td>
+                    <td class="p-3 border-x border-gray-200">${dayData.movementOut || '-'}</td>
+                    <td class="p-3 border-x border-gray-200">${dayData.movementIn || '-'}</td>
+                    <td class="p-3 border-x border-gray-200 break-words">${dayData.teamMembers || '-'}</td>
+                    <td class="p-3 border-x border-gray-200 break-words">${dayData.workLocation || '-'}</td>
+                    <td class="p-3 border-x border-gray-200">${dayData.vehicleNumber || '-'}</td>
+                    <td class="p-3 border-x border-gray-200">${dayData.km || '-'}</td>
+                    <td class="p-3 border-x border-gray-200">${dayData.specialDays || '-'}</td>
+                    <td class="p-3 border-x border-gray-200">${leaveStatusHTML}</td>
+                    <td class="p-3 border-x border-gray-200 break-words">${dayData.leaveReason || '-'}</td>
+                </tr>`;
+        }).join('');
+
+        const previewHTML = `
+            <div class="fixed inset-0 bg-gray-900 bg-opacity-70 flex justify-center items-center z-50 p-4 overflow-auto modal-bg-animate" data-dismiss="modal">
+                <div class="bg-white rounded-lg shadow-2xl w-full max-w-4xl transform transition-all modal-content-animate" onclick="event.stopPropagation()">
+                    <div class="p-4 sm:p-6 sticky top-0 bg-white border-b z-10 flex flex-col sm:flex-row justify-between items-center gap-3">
+                        <h2 class="text-xl font-bold text-center sm:text-left">Export Preview: ${months[month]} ${year}</h2>
+                        <div class="flex gap-3">
+                            <button id="generate-pdf-btn" class="px-5 py-2.5 rounded-lg font-semibold text-sm shadow-sm transition-all bg-blue-600 text-white hover:bg-blue-700">Download as PDF</button>
+                            <button data-dismiss="modal" class="px-5 py-2.5 rounded-lg font-semibold text-sm shadow-sm transition-all bg-white text-gray-800 border border-gray-300 hover:bg-gray-100">Close</button>
+                        </div>
+                    </div>
+                    <div id="export-content" class="p-4 bg-white text-black" style="font-size: 18px;">
+                        <div class="text-center mb-4" style="font-size: 20px;">
+                            <h2 class="text-xl font-bold">Work Data Sheet</h2>
+                            <p class="text-md font-semibold">Name: T.Jeyaraman | Service No: 016696</p>
+                            <h3 class="text-lg font-semibold">${months[month]} ${year}</h3>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full border-collapse border-y border-gray-200">
+                                <thead class="bg-gray-100 text-gray-700">
+                                    <tr>
+                                        ${['Day', 'In', 'Out', 'Mov Out', 'Mov In', 'Team', 'Location', 'Vehicle', 'KM', 'Special', 'Leave', 'Reason'].map(h => 
+                                            `<th class="p-3 border-x border-gray-200 font-semibold">${h}</th>`
+                                        ).join('')}
+                                    </tr>
+                                </thead>
+                                <tbody class="text-black text-center">${tableRows}</tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+        openModal(previewHTML);
+
+        document.getElementById('generate-pdf-btn').addEventListener('click', () => {
+            const el = document.getElementById('export-content');
+            const spinner = document.getElementById('loading-spinner');
+            spinner.style.display = 'flex';
+
+            const originalWidth = el.style.width;
+            el.style.width = '1200px';
+
+            html2canvas(el, { scale: 3, useCORS: true, backgroundColor: '#ffffff' }).then(canvas => {
+                el.style.width = originalWidth;
+
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+                const imgData = canvas.toDataURL('image/png');
+                const pdfWidth = pdf.internal.pageSize.getWidth();
+                const pdfHeight = pdf.internal.pageSize.getHeight();
+                
+                pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+                pdf.save(`Work_Report_${year}_${month + 1}.pdf`);
+                spinner.style.display = 'none';
+
+            }).catch(err => {
+                el.style.width = originalWidth;
+                console.error('PDF generation failed:', err);
+                alert('Sorry, there was an error generating the PDF.');
+                spinner.style.display = 'none';
+            });
+        });
     };
     
+    // FIREBASE-RELATED FUNCTIONS
+    const syncToCloud = () => {
+        if (user) {
+            db.collection("users").doc(user.uid).set({ workData, reminders }, { merge: true })
+                .catch(err => console.error("Firestore write error:", err));
+        }
+    };
+
+    const promptToSavePassword = async (email, password) => {
+        if ('credentials' in navigator && navigator.credentials.store) {
+            try {
+                const credential = new PasswordCredential({ id: email, password: password, name: email });
+                await navigator.credentials.store(credential);
+            } catch (err) {
+                console.error('Error storing credential:', err);
+            }
+        }
+    };
+
+
     // MAIN RENDER/INITIALIZATION FUNCTIONS
-    const renderAllReportView = () => {
-        if(user) document.getElementById('back-to-dashboard-btn').classList.remove('hidden'); else document.getElementById('back-to-dashboard-btn')?.classList.add('hidden');
+    const renderAll = () => {
+        //renderAuthArea(); // Replaced by Dashboard Nav
         renderHeader();
         renderDays();
         renderSummary();
     };
 
-    const addLoginListeners = () => {
-        document.getElementById('show-signup-btn').addEventListener('click', renderSignupForm);
-        document.getElementById('forgot-password-btn').addEventListener('click', async () => { /* ... existing implementation ... */ });
-        document.getElementById('login-form').addEventListener('submit', async (e) => {
-             e.preventDefault();
-            const email = document.getElementById('auth-email').value;
-            const password = document.getElementById('auth-password').value;
-            const errorEl = document.getElementById('auth-error');
-            errorEl.textContent = '';
-            try {
-                await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
-                const userCredential = await auth.signInWithEmailAndPassword(email, password);
-                if (!userCredential.user.emailVerified) {
-                    errorEl.textContent = 'Please verify your email first.';
-                    await auth.signOut();
-                    return;
-                }
-            } catch (err) { errorEl.textContent = err.message; }
-        });
-        document.getElementById('google-login').addEventListener('click', async () => {
-            const provider = new firebase.auth.GoogleAuthProvider();
-            try {
-                await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
-                await auth.signInWithPopup(provider);
-            } catch (e) { document.getElementById('auth-error').textContent = e.message; }
-        });
+    const initializeApp = () => {
+        renderAll();
+        scrollToToday();
+        loadingSpinner.style.opacity = '0';
+        setTimeout(() => {
+            loadingSpinner.style.display = 'none';
+        }, 300);
+        appContainer.classList.add('fade-in');
+        appContainer.style.opacity = '1';
     };
-    const addSignupListeners = () => {
-        document.getElementById('show-login-btn').addEventListener('click', renderLoginForm);
-        document.getElementById('signup-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const fullName = document.getElementById('signup-name').value;
-            const email = document.getElementById('signup-email').value;
-            const password = document.getElementById('signup-password').value;
-            const confirmPassword = document.getElementById('signup-confirm-password').value;
-            const errorEl = document.getElementById('signup-error');
-            if (password !== confirmPassword) { errorEl.textContent = 'Passwords do not match.'; return; }
-            try {
-                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-                await userCredential.user.updateProfile({ displayName: fullName });
-                await userCredential.user.sendEmailVerification();
-                await auth.signOut();
-                showInfoModal('Verification Required', 'A verification link has been sent. Please verify your email before logging in.');
-                renderLoginForm();
-            } catch (err) { errorEl.textContent = err.message; }
-        });
-    };
-    
+
     // -----------------------------------------------------------------------------
     // SCRIPT EXECUTION & EVENT BINDING
     // -----------------------------------------------------------------------------
@@ -1080,64 +1856,94 @@ document.addEventListener('DOMContentLoaded', () => {
       measurementId: "G-ZR8RGLKB77"
     };
 
-    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
     const auth = firebase.auth();
     const db = firebase.firestore();
     let userRefUnsubscribe = null;
 
-    loadingSpinner.style.display = 'flex'; // Show loader initially
-
     auth.onAuthStateChanged(async (currentUser) => {
-        if (userRefUnsubscribe) { userRefUnsubscribe(); userRefUnsubscribe = null; }
-        if (currentUser) await currentUser.reload();
+        loadingSpinner.style.display = 'flex';
+        loadingSpinner.style.opacity = '1';
+
+        if (userRefUnsubscribe) {
+            userRefUnsubscribe();
+            userRefUnsubscribe = null;
+        }
+        
+        if (currentUser) {
+            await currentUser.reload();
+        }
 
         if (currentUser && currentUser.emailVerified) {
             user = currentUser;
+            dashboardPage.style.display = 'flex';
+            signinPage.classList.add('hidden');
+
+            renderDashboardNav(user);
+
             const userRef = db.collection("users").doc(user.uid);
-            // Handle merging local data if any
+            
             const localWorkDataRaw = localStorage.getItem('workData');
-            if (localWorkDataRaw) {
-                // merge logic...
-                localStorage.removeItem('workData');
-                localStorage.removeItem('reminders');
+            const localRemindersRaw = localStorage.getItem('reminders');
+
+            if (localWorkDataRaw || localRemindersRaw) {
+                try {
+                    const localWorkData = JSON.parse(localWorkDataRaw || '{}');
+                    const localReminders = JSON.parse(localRemindersRaw || '[]');
+                    
+                    const doc = await userRef.get();
+                    const cloudData = doc.data() || {};
+                    
+                    const mergedWorkData = { ...(cloudData.workData || {}), ...localWorkData };
+                    const mergedReminders = [...(cloudData.reminders || []), ...localReminders];
+                    const uniqueReminders = Array.from(new Set(mergedReminders.map(r => JSON.stringify(r)))).map(s => JSON.parse(s));
+
+                    await userRef.update({
+                        workData: mergedWorkData,
+                        reminders: uniqueReminders
+                    });
+                    
+                    localStorage.removeItem('workData');
+                    localStorage.removeItem('reminders');
+                } catch (err) {
+                    console.error("Failed to sync local data on login:", err);
+                    alert("Could not sync local data.");
+                }
             }
 
             userRefUnsubscribe = userRef.onSnapshot(doc => {
                 const data = doc.data();
                 workData = data?.workData || {};
                 reminders = data?.reminders || [];
-                if (isInitialLoad) {
-                    playWelcomeAnimation(user);
-                    isInitialLoad = false;
-                } else {
-                    showView('dashboard');
-                    renderDashboard(user);
-                }
-                 loadingSpinner.style.display = 'none';
+                initializeApp();
             }, err => {
-                console.error("Firestore error: ", err);
-                loadingSpinner.style.display = 'none';
+                console.error("Firestore snapshot error: ", err);
+                initializeApp();
             });
 
         } else {
-            user = null;
             if (currentUser && !currentUser.emailVerified) {
                  showInfoModal('Verification Required', 'Please verify your email to continue.');
             }
-            // Guest user logic
+            user = null;
             workData = JSON.parse(localStorage.getItem('workData') || '{}');
             reminders = JSON.parse(localStorage.getItem('reminders') || '[]');
             
-            showView('login');
-            renderLoginForm(); // Show login form
-            
-            loadingSpinner.style.display = 'none';
+            dashboardPage.style.display = 'none';
+            signinPage.classList.remove('hidden');
+
+            addSigninEventListeners();
+
+            loadingSpinner.style.opacity = '0';
+            setTimeout(() => { loadingSpinner.style.display = 'none'; }, 300);
         }
     });
 });
 </script>
 <script type="module">
-    import { GoogleGenAI } from "@google/genai";
+    import { GoogleGenAI } from "https://aistudiocdn.com/@google/genai@^0.14.0";
 
     const apiKey = "AIzaSyCppq-j59GI9USv1Y0v2miQEn9y_7NfIWM";
     const ai = new GoogleGenAI({ apiKey: apiKey });
@@ -1161,6 +1967,5 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 </script>
-<script type="module" src="/index.tsx"></script>
 </body>
 </html>
