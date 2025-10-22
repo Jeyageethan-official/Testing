@@ -732,7 +732,7 @@
                     </div>
                     <div id="widget-total-hours" class="iphone-widget flex flex-col justify-between">
                         <div>
-                            <h3 class="widget-title">Total Hours</h3>
+                            <h3 class="widget-title">Total OT Hours</h3>
                             <p id="widget-total-hours-value" class="text-4xl font-bold mt-2 text-gray-800 dark:text-white">0.0</p>
                         </div>
                     </div>
@@ -954,85 +954,67 @@ document.addEventListener('DOMContentLoaded', () => {
         const d = new Date(year, month, day).getDay();
         return d === 0 || d === 6;
     };
-    const calculateHoursDifference = (inTime, outTime) => {
-        if (!inTime || !outTime) return 0;
-        const [inH, inM] = inTime.split(':').map(Number);
-        const [outH, outM] = outTime.split(':').map(Number);
-        const inMinutes = inH * 60 + inM;
-        const outMinutes = outH * 60 + outM;
-        if (outMinutes < inMinutes) return 0;
-        return (outMinutes - inMinutes) / 60;
-    };
-
+    
     const calculateDayHours = (dayData, year, month, day) => {
-        const { inTime, outTime, specialDays, leaveReason } = dayData;
-
-        if (!inTime || !outTime) {
-            return { regularHours: 0, toHours: 0 };
-        }
-
-        const timeToMinutes = (timeStr) => {
-            if (!timeStr || !timeStr.includes(':')) return 0;
-            const [h, m] = timeStr.split(':').map(Number);
-            return h * 60 + m;
-        };
-
-        const inMinutes = timeToMinutes(inTime);
-        const outMinutes = timeToMinutes(outTime);
-
-        if (outMinutes <= inMinutes) {
-            return { regularHours: 0, toHours: 0 };
-        }
+        const { inTime, outTime, specialDays } = dayData;
+        if (!inTime || !outTime) return { regularHours: 0, toHours: 0 };
 
         const date = new Date(year, month, day);
         const dayOfWeek = date.getDay();
         const isDayWeekend = dayOfWeek === 0 || dayOfWeek === 6;
-        const isSpecial = specialDays === "Poya Day" || specialDays === "Public Holiday" || leaveReason === "Custom Reason";
+        const isSpecial = specialDays === "Poya Day" || specialDays === "Public Holiday" || dayData.leaveReason === "Custom Reason";
 
-        // Rule for weekends and special days: count full hours without a 9-hour limit.
+        const [inH, inM] = inTime.split(':').map(Number);
+        const [outH, outM] = outTime.split(':').map(Number);
+        const inMinutes = inH * 60 + inM;
+        const outMinutes = outH * 60 + outM;
+        
+        if (outMinutes <= inMinutes) return { regularHours: 0, toHours: 0 };
+
+        // For weekends and special days, count full hours as regular, no OT.
         if (isDayWeekend || isSpecial) {
-            const totalMinutesWorked = outMinutes - inMinutes;
-            return { regularHours: totalMinutesWorked / 60, toHours: 0 };
+            return {
+                regularHours: (outMinutes - inMinutes) / 60,
+                toHours: 0
+            };
         }
 
-        // Rule for normal weekdays (Monday to Friday)
-        const eightThirtyAMInMinutes = 8 * 60 + 30; // 510
-        const nineHoursInMinutes = 9 * 60; // 540
-
-        // Effective start time is 8:30 AM or later if they came in later.
+        // For normal weekdays (Monday to Friday)
+        const eightThirtyAMInMinutes = 8 * 60 + 30; // 510 minutes
+        const nineHoursInMinutes = 9 * 60; // 540 minutes
+        
+        // Start counting from 8:30 AM even if user came in earlier
         const effectiveInMinutes = Math.max(inMinutes, eightThirtyAMInMinutes);
 
-        if (outMinutes <= effectiveInMinutes) {
-            return { regularHours: 0, toHours: 0 };
-        }
+        if (outMinutes <= effectiveInMinutes) return { regularHours: 0, toHours: 0 };
+        
+        const totalMinutesWorked = outMinutes - effectiveInMinutes;
+        
+        const regularMinutes = Math.min(totalMinutesWorked, nineHoursInMinutes);
+        const toMinutes = Math.max(0, totalMinutesWorked - nineHoursInMinutes);
 
-        const totalEffectiveMinutesWorked = outMinutes - effectiveInMinutes;
-
-        if (totalEffectiveMinutesWorked <= nineHoursInMinutes) {
-            // Worked 9 hours or less, no "To Hours"
-            return { regularHours: totalEffectiveMinutesWorked / 60, toHours: 0 };
-        } else {
-            // Worked more than 9 hours. Regular hours are capped at 9.
-            const overtimeMinutes = totalEffectiveMinutesWorked - nineHoursInMinutes;
-            return { regularHours: nineHoursInMinutes / 60, toHours: overtimeMinutes / 60 };
-        }
+        return {
+            regularHours: regularMinutes / 60,
+            toHours: toMinutes / 60
+        };
     };
 
     const getMonthStats = (year, month) => {
         const monthPrefix = `${year}-${month}`;
-        let ownLeaves = 0, publicHolidayLeaveDays = 0, totalPresentDays = 0, totalMonthHours = 0;
+        let ownLeaves = 0, publicHolidayLeaveDays = 0, totalPresentDays = 0, totalMonthRegularHours = 0, totalMonthToHours = 0;
 
         Object.keys(workData).forEach(key => {
             if (key.startsWith(monthPrefix)) {
                 const data = workData[key];
                 const day = parseInt(key.split('-')[2], 10);
-                const { regularHours, toHours } = calculateDayHours(data, year, month, day);
-                const totalHours = regularHours + toHours;
+                const hours = calculateDayHours(data, year, month, day);
+                const totalHoursForDay = hours.regularHours + hours.toHours;
                 const isSpecial = data.specialDays === "Poya Day" || data.specialDays === "Public Holiday";
 
-                if (totalHours > 0) {
+                if (totalHoursForDay > 0) {
                     totalPresentDays++;
-                    totalMonthHours += totalHours;
+                    totalMonthRegularHours += hours.regularHours;
+                    totalMonthToHours += hours.toHours;
                 }
             
                 if (data.leaveStatus === "Yes") {
@@ -1040,13 +1022,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (isSpecial || data.leaveReason === "Poya Day" || data.leaveReason === "Public Holiday") {
                         publicHolidayLeaveDays++;
                     }
-                } else if (isSpecial && calculateHoursDifference(data.inTime, data.outTime) === 0) {
+                } else if (isSpecial && totalHoursForDay === 0) {
                     publicHolidayLeaveDays++;
                 }
             }
         });
 
-        return { ownLeaves, publicHolidayLeaveDays, totalPresentDays, totalMonthHours };
+        return { ownLeaves, publicHolidayLeaveDays, totalPresentDays, totalMonthRegularHours, totalMonthToHours };
     };
 
     const calculateAnnualLeaveStats = () => {
@@ -1320,7 +1302,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const year = currentDate.getFullYear();
         const month = currentDate.getMonth();
         const stats = getMonthStats(year, month);
-        const { totalMonthHours } = stats;
 
         summaryContainer.innerHTML = `
             <div class="mt-8 p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-800/50">
@@ -1329,8 +1310,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     <p>Total Own Leaves: <span class="font-semibold text-gray-800 dark:text-gray-100">${stats.ownLeaves}</span></p>
                     <p>Public Holiday Leaves: <span class="font-semibold text-gray-800 dark:text-gray-100">${stats.publicHolidayLeaveDays}</span></p>
                     <p>Total Days Present: <span class="font-semibold text-gray-800 dark:text-gray-100">${stats.totalPresentDays}</span></p>
+                    <p>Total Regular Hours: <span class="font-semibold text-gray-800 dark:text-gray-100">${stats.totalMonthRegularHours.toFixed(2)} hours</span></p>
                     <div class="md:col-span-2 my-2 border-t border-gray-200 dark:border-gray-800"></div>
-                    <p class="md:col-span-2 text-lg font-bold text-blue-600 dark:text-blue-400">Total Hours Worked: <span id="totalHoursWorked">${totalMonthHours.toFixed(2)}</span> hours</p>
+                    <p class="md:col-span-2 text-lg font-bold text-blue-600 dark:text-blue-400">Total OT Hours: <span id="totalToHoursWorked">${stats.totalMonthToHours.toFixed(2)}</span> hours</p>
                 </div>
                 <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-800 flex flex-col sm:flex-row gap-4">
                     <button id="backup-btn" class="w-full sm:w-auto flex-1 bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 font-semibold px-4 py-2 rounded-lg border border-blue-200 dark:border-blue-900 hover:bg-blue-100 dark:hover:bg-blue-950 transition">Backup Month Data</button>
@@ -2262,7 +2244,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('widget-own-leaves-value').textContent = stats.ownLeaves;
         document.getElementById('widget-public-leaves-value').textContent = stats.publicHolidayLeaveDays;
         document.getElementById('widget-total-present-value').textContent = stats.totalPresentDays;
-        document.getElementById('widget-total-hours-value').textContent = stats.totalMonthHours.toFixed(1);
+        document.getElementById('widget-total-hours-value').textContent = stats.totalMonthToHours.toFixed(1);
     };
     
     const renderHeatMap = (year, month) => {
@@ -2277,7 +2259,8 @@ document.addEventListener('DOMContentLoaded', () => {
         for (let day = 1; day <= daysInMonth; day++) {
             const dateKey = `${year}-${month}-${day}`;
             const dayData = workData[dateKey] || {};
-            const workingHours = calculateHoursDifference(dayData.inTime, dayData.outTime);
+            const hours = calculateDayHours(dayData, year, month, day);
+            const totalHours = hours.regularHours + hours.toHours;
             
             let statusClass = 'bg-gray-100 dark:bg-gray-800/50';
             const isDayWeekend = isWeekend(year, month, day);
@@ -2289,7 +2272,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 statusClass = 'heatmap-public-holiday';
             } else if (dayData.leaveStatus === 'Yes') {
                  statusClass = 'heatmap-public-holiday'; // Using same color for other leaves for now
-            } else if (workingHours > 0) {
+            } else if (totalHours > 0) {
                 statusClass = 'heatmap-present';
             } else if (isDayWeekend) {
                 statusClass = 'heatmap-weekend';
@@ -2316,12 +2299,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const [year, month, day] = dateKey.split('-').map(Number);
         const dayName = new Date(year, month, day).toLocaleDateString("en-US", { weekday: "long" });
         const title = `${dayName}, ${months[month]} ${day}, ${year}`;
+        const hours = calculateDayHours(dayData, year, month, day);
+        const totalHours = hours.regularHours + hours.toHours;
         
         let content = '<div class="space-y-2 text-sm">';
         const details = {
-            "Status": dayData.leaveStatus === 'Yes' ? `Leave (${dayData.leaveReason || 'N/A'})` : (calculateHoursDifference(dayData.inTime, dayData.outTime) > 0 ? 'Present' : 'No Data'),
+            "Status": dayData.leaveStatus === 'Yes' ? `Leave (${dayData.leaveReason || 'N/A'})` : (totalHours > 0 ? 'Present' : 'No Data'),
             "In Time": dayData.inTime,
             "Out Time": dayData.outTime,
+            "Regular Hours": hours.regularHours > 0 ? hours.regularHours.toFixed(2) : null,
+            "OT Hours": hours.toHours > 0 ? hours.toHours.toFixed(2) : null,
             "Work Location": dayData.workLocation,
             "Team": dayData.teamMembers,
             "Vehicle": dayData.vehicleNumber,
@@ -2443,10 +2430,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 cumulativeOwnLeaves++;
             }
 
-            const workingHours = calculateHoursDifference(data.inTime, data.outTime);
+            const hours = calculateDayHours(data, year, month, day);
+            const totalHours = hours.regularHours + hours.toHours;
             const isSpecial = data.specialDays === "Poya Day" || data.specialDays === "Public Holiday";
 
-            if ((data.leaveStatus === 'Yes' && isSpecial) || (isSpecial && workingHours === 0)) {
+            if ((data.leaveStatus === 'Yes' && isSpecial) || (isSpecial && totalHours === 0)) {
                 cumulativePublicLeaves++;
             } else if (data.leaveStatus === 'Yes' && data.leaveReason !== 'Own Leave') {
                 cumulativePublicLeaves++;
@@ -2567,13 +2555,14 @@ document.addEventListener('DOMContentLoaded', () => {
         
         Object.keys(workData).filter(k => k.startsWith(monthPrefix)).sort().forEach(key => {
             const data = workData[key];
-            const workingHours = calculateHoursDifference(data.inTime, data.outTime);
+            const day = parseInt(key.split('-')[2], 10);
+            const hours = calculateDayHours(data, year, month, day);
+            const totalHours = hours.regularHours + hours.toHours;
             const isSpecial = data.specialDays === "Poya Day" || data.specialDays === "Public Holiday";
 
-            if ((data.leaveStatus === 'Yes' && isSpecial) || (isSpecial && workingHours === 0)) {
-                const day = parseInt(key.split('-')[2], 10);
+            if ((data.leaveStatus === 'Yes' && isSpecial) || (isSpecial && totalHours === 0)) {
                 const formattedDate = `${months[month]} ${day}`;
-                const ot = workingHours > 0 ? `${workingHours.toFixed(1)} OT hrs` : 'Holiday';
+                const ot = totalHours > 0 ? `${totalHours.toFixed(1)} hrs worked` : 'Holiday';
                 
                 let reasonText = data.specialDays;
                 if (data.leaveReason === 'Custom Reason' && data.customReasonDetails) {
