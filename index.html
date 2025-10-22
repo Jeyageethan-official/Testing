@@ -973,7 +973,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const isDayWeekend = dayOfWeek === 0 || dayOfWeek === 6; // Sunday or Saturday
         const isSpecial = specialDays === "Poya Day" || specialDays === "Public Holiday" || dayData.leaveReason === "Custom Reason";
 
-        // For weekends and special days, count full hours
+        // For weekends and special days, count full hours from actual In Time
         if (isDayWeekend || isSpecial) {
             return calculateHoursDifference(inTime, outTime);
         }
@@ -996,8 +996,8 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const workingHours = (outMinutes - effectiveInMinutes) / 60;
 
-        // Cap at 9 hours for normal weekdays
-        return Math.min(workingHours, 9);
+        // For weekdays, count all hours starting from 8:30 AM (or later if In Time is later)
+        return workingHours;
     };
 
     const getMonthStats = (year, month) => {
