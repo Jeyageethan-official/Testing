@@ -965,39 +965,57 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const calculateDayHours = (dayData, year, month, day) => {
-        const { inTime, outTime, specialDays } = dayData;
-        if (!inTime || !outTime) return 0;
+        const { inTime, outTime, specialDays, leaveReason } = dayData;
+
+        if (!inTime || !outTime) {
+            return { regularHours: 0, toHours: 0 };
+        }
+
+        const timeToMinutes = (timeStr) => {
+            if (!timeStr || !timeStr.includes(':')) return 0;
+            const [h, m] = timeStr.split(':').map(Number);
+            return h * 60 + m;
+        };
+
+        const inMinutes = timeToMinutes(inTime);
+        const outMinutes = timeToMinutes(outTime);
+
+        if (outMinutes <= inMinutes) {
+            return { regularHours: 0, toHours: 0 };
+        }
 
         const date = new Date(year, month, day);
         const dayOfWeek = date.getDay();
-        const isDayWeekend = dayOfWeek === 0 || dayOfWeek === 6; // Sunday or Saturday
-        const isSpecial = specialDays === "Poya Day" || specialDays === "Public Holiday" || dayData.leaveReason === "Custom Reason";
+        const isDayWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+        const isSpecial = specialDays === "Poya Day" || specialDays === "Public Holiday" || leaveReason === "Custom Reason";
 
-        // For weekends and special days, count full hours from actual In Time
+        // Rule for weekends and special days: count full hours without a 9-hour limit.
         if (isDayWeekend || isSpecial) {
-            return calculateHoursDifference(inTime, outTime);
+            const totalMinutesWorked = outMinutes - inMinutes;
+            return { regularHours: totalMinutesWorked / 60, toHours: 0 };
         }
 
-        // For normal weekdays (Monday to Friday)
-        const [inH, inM] = inTime.split(':').map(Number);
-        const [outH, outM] = outTime.split(':').map(Number);
-        
-        const inMinutes = inH * 60 + inM;
-        const outMinutes = outH * 60 + outM;
+        // Rule for normal weekdays (Monday to Friday)
+        const eightThirtyAMInMinutes = 8 * 60 + 30; // 510
+        const nineHoursInMinutes = 9 * 60; // 540
 
-        if (outMinutes < inMinutes) return 0;
-        
-        const eightThirtyAMInMinutes = 8 * 60 + 30; // 510 minutes
-        
-        // Start counting from 8:30 AM even if user came in earlier
+        // Effective start time is 8:30 AM or later if they came in later.
         const effectiveInMinutes = Math.max(inMinutes, eightThirtyAMInMinutes);
 
-        if (outMinutes < effectiveInMinutes) return 0;
-        
-        const workingHours = (outMinutes - effectiveInMinutes) / 60;
+        if (outMinutes <= effectiveInMinutes) {
+            return { regularHours: 0, toHours: 0 };
+        }
 
-        // For weekdays, count all hours starting from 8:30 AM (or later if In Time is later)
-        return workingHours;
+        const totalEffectiveMinutesWorked = outMinutes - effectiveInMinutes;
+
+        if (totalEffectiveMinutesWorked <= nineHoursInMinutes) {
+            // Worked 9 hours or less, no "To Hours"
+            return { regularHours: totalEffectiveMinutesWorked / 60, toHours: 0 };
+        } else {
+            // Worked more than 9 hours. Regular hours are capped at 9.
+            const overtimeMinutes = totalEffectiveMinutesWorked - nineHoursInMinutes;
+            return { regularHours: nineHoursInMinutes / 60, toHours: overtimeMinutes / 60 };
+        }
     };
 
     const getMonthStats = (year, month) => {
@@ -1008,12 +1026,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if (key.startsWith(monthPrefix)) {
                 const data = workData[key];
                 const day = parseInt(key.split('-')[2], 10);
-                const workingHours = calculateDayHours(data, year, month, day);
+                const { regularHours, toHours } = calculateDayHours(data, year, month, day);
+                const totalHours = regularHours + toHours;
                 const isSpecial = data.specialDays === "Poya Day" || data.specialDays === "Public Holiday";
 
-                if (workingHours > 0) {
+                if (totalHours > 0) {
                     totalPresentDays++;
-                    totalMonthHours += workingHours;
+                    totalMonthHours += totalHours;
                 }
             
                 if (data.leaveStatus === "Yes") {
