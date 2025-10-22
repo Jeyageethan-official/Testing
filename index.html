@@ -568,7 +568,7 @@
         }
         .widget-view-all {
             position: absolute;
-            top: 0.75rem;
+            bottom: 0.75rem;
             right: 1rem;
             font-size: 0.75rem;
             font-weight: 600;
@@ -670,28 +670,24 @@
         
         <!-- Dashboard Page -->
         <div id="dashboard-page" class="p-4 sm:p-6 lg:p-8">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white">Overview</h2>
-                <button id="view-full-report-btn" class="bg-blue-600 text-white font-semibold px-4 py-2 rounded-lg hover:bg-blue-700 transition">View Full Report</button>
-            </div>
     
             <!-- DASHBOARD START -->
              <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                 <!-- Left Widgets -->
                 <div class="flex flex-col gap-4">
                     <div id="widget-own-leaves" class="iphone-widget flex flex-col justify-between">
-                        <a id="view-all-own-leaves" class="widget-view-all">View All</a>
                         <div>
                             <h3 class="widget-title">Own Leaves</h3>
                             <p id="widget-own-leaves-value" class="text-4xl font-bold mt-2 text-gray-800 dark:text-white">0</p>
                         </div>
+                        <a id="view-all-own-leaves" class="widget-view-all">View All</a>
                     </div>
                     <div id="widget-public-leaves" class="iphone-widget flex flex-col justify-between">
-                        <a id="view-all-public-leaves" class="widget-view-all">View All</a>
                         <div>
                             <h3 class="widget-title">Public Holiday Leaves</h3>
                             <p id="widget-public-leaves-value" class="text-4xl font-bold mt-2 text-gray-800 dark:text-white">0</p>
                         </div>
+                        <a id="view-all-public-leaves" class="widget-view-all">View All</a>
                     </div>
                 </div>
                  <!-- Right Widgets -->
@@ -714,8 +710,19 @@
                     <div id="heatmap-container"></div>
                 </div>
             </div>
+
+            <div class="mb-6">
+                <button id="view-full-report-btn" class="w-full bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-blue-700 transition-all transform hover:-translate-y-0.5 shadow-lg hover:shadow-xl">View Full Report</button>
+            </div>
             
             <div id="dashboard-widgets" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- New Chart Widget -->
+                <div class="widget-card md:col-span-2 lg:col-span-3">
+                    <h3 class="widget-title mb-4">Monthly Leave Trend</h3>
+                    <div class="h-64 relative">
+                        <canvas id="monthly-leave-trend-chart"></canvas>
+                    </div>
+                </div>
                 <!-- Widgets Grid -->
                 <div class="widget-card">
                     <h3 class="widget-title mb-4">Upcoming Events (Next 7 Days)</h3>
@@ -827,6 +834,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Chart and Map instances
     let leaveReasonChartInstance = null;
+    let monthlyLeaveTrendChartInstance = null;
     let leafletMapInstance = null;
     
     const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -1295,6 +1303,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const handleThemeToggle = () => {
         const currentTheme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
         applyTheme(currentTheme === 'light' ? 'dark' : 'light');
+        if (dashboardPage.style.display === 'block') {
+            renderDashboard(); // Re-render dashboard to update charts with new theme colors
+        }
     }
 
     const addSingleDayCardEventListeners = (dayBox) => {
@@ -2130,6 +2141,7 @@ document.addEventListener('DOMContentLoaded', () => {
         renderHeatMap(year, month);
         renderUpcomingEvents();
         renderLeaveReasonChart(year, month);
+        renderMonthlyLeaveTrendChart(year, month);
         addDashboardEventListeners();
     };
 
@@ -2294,6 +2306,124 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     };
+
+    const renderMonthlyLeaveTrendChart = (year, month) => {
+        const ctx = document.getElementById('monthly-leave-trend-chart')?.getContext('2d');
+        if (!ctx) return;
+
+        if (monthlyLeaveTrendChartInstance) {
+            monthlyLeaveTrendChartInstance.destroy();
+        }
+
+        const daysInMonth = getDaysInMonth(year, month);
+        const labels = Array.from({ length: daysInMonth }, (_, i) => i + 1);
+
+        let cumulativeOwnLeaves = 0;
+        let cumulativePublicLeaves = 0;
+        const ownLeaveData = [];
+        const publicLeaveData = [];
+
+        for (let day = 1; day <= daysInMonth; day++) {
+            const dateKey = `${year}-${month}-${day}`;
+            const data = workData[dateKey] || {};
+            
+            if (data.leaveReason === 'Own Leave') {
+                cumulativeOwnLeaves++;
+            }
+
+            const workingHours = calculateHoursDifference(data.inTime, data.outTime);
+            const isSpecial = data.specialDays === "Poya Day" || data.specialDays === "Public Holiday";
+
+            if ((data.leaveStatus === 'Yes' && isSpecial) || (isSpecial && workingHours === 0)) {
+                cumulativePublicLeaves++;
+            } else if (data.leaveStatus === 'Yes' && data.leaveReason !== 'Own Leave') {
+                cumulativePublicLeaves++;
+            }
+
+            ownLeaveData.push(cumulativeOwnLeaves);
+            publicLeaveData.push(cumulativePublicLeaves);
+        }
+        
+        const isDarkMode = document.documentElement.classList.contains('dark');
+        const gridColor = isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+        const textColor = isDarkMode ? '#d1d5db' : '#4b5563';
+
+        const ownLeaveGradient = ctx.createLinearGradient(0, 0, 0, ctx.canvas.clientHeight);
+        ownLeaveGradient.addColorStop(0, 'rgba(239, 68, 68, 0.5)'); // red-500
+        ownLeaveGradient.addColorStop(1, isDarkMode ? 'rgba(239, 68, 68, 0)' : 'rgba(255, 255, 255, 0)');
+
+        const publicLeaveGradient = ctx.createLinearGradient(0, 0, 0, ctx.canvas.clientHeight);
+        publicLeaveGradient.addColorStop(0, 'rgba(251, 191, 36, 0.5)'); // amber-400
+        publicLeaveGradient.addColorStop(1, isDarkMode ? 'rgba(251, 191, 36, 0)' : 'rgba(255, 255, 255, 0)');
+
+        monthlyLeaveTrendChartInstance = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Cumulative Own Leaves',
+                        data: ownLeaveData,
+                        borderColor: 'rgb(239, 68, 68)', // red-500
+                        backgroundColor: ownLeaveGradient,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: 'rgb(239, 68, 68)',
+                        pointBorderColor: '#fff',
+                        pointHoverRadius: 6,
+                    },
+                    {
+                        label: 'Cumulative Public & Other Leaves',
+                        data: publicLeaveData,
+                        borderColor: 'rgb(251, 191, 36)', // amber-400
+                        backgroundColor: publicLeaveGradient,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: 'rgb(251, 191, 36)',
+                        pointBorderColor: '#fff',
+                        pointHoverRadius: 6,
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false,
+                },
+                scales: {
+                    x: {
+                        title: { display: true, text: 'Day of Month', color: textColor },
+                        grid: { color: gridColor },
+                        ticks: { color: textColor },
+                    },
+                    y: {
+                        title: { display: true, text: 'Cumulative Count', color: textColor },
+                        grid: { color: gridColor },
+                        ticks: { color: textColor, stepSize: 1 },
+                        beginAtZero: true
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: { color: textColor }
+                    },
+                    tooltip: {
+                        backgroundColor: isDarkMode ? '#1f2937' : '#fff',
+                        titleColor: isDarkMode ? '#f9fafb' : '#111827',
+                        bodyColor: isDarkMode ? '#d1d5db' : '#374151',
+                        borderColor: isDarkMode ? '#374151' : '#e5e7eb',
+                        borderWidth: 1,
+                        padding: 10,
+                        cornerRadius: 8,
+                        displayColors: true,
+                    }
+                }
+            }
+        });
+    };
     
     const showOwnLeaveDetailsModal = () => {
         const year = currentDate.getFullYear();
@@ -2332,7 +2462,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 const day = parseInt(key.split('-')[2], 10);
                 const formattedDate = `${months[month]} ${day}`;
                 const ot = workingHours > 0 ? `${workingHours.toFixed(1)} OT hrs` : 'Holiday';
-                details.push({ date: formattedDate, reason: `${data.specialDays} (${ot})` });
+                
+                let reasonText = data.specialDays;
+                if (data.leaveReason === 'Custom Reason' && data.customReasonDetails) {
+                    reasonText += `: ${data.customReasonDetails}`;
+                }
+
+                details.push({ date: formattedDate, reason: `${reasonText} (${ot})` });
             }
         });
 
