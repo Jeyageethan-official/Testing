@@ -555,20 +555,28 @@
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border-radius: 1.25rem; /* rounded-2xl */
-            padding: 1.25rem; /* p-5 */
+            padding: 1rem;
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.2);
             transition: all 0.3s ease;
-            cursor: pointer;
-            min-height: 140px;
-        }
-        .iphone-widget:hover {
-            transform: translateY(-4px) scale(1.02);
-            box-shadow: 0 0 20px 0 rgba(96, 165, 250, 0.4);
+            min-height: 120px;
+            position: relative;
         }
         html.dark .iphone-widget {
              background: rgba(31, 41, 55, 0.6);
              border-color: rgba(255, 255, 255, 0.1);
+        }
+        .widget-view-all {
+            position: absolute;
+            top: 0.75rem;
+            right: 1rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--slt-blue);
+            cursor: pointer;
+        }
+        html.dark .widget-view-all {
+            color: #60a5fa;
         }
         
         /* Heatmap styles */
@@ -578,7 +586,7 @@
         }
         .heatmap-present { background-color: rgba(34, 197, 94, 0.7); }
         .heatmap-leave-own { background-color: rgba(239, 68, 68, 0.7); } /* Red */
-        .heatmap-leave-other { background-color: rgba(251, 191, 36, 0.7); } /* Yellow */
+        .heatmap-public-holiday { background-color: rgba(251, 191, 36, 0.7); } /* Yellow */
         .heatmap-weekend { background-color: #e5e7eb; }
         html.dark .heatmap-weekend { background-color: #374151; }
         
@@ -668,57 +676,54 @@
             </div>
     
             <!-- DASHBOARD START -->
-            <div id="dashboard-widgets" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                 <!-- New iPhone-style Widgets -->
-                <div id="widget-total-leaves" class="iphone-widget flex flex-col justify-between">
-                    <div>
-                        <h3 class="widget-title">Total Leaves</h3>
-                        <p id="widget-total-leaves-value" class="text-4xl font-bold mt-2 text-gray-800 dark:text-white">0</p>
+             <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <!-- Left Widgets -->
+                <div class="flex flex-col gap-4">
+                    <div id="widget-own-leaves" class="iphone-widget flex flex-col justify-between">
+                        <a id="view-all-own-leaves" class="widget-view-all">View All</a>
+                        <div>
+                            <h3 class="widget-title">Own Leaves</h3>
+                            <p id="widget-own-leaves-value" class="text-4xl font-bold mt-2 text-gray-800 dark:text-white">0</p>
+                        </div>
                     </div>
-                    <p class="text-xs text-gray-500 dark:text-gray-400">Days taken this month</p>
-                </div>
-                <div id="widget-ot-hours" class="iphone-widget flex flex-col justify-between">
-                    <div>
-                        <h3 class="widget-title">OT Hours</h3>
-                        <p id="widget-ot-hours-value" class="text-4xl font-bold mt-2 text-gray-800 dark:text-white">0.0</p>
+                    <div id="widget-public-leaves" class="iphone-widget flex flex-col justify-between">
+                        <a id="view-all-public-leaves" class="widget-view-all">View All</a>
+                        <div>
+                            <h3 class="widget-title">Public Holiday Leaves</h3>
+                            <p id="widget-public-leaves-value" class="text-4xl font-bold mt-2 text-gray-800 dark:text-white">0</p>
+                        </div>
                     </div>
-                    <p class="text-xs text-gray-500 dark:text-gray-400">Total overtime accumulated</p>
                 </div>
-                <div id="widget-own-leaves" class="iphone-widget flex flex-col justify-between">
-                    <div>
-                        <h3 class="widget-title">Own Leaves</h3>
-                        <p id="widget-own-leaves-value" class="text-4xl font-bold mt-2 text-gray-800 dark:text-white">0</p>
+                 <!-- Right Widgets -->
+                <div class="flex flex-col gap-4">
+                     <div id="widget-total-present" class="iphone-widget flex flex-col justify-between">
+                        <div>
+                            <h3 class="widget-title">Total Present</h3>
+                            <p id="widget-total-present-value" class="text-4xl font-bold mt-2 text-gray-800 dark:text-white">0</p>
+                        </div>
                     </div>
-                    <p class="text-xs text-gray-500 dark:text-gray-400">Personal leave days</p>
-                </div>
-                <div id="widget-poya-leaves" class="iphone-widget flex flex-col justify-between">
-                    <div>
-                        <h3 class="widget-title">Poya/Public</h3>
-                        <p id="widget-poya-leaves-value" class="text-4xl font-bold mt-2 text-gray-800 dark:text-white">0</p>
+                    <div id="widget-total-hours" class="iphone-widget flex flex-col justify-between">
+                        <div>
+                            <h3 class="widget-title">Total Month Hours</h3>
+                            <p id="widget-total-hours-value" class="text-4xl font-bold mt-2 text-gray-800 dark:text-white">0.0</p>
+                        </div>
                     </div>
-                    <p class="text-xs text-gray-500 dark:text-gray-400">Holiday leaves recorded</p>
                 </div>
-
-                <!-- Existing Widgets -->
-                <div class="widget-card md:col-span-2 lg:col-span-2">
+                 <div class="widget-card col-span-2 lg:col-span-2">
                     <h3 class="widget-title mb-4">Attendance Heat Map</h3>
                     <div id="heatmap-container"></div>
                 </div>
-                <div class="widget-card">
-                    <h3 class="widget-title mb-4">Smart Leave Pattern Analyzer</h3>
-                    <div id="leave-analyzer-container" class="text-sm space-y-3"></div>
-                </div>
+            </div>
+            
+            <div id="dashboard-widgets" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Widgets Grid -->
                 <div class="widget-card">
                     <h3 class="widget-title mb-4">Upcoming Events (Next 7 Days)</h3>
                     <div id="events-container" class="text-sm space-y-2"></div>
                 </div>
-                <div class="widget-card md:col-span-2 lg:col-span-1">
+                <div class="widget-card">
                     <h3 class="widget-title mb-4">Own Leave Reason Summary</h3>
                     <canvas id="leave-reason-chart"></canvas>
-                </div>
-                <div class="widget-card md:col-span-2">
-                    <h3 class="widget-title mb-4">Work Location History</h3>
-                    <div id="location-map" class="h-full w-full rounded-lg min-h-[220px] bg-gray-200 dark:bg-gray-700"></div>
                 </div>
                  <div class="widget-card">
                     <h3 class="widget-title mb-4">Quick Export</h3>
@@ -731,9 +736,9 @@
                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></svg>
                            Export Excel (CSV)
                         </button>
-                        <button id="export-screenshot-shortcut" class="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-semibold text-sm transition-all bg-blue-500 hover:bg-blue-600 text-white">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></svg>
-                            Screenshot
+                        <button id="share-shortcut-btn" class="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-semibold text-sm transition-all bg-blue-500 hover:bg-blue-600 text-white">
+                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M13.5 1a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5zm-8.5 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm11 5.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/></svg>
+                            Share
                         </button>
                     </div>
                 </div>
@@ -744,7 +749,7 @@
         <!-- Scroll Buttons -->
         <div class="fixed bottom-6 right-6 flex flex-col gap-3 z-40">
             <button id="floating-date-picker-btn" title="Go to Date" class="w-12 h-12 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm text-gray-700 dark:text-gray-200 rounded-full shadow-lg flex items-center justify-center hover:bg-white dark:hover:bg-gray-700 hover:text-blue-600 transition-all duration-200 hidden">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
             </button>
             <button id="scrollUpButton" class="w-12 h-12 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm text-gray-700 dark:text-gray-200 rounded-full shadow-lg flex items-center justify-center hover:bg-white dark:hover:bg-gray-700 hover:text-blue-600 transition-all duration-200 hidden">↑</button>
             <button id="scrollDownButton" class="w-12 h-12 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm text-gray-700 dark:text-gray-200 rounded-full shadow-lg flex items-center justify-center hover:bg-white dark:hover:bg-gray-700 hover:text-blue-600 transition-all duration-200">↓</button>
@@ -850,6 +855,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const viewFullReportBtn = document.getElementById('view-full-report-btn');
     // BACK BUTTON NAVIGATION END
 
+    let floatingBtnListener = null;
+
 
     // -----------------------------------------------------------------------------
     // ALL FUNCTION DEFINITIONS
@@ -865,14 +872,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 page.style.display = 'none';
             }
         });
+        
+        if (floatingBtnListener) {
+            floatingDatePickerBtn.removeEventListener('click', floatingBtnListener);
+        }
 
         if(pageId === 'dashboard-page') {
              pageTitle.textContent = "Dashboard";
+             floatingDatePickerBtn.title = "Select Month";
+             floatingBtnListener = showMonthPickerModal;
              renderDashboard();
         } else {
              pageTitle.textContent = "Work Report";
+             floatingDatePickerBtn.title = "Go to Date";
+             floatingBtnListener = showDatePickerModal;
         }
 
+        floatingDatePickerBtn.addEventListener('click', floatingBtnListener);
         signinPage.style.display = 'none';
         appWrapper.style.display = 'block';
     };
@@ -892,42 +908,33 @@ document.addEventListener('DOMContentLoaded', () => {
         if (outMinutes < inMinutes) return 0;
         return (outMinutes - inMinutes) / 60;
     };
-     const getMonthStats = (year, month) => {
+    const getMonthStats = (year, month) => {
         const monthPrefix = `${year}-${month}`;
-        let regularLeaves = 0, poyaPublicLeaves = 0, weekendLeaveDays = 0, ownLeaves = 0;
-        let totalOtHours = 0;
-        let workingDays = 0;
+        let ownLeaves = 0, publicHolidayLeaveDays = 0, totalPresentDays = 0, totalMonthHours = 0;
 
         Object.keys(workData).forEach(key => {
             if (key.startsWith(monthPrefix)) {
                 const data = workData[key];
-                const day = parseInt(key.split('-')[2], 10);
-                const isDayWeekend = isWeekend(year, month, day);
-                const isSpecial = data.specialDays === "Poya Day" || data.specialDays === "Public Holiday";
                 const workingHours = calculateHoursDifference(data.inTime, data.outTime);
+                const isSpecial = data.specialDays === "Poya Day" || data.specialDays === "Public Holiday";
 
                 if (workingHours > 0) {
-                    workingDays++;
-                    let ot = 0;
-                    if (isSpecial) ot = workingHours;
-                    else if (isDayWeekend) ot = workingHours;
-                    else if (workingHours > 9) ot = workingHours - 9;
-                    totalOtHours += ot;
+                    totalPresentDays++;
+                    totalMonthHours += workingHours;
                 }
-               
+            
                 if (data.leaveStatus === "Yes") {
                     if (data.leaveReason === "Own Leave") ownLeaves++;
-                    if (data.leaveReason === "Own Leave" || (data.leaveReason === "Custom Reason" && !isDayWeekend && !isSpecial)) regularLeaves++;
-                    else if (isSpecial || data.leaveReason === "Poya Day" || data.leaveReason === "Public Holiday") poyaPublicLeaves++;
-                    if (isDayWeekend && data.leaveReason === "Normal Leave Day") weekendLeaveDays++;
-                } else if (isSpecial) {
-                    poyaPublicLeaves++;
+                    if (isSpecial || data.leaveReason === "Poya Day" || data.leaveReason === "Public Holiday") {
+                        publicHolidayLeaveDays++;
+                    }
+                } else if (isSpecial && workingHours === 0) {
+                    publicHolidayLeaveDays++;
                 }
             }
         });
-        const totalLeaves = regularLeaves + poyaPublicLeaves + weekendLeaveDays;
 
-        return { regularLeaves, poyaPublicLeaves, weekendLeaveDays, totalLeaves, totalOtHours, workingDays, ownLeaves };
+        return { ownLeaves, publicHolidayLeaveDays, totalPresentDays, totalMonthHours };
     };
 
     // MODAL & SIDEBAR MANAGEMENT
@@ -1042,12 +1049,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const userInitial = (user.displayName || user.email || 'U').charAt(0).toUpperCase();
         authArea.innerHTML = `
             <div class="flex items-center gap-4">
-                <button id="sidebar-open-btn" title="Open Menu" class="p-2 text-gray-600 dark:text-gray-300 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
-                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-                </button>
-                <div class="w-px h-6 bg-gray-200 dark:bg-gray-700 hidden sm:block"></div>
                 <button id="user-menu-btn" class="relative w-10 h-10 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center text-gray-600 dark:text-gray-300 font-semibold text-lg">
                     ${userInitial}
+                </button>
+                <button id="sidebar-open-btn" title="Open Menu" class="p-2 text-gray-600 dark:text-gray-300 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
                 </button>
             </div>
             <div id="user-menu-dropdown" class="hidden">
@@ -1179,16 +1185,17 @@ document.addEventListener('DOMContentLoaded', () => {
         const year = currentDate.getFullYear();
         const month = currentDate.getMonth();
         const stats = getMonthStats(year, month);
-        
+        const { totalMonthHours } = stats;
+
         summaryContainer.innerHTML = `
             <div class="mt-8 p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-800/50">
                 <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-4">Monthly Summary</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3 text-gray-600 dark:text-gray-300">
-                    <p>Leave Days (Regular): <span class="font-semibold text-gray-800 dark:text-gray-100">${stats.regularLeaves}</span></p>
-                    <p>Leave Days (Poya/Public): <span class="font-semibold text-gray-800 dark:text-gray-100">${stats.poyaPublicLeaves}</span></p>
-                    <p>Leave Days (Weekend): <span class="font-semibold text-gray-800 dark:text-gray-100">${stats.weekendLeaveDays}</span></p>
+                    <p>Total Own Leaves: <span class="font-semibold text-gray-800 dark:text-gray-100">${stats.ownLeaves}</span></p>
+                    <p>Public Holiday Leaves: <span class="font-semibold text-gray-800 dark:text-gray-100">${stats.publicHolidayLeaveDays}</span></p>
+                    <p>Total Days Present: <span class="font-semibold text-gray-800 dark:text-gray-100">${stats.totalPresentDays}</span></p>
                     <div class="md:col-span-2 my-2 border-t border-gray-200 dark:border-gray-800"></div>
-                    <p class="md:col-span-2 text-lg font-bold text-blue-600 dark:text-blue-400">Total OT Hours: <span id="totalOtHours">${stats.totalOtHours.toFixed(2)}</span> hours</p>
+                    <p class="md:col-span-2 text-lg font-bold text-blue-600 dark:text-blue-400">Total Hours Worked: <span id="totalHoursWorked">${totalMonthHours.toFixed(2)}</span> hours</p>
                 </div>
                 <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-800 flex flex-col sm:flex-row gap-4">
                     <button id="backup-btn" class="w-full sm:w-auto flex-1 bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 font-semibold px-4 py-2 rounded-lg border border-blue-200 dark:border-blue-900 hover:bg-blue-100 dark:hover:bg-blue-950 transition">Backup Month Data</button>
@@ -1815,9 +1822,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     currentDate.setFullYear(pickerYear);
                     currentDate.setMonth(selectedMonth);
                     closeModal();
-                    renderAll(); // Renders the report page
+                    if (document.getElementById('report-page').style.display === 'block') {
+                        renderAll();
+                    }
                     if(document.getElementById('dashboard-page').style.display === 'block'){
-                        renderDashboard(); // If dashboard was open, re-render it for the new month
+                        renderDashboard();
                     }
                 });
             });
@@ -2119,19 +2128,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
         renderDashboardSummaryWidgets(year, month);
         renderHeatMap(year, month);
-        renderLeaveAnalyzer(year, month);
         renderUpcomingEvents();
         renderLeaveReasonChart(year, month);
-        renderLocationMap(year, month);
         addDashboardEventListeners();
     };
 
     const renderDashboardSummaryWidgets = (year, month) => {
         const stats = getMonthStats(year, month);
-        document.getElementById('widget-total-leaves-value').textContent = stats.totalLeaves;
-        document.getElementById('widget-ot-hours-value').textContent = stats.totalOtHours.toFixed(1);
         document.getElementById('widget-own-leaves-value').textContent = stats.ownLeaves;
-        document.getElementById('widget-poya-leaves-value').textContent = stats.poyaPublicLeaves;
+        document.getElementById('widget-public-leaves-value').textContent = stats.publicHolidayLeaveDays;
+        document.getElementById('widget-total-present-value').textContent = stats.totalPresentDays;
+        document.getElementById('widget-total-hours-value').textContent = stats.totalMonthHours.toFixed(1);
     };
     
     const renderHeatMap = (year, month) => {
@@ -2150,13 +2157,16 @@ document.addEventListener('DOMContentLoaded', () => {
             
             let statusClass = 'bg-gray-100 dark:bg-gray-800/50';
             const isDayWeekend = isWeekend(year, month, day);
+            const isSpecial = dayData.specialDays === "Poya Day" || dayData.specialDays === "Public Holiday";
 
             if (dayData.leaveReason === 'Own Leave') {
-                statusClass = 'heatmap-leave-own'; // Red
-            } else if (dayData.leaveStatus === 'Yes' || dayData.specialDays) {
-                statusClass = 'heatmap-leave-other'; // Yellow
+                statusClass = 'heatmap-leave-own';
+            } else if (isSpecial) {
+                statusClass = 'heatmap-public-holiday';
+            } else if (dayData.leaveStatus === 'Yes') {
+                 statusClass = 'heatmap-public-holiday'; // Using same color for other leaves for now
             } else if (workingHours > 0) {
-                statusClass = 'heatmap-present'; // Green
+                statusClass = 'heatmap-present';
             } else if (isDayWeekend) {
                 statusClass = 'heatmap-weekend';
             }
@@ -2203,43 +2213,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         content += '</div>';
 
-        openModal(createModal(title, content, 'heatmap-detail-modal'));
-    };
-
-    const renderLeaveAnalyzer = (year, month) => {
-        const container = document.getElementById('leave-analyzer-container');
-        const monthPrefix = `${year}-${month}`;
-        let insights = [];
-        const leaveDays = {};
-        let poyaLeaves = 0;
-
-        Object.keys(workData).filter(k => k.startsWith(monthPrefix)).forEach(key => {
-            const data = workData[key];
-            if (data.leaveStatus === 'Yes' && data.leaveReason === 'Own Leave') {
-                const day = parseInt(key.split('-')[2], 10);
-                const dayOfWeek = new Date(year, month, day).getDay();
-                leaveDays[dayOfWeek] = (leaveDays[dayOfWeek] || 0) + 1;
-            }
-            if (data.specialDays === 'Poya Day' && data.leaveStatus === 'Yes') poyaLeaves++;
-        });
-
-        const dayNames = ['Sundays', 'Mondays', 'Tuesdays', 'Wednesdays', 'Thursdays', 'Fridays', 'Saturdays'];
-        for (const [day, count] of Object.entries(leaveDays)) {
-            if (count > 1) {
-                insights.push(`You took <strong>${count}</strong> own leaves on <strong>${dayNames[day]}</strong> this month.`);
-            }
-        }
-        if (poyaLeaves > 1) insights.push(`You took leaves on <strong>${poyaLeaves} Poya days</strong>.`);
-        
-        if (insights.length === 0) {
-            insights.push('Your leave patterns appear normal this month. Great job!');
-        }
-
-        container.innerHTML = insights.map(insight => `
-            <div class="flex items-start gap-3 p-2 rounded-lg bg-blue-50/50 dark:bg-blue-900/20">
-                <span class="text-blue-500 mt-1">✨</span>
-                <p class="text-gray-700 dark:text-gray-300">${insight}</p>
-            </div>`).join('');
+        openModal(createModal(title, content, 'heatmap-detail-modal', 'max-w-sm'));
     };
 
     const renderUpcomingEvents = () => {
@@ -2289,9 +2263,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const sortedReasons = Object.entries(reasonCounts).sort((a, b) => b[1] - a[1]).slice(0, 3);
         
         if (leaveReasonChartInstance) leaveReasonChartInstance.destroy();
+        
+        const parent = ctx.canvas.parentElement;
+        const existingP = parent.querySelector('p');
+        if (existingP) existingP.remove();
+
         if(sortedReasons.length === 0) {
-            ctx.canvas.parentElement.innerHTML += `<p class="text-gray-500 text-center py-4">No 'Own Leave' reasons recorded.</p>`;
             ctx.canvas.style.display = 'none';
+            parent.insertAdjacentHTML('beforeend', `<p class="text-gray-500 text-center py-4">No 'Own Leave' reasons recorded.</p>`);
             return;
         }
         ctx.canvas.style.display = 'block';
@@ -2315,101 +2294,55 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     };
-
-    const renderLocationMap = (year, month) => {
-        const mapContainer = document.getElementById('location-map');
-        if (leafletMapInstance) {
-            leafletMapInstance.remove();
-            leafletMapInstance = null;
-        }
-
-        const monthPrefix = `${year}-${month}`;
-        const locations = new Map();
-        Object.keys(workData).filter(k => k.startsWith(monthPrefix)).forEach(key => {
-            const data = workData[key];
-            if (data.workLocation) {
-                const loc = data.workLocation.trim();
-                 if(!locations.has(loc)) locations.set(loc, []);
-                 locations.get(loc).push(`Day ${key.split('-')[2]}: ${data.vehicleNumber || 'N/A'}`);
-            }
-        });
-        
-        const placeholderCoords = { 'Office': [6.9271, 79.8612], 'Colombo': [6.9344, 79.8428], 'Kandy': [7.2906, 80.6337] };
-
-        if(locations.size === 0){
-             mapContainer.innerHTML = `<div class="w-full h-full flex items-center justify-center text-gray-500">No location data for this month.</div>`;
-             return;
-        }
-
-        leafletMapInstance = L.map('location-map').setView([6.9271, 79.8612], 8);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; OpenStreetMap'
-        }).addTo(leafletMapInstance);
-
-        for(const [location, details] of locations.entries()){
-            if(placeholderCoords[location]) {
-                L.marker(placeholderCoords[location])
-                 .addTo(leafletMapInstance)
-                 .bindPopup(`<b>${location}</b><br>${details.join('<br>')}`);
-            }
-        }
-        setTimeout(() => leafletMapInstance?.invalidateSize(), 100);
-    };
-
-    const showWidgetDetailModal = (type) => {
+    
+    const showOwnLeaveDetailsModal = () => {
         const year = currentDate.getFullYear();
         const month = currentDate.getMonth();
         const monthPrefix = `${year}-${month}`;
-        let title = '';
-        let details = [];
+        const details = [];
 
         Object.keys(workData).filter(k => k.startsWith(monthPrefix)).sort().forEach(key => {
             const data = workData[key];
-            const day = parseInt(key.split('-')[2], 10);
-            const formattedDate = `${months[month]} ${day}`;
-
-            switch(type) {
-                case 'totalLeaves':
-                    title = 'Total Leave Details';
-                    if (data.leaveStatus === 'Yes') {
-                        details.push({ date: formattedDate, reason: data.leaveReason || 'N/A' });
-                    } else if (data.specialDays) {
-                         details.push({ date: formattedDate, reason: data.specialDays });
-                    }
-                    break;
-                case 'otHours':
-                    title = 'Overtime Hour Details';
-                     const workingHours = calculateHoursDifference(data.inTime, data.outTime);
-                    if (workingHours > 0) {
-                        const isDayWeekend = isWeekend(year, month, day);
-                        const isSpecial = data.specialDays === "Poya Day" || data.specialDays === "Public Holiday";
-                        let ot = 0;
-                        if (isSpecial || isDayWeekend) ot = workingHours;
-                        else if (workingHours > 9) ot = workingHours - 9;
-                        if (ot > 0) details.push({ date: formattedDate, reason: `${ot.toFixed(2)} hours` });
-                    }
-                    break;
-                case 'ownLeaves':
-                     title = 'Own Leave Details';
-                    if (data.leaveReason === 'Own Leave') {
-                        details.push({ date: formattedDate, reason: data.leaveReasonText || 'No details provided' });
-                    }
-                    break;
-                case 'poyaLeaves':
-                    title = 'Poya/Public Holiday Leaves';
-                    if (data.specialDays && (data.leaveStatus === 'Yes' || calculateHoursDifference(data.inTime, data.outTime) === 0)) {
-                         details.push({ date: formattedDate, reason: data.specialDays });
-                    }
-                    break;
+             if (data.leaveReason === 'Own Leave') {
+                const day = parseInt(key.split('-')[2], 10);
+                const formattedDate = `${months[month]} ${day}`;
+                details.push({ date: formattedDate, reason: data.leaveReasonText || 'No details' });
             }
         });
-        
-        const content = details.length > 0 
+
+        const content = details.length > 0
             ? `<ul class="space-y-2">${details.map(d => `<li class="flex justify-between items-center text-sm p-2 bg-gray-50 dark:bg-gray-800/50 rounded-md"><span class="font-semibold text-gray-700 dark:text-gray-300">${d.date}</span><span class="text-gray-500 dark:text-gray-400 text-right">${d.reason}</span></li>`).join('')}</ul>`
-            : `<p class="text-center text-gray-500 dark:text-gray-400">No data available for this month.</p>`;
+            : `<p class="text-center text-gray-500 dark:text-gray-400">No own leaves recorded for this month.</p>`;
         
-        openModal(createModal(title, content));
+        openModal(createModal('Own Leave Details', content));
     };
+
+    const showPublicHolidayDetailsModal = () => {
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
+        const monthPrefix = `${year}-${month}`;
+        const details = [];
+        
+        Object.keys(workData).filter(k => k.startsWith(monthPrefix)).sort().forEach(key => {
+            const data = workData[key];
+            const workingHours = calculateHoursDifference(data.inTime, data.outTime);
+            const isSpecial = data.specialDays === "Poya Day" || data.specialDays === "Public Holiday";
+
+            if ((data.leaveStatus === 'Yes' && isSpecial) || (isSpecial && workingHours === 0)) {
+                const day = parseInt(key.split('-')[2], 10);
+                const formattedDate = `${months[month]} ${day}`;
+                const ot = workingHours > 0 ? `${workingHours.toFixed(1)} OT hrs` : 'Holiday';
+                details.push({ date: formattedDate, reason: `${data.specialDays} (${ot})` });
+            }
+        });
+
+        const content = details.length > 0
+            ? `<ul class="space-y-2">${details.map(d => `<li class="flex justify-between items-center text-sm p-2 bg-gray-50 dark:bg-gray-800/50 rounded-md"><span class="font-semibold text-gray-700 dark:text-gray-300">${d.date}</span><span class="text-gray-500 dark:text-gray-400 text-right">${d.reason}</span></li>`).join('')}</ul>`
+            : `<p class="text-center text-gray-500 dark:text-gray-400">No public holiday leaves recorded for this month.</p>`;
+        
+        openModal(createModal('Public Holiday Leave Details', content));
+    };
+
 
     const addDashboardEventListeners = () => {
         document.getElementById('export-pdf-shortcut').addEventListener('click', () => {
@@ -2418,26 +2351,10 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('export-excel-shortcut').addEventListener('click', () => {
             showExportMonthPickerModal((year, month) => exportAsCSV(year, month));
         });
-        document.getElementById('export-screenshot-shortcut').addEventListener('click', () => {
-            loadingSpinner.style.display = 'flex';
-            const activePage = document.getElementById('dashboard-page');
-            html2canvas(activePage, { scale: 2, useCORS: true, backgroundColor: document.documentElement.classList.contains('dark') ? '#111827' : '#f8f9fa' }).then(canvas => {
-                const link = document.createElement('a');
-                link.download = `dashboard-screenshot-${currentDate.getFullYear()}-${currentDate.getMonth()+1}.png`;
-                link.href = canvas.toDataURL();
-                link.click();
-                loadingSpinner.style.display = 'none';
-            }).catch(err => {
-                console.error("Screenshot failed:", err);
-                loadingSpinner.style.display = 'none';
-            });
-        });
-
-        // Add event listeners for new widgets
-        document.getElementById('widget-total-leaves').addEventListener('click', () => showWidgetDetailModal('totalLeaves'));
-        document.getElementById('widget-ot-hours').addEventListener('click', () => showWidgetDetailModal('otHours'));
-        document.getElementById('widget-own-leaves').addEventListener('click', () => showWidgetDetailModal('ownLeaves'));
-        document.getElementById('widget-poya-leaves').addEventListener('click', () => showWidgetDetailModal('poyaLeaves'));
+        document.getElementById('share-shortcut-btn').addEventListener('click', handleShare);
+        
+        document.getElementById('view-all-own-leaves').addEventListener('click', showOwnLeaveDetailsModal);
+        document.getElementById('view-all-public-leaves').addEventListener('click', showPublicHolidayDetailsModal);
     }
 
     // DASHBOARD END
@@ -2464,6 +2381,87 @@ document.addEventListener('DOMContentLoaded', () => {
         link.setAttribute("href", encodeURI(csvContent));
         link.setAttribute("download", `Work_Report_${year}_${month + 1}.csv`);
         link.click();
+    };
+
+    const handleShare = async () => {
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
+        const fileName = `Work_Report_${year}_${month + 1}.pdf`;
+
+        // Check for Web Share API support
+        if (!navigator.share || !navigator.canShare) {
+            alert("Sharing is not supported on this browser. Please try exporting as PDF.");
+            return;
+        }
+
+        loadingSpinner.style.display = 'flex';
+        
+        try {
+            // Create a temporary, off-screen element for rendering
+            const tempContainer = document.createElement('div');
+            tempContainer.style.position = 'absolute';
+            tempContainer.style.left = '-9999px';
+            tempContainer.style.top = '0';
+            tempContainer.innerHTML = document.querySelector('#report-page').innerHTML;
+            document.body.appendChild(tempContainer);
+            
+            // This is a simplified render. A proper one would rebuild the content.
+            // For now, let's generate the PDF from a dedicated export element structure.
+            const exportEl = document.createElement('div');
+            exportEl.innerHTML = `
+                <div id="share-export-content" class="p-4 bg-white text-black" style="font-size: 18px; width: 1200px;">
+                    <!-- Re-using existing export preview structure -->
+                </div>
+            `;
+            const daysInMonth = getDaysInMonth(year, month);
+            const tableRows = Array.from({ length: daysInMonth }, (_, i) => {
+                const day = i + 1;
+                const dateKey = `${year}-${month}-${day}`;
+                const dayData = workData[dateKey] || {};
+                const formattedDate = `${String(day).padStart(2, '0')}.${String(month + 1).padStart(2, '0')}.${year}`;
+                return `<tr><td style="padding:4px; border:1px solid #ccc;">${formattedDate}</td><td style="padding:4px; border:1px solid #ccc;">${dayData.inTime || '-'}</td><td style="padding:4px; border:1px solid #ccc;">${dayData.outTime || '-'}</td><td style="padding:4px; border:1px solid #ccc;">${dayData.leaveStatus || 'No'}</td><td style="padding:4px; border:1px solid #ccc;">${dayData.leaveReason || '-'}</td></tr>`;
+            }).join('');
+            
+            exportEl.querySelector('#share-export-content').innerHTML = `
+                <div style="text-align: center; margin-bottom: 1rem; font-size: 20px;">
+                    <h2 style="font-size: 1.25rem; font-weight: bold;">Work Data Sheet</h2>
+                    <h3 style="font-size: 1.125rem; font-weight: 600;">${months[month]} ${year}</h3>
+                </div>
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead style="background-color: #f3f4f6;">
+                        <tr>
+                            ${['Day', 'In', 'Out', 'Leave', 'Reason'].map(h => `<th style="padding:4px; border:1px solid #ccc; font-weight: 600;">${h}</th>`).join('')}
+                        </tr>
+                    </thead>
+                    <tbody style="text-align: center;">${tableRows}</tbody>
+                </table>`;
+            document.body.appendChild(exportEl);
+
+            const canvas = await html2canvas(exportEl.querySelector('#share-export-content'), { scale: 2, useCORS: true });
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+            pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, pdf.internal.pageSize.getWidth(), pdf.internal.pageSize.getHeight());
+            const pdfBlob = pdf.output('blob');
+
+            const file = new File([pdfBlob], fileName, { type: 'application/pdf' });
+            
+            if (navigator.canShare({ files: [file] })) {
+                await navigator.share({
+                    files: [file],
+                    title: `Work Report for ${months[month]} ${year}`,
+                    text: `Here is the work report for ${months[month]} ${year}.`,
+                });
+            } else {
+                alert("Cannot share PDF files on this browser.");
+            }
+            document.body.removeChild(exportEl);
+
+        } catch (error) {
+            console.error('Sharing failed:', error);
+            alert('Could not share the report. Please try again.');
+        } finally {
+            loadingSpinner.style.display = 'none';
+        }
     };
 
     // MAIN RENDER/INITIALIZATION FUNCTIONS
@@ -2495,7 +2493,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     scrollUpButton.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
     scrollDownButton.addEventListener('click', () => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'smooth' }));
-    floatingDatePickerBtn.addEventListener('click', showDatePickerModal);
 
     // BACK BUTTON NAVIGATION START
     backToDashboardBtn.addEventListener('click', () => showPage('dashboard-page'));
@@ -2553,12 +2550,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 if (isFirstSnapshot) {
                     isFirstSnapshot = false;
-                    showPage('report-page'); // Default to report page on data load/update
+                    showPage('dashboard-page'); // Default to dashboard page on login
                     initializeAppForUser();
                 }
-                // For subsequent snapshot events, we do nothing here to avoid re-rendering
-                // the entire UI, which solves the input focus loss and scrolling issues.
-                // The UI is updated locally by input event handlers.
             }, err => {
                 console.error("Firestore snapshot error: ", err);
                 initializeAppForUser(); // Fallback on error
