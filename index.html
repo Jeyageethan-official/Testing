@@ -1,10 +1,11 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Work Report</title>
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cg stroke='%233b82f6' stroke-width='8' stroke-linecap='round' stroke-linejoin='round' fill='none'%3E%3Cpath d='M25,15 h50 a5,5 0 0 1 5,5 v60 a5,5 0 0 1 -5,5 h-50 a5,5 0 0 1 -5,-5 v-60 a5,5 0 0 1 5,-5 z' /%3E%3Cpath d='M35 35 H 75' /%3E%3Cpath d='M35 50 H 75' /%3E%3Cpath d='M35 65 H 60' /%3E%3C/g%3E%3C/svg%3E">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cg stroke='%233b82f6' stroke-width='8' stroke-linecap='round' stroke-linejoin='round' fill='none'%3E%3Cpath d='M25,15 h50 a5,5 0 0 1 5,5 v60 a5,5 0 0 1 -5,5 h-50 a5,5 0 0 1 -5,-5 v-60 a5,5 0 0 1 5,-5 z'/%3E%3Cpath d='M35 35 H 75'/%3E%3Cpath d='M35 50 H 75'/%3E%3Cpath d='M35 65 H 60'/%3E%3C/g%3E%3C/svg%3E">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -412,7 +413,7 @@
         }
 
         /* Dashboard & Report Pages */
-        #report-page, #dashboard-page {
+        #report-page, #dashboard-page, #settings-page {
             display: none;
             /* Switched to block for simpler layout management */
         }
@@ -500,6 +501,7 @@
         .sidebar-item {
             display: flex;
             align-items: center;
+            justify-content: space-between;
             gap: 1rem;
             padding: 0.75rem 1rem;
             border-radius: 0.5rem;
@@ -507,6 +509,11 @@
             cursor: pointer;
             transition: background-color 0.2s;
             color: #374151; /* gray-700 */
+        }
+        .sidebar-item .sidebar-item-content {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
         }
         html.dark .sidebar-item {
             color: #d1d5db; /* gray-300 */
@@ -669,7 +676,10 @@
     <div id="app-wrapper" style="display: none;">
         <!-- Top Navigation -->
         <nav id="main-nav" class="flex items-center justify-between">
-            <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2">
+                <button id="header-back-btn" class="hidden p-2 text-gray-600 dark:text-gray-300 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" aria-label="Back to Dashboard">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                </button>
                 <!-- Logo -->
                 <div class="flex items-center gap-2 text-xl font-bold text-gray-800 dark:text-white">
                     <svg class="w-8 h-8 text-blue-600" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
@@ -690,14 +700,6 @@
 
         <!-- Report Page -->
         <div id="report-page">
-             <!-- BACK BUTTON NAVIGATION START -->
-            <div class="px-4 sm:px-6 lg:px-8 pt-6">
-                <button id="back-to-dashboard-btn" class="flex items-center gap-2 text-sm font-semibold text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-                    Back to Dashboard
-                </button>
-            </div>
-            <!-- BACK BUTTON NAVIGATION END -->
             <main id="main-content" class="p-4 sm:p-6 lg:p-8 pt-4">
                 <div id="app-container" class="relative text-gray-800 dark:text-gray-200 opacity-0 transition-opacity duration-500">
                     <header id="header-container"></header>
@@ -711,7 +713,6 @@
         
         <!-- Dashboard Page -->
         <div id="dashboard-page" class="p-4 sm:p-6 lg:p-8">
-    
             <!-- DASHBOARD START -->
              <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                 <!-- Left Widgets -->
@@ -723,7 +724,7 @@
                         </div>
                         <a id="view-all-own-leaves" class="widget-view-all">View All</a>
                     </div>
-                    <div id="widget-public-leaves" class="iphone-widget flex flex-col justify-between">
+                     <div id="widget-public-leaves" class="iphone-widget flex flex-col justify-between">
                         <div>
                             <h3 class="widget-title">Public Holiday Leaves</h3>
                             <p id="widget-public-leaves-value" class="text-4xl font-bold mt-2 text-gray-800 dark:text-white">0</p>
@@ -733,11 +734,12 @@
                 </div>
                  <!-- Right Widgets -->
                 <div class="flex flex-col gap-4">
-                     <div id="widget-total-present" class="iphone-widget flex flex-col justify-between">
+                    <div id="widget-annual-leave" class="iphone-widget flex flex-col justify-between">
                         <div>
-                            <h3 class="widget-title">Total Present</h3>
-                            <p id="widget-total-present-value" class="text-4xl font-bold mt-2 text-gray-800 dark:text-white">0</p>
+                            <h3 class="widget-title">Annual Leave Balance</h3>
+                            <p id="widget-annual-leave-value" class="text-4xl font-bold mt-2 text-gray-800 dark:text-white">0</p>
                         </div>
+                        <a id="edit-annual-leave-settings" class="widget-view-all">Edit Settings</a>
                     </div>
                     <div id="widget-total-hours" class="iphone-widget flex flex-col justify-between">
                         <div>
@@ -795,6 +797,65 @@
                 </div>
             </div>
             <!-- DASHBOARD END -->
+        </div>
+
+        <!-- Settings Page -->
+        <div id="settings-page" class="p-4 sm:p-6 lg:p-8">
+             <div class="space-y-8 max-w-4xl mx-auto fade-in">
+                <!-- Profile Settings Card -->
+                <div class="widget-card">
+                     <h3 class="widget-title mb-6">Profile Settings</h3>
+                     <div class="flex flex-col sm:flex-row items-center gap-6">
+                         <div class="w-24 h-24 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center text-gray-400 dark:text-gray-500 text-4xl font-bold" id="settings-user-initial">
+                             U
+                         </div>
+                         <div class="flex-grow w-full text-center sm:text-left">
+                             <div class="space-y-3">
+                                 <div>
+                                     <label for="settings-display-name" class="font-medium text-sm text-gray-700 dark:text-gray-300">Display Name</label>
+                                     <input type="text" id="settings-display-name" class="w-full mt-1 p-2 border border-gray-300 rounded-lg bg-gray-50/50 premium-input dark:bg-gray-800/50 dark:border-gray-700" />
+                                 </div>
+                                 <div>
+                                     <label class="font-medium text-sm text-gray-700 dark:text-gray-300">Email</label>
+                                     <p id="settings-email" class="mt-1 text-gray-500 dark:text-gray-400"></p>
+                                 </div>
+                             </div>
+                             <div class="mt-4 flex gap-3">
+                                 <button id="save-profile-btn" class="px-5 py-2 rounded-lg font-semibold text-sm shadow-sm transition-all bg-blue-600 text-white hover:bg-blue-700">Save Profile</button>
+                                 <p id="profile-save-status" class="text-sm text-green-600 dark:text-green-400 flex items-center"></p>
+                             </div>
+                         </div>
+                     </div>
+                </div>
+                <!-- App Preferences Card -->
+                <div class="widget-card">
+                    <h3 class="widget-title mb-6">App Preferences</h3>
+                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                             <label for="settings-leave-allowance" class="font-medium text-sm text-gray-700 dark:text-gray-300">Base Annual Leave Allowance</label>
+                             <input type="number" id="settings-leave-allowance" class="w-full mt-1 p-2 border border-gray-300 rounded-lg bg-gray-50/50 premium-input dark:bg-gray-800/50 dark:border-gray-700" />
+                        </div>
+                        <div>
+                             <label for="settings-work-hours" class="font-medium text-sm text-gray-700 dark:text-gray-300">Normal Work Hours / Day</label>
+                             <input type="number" step="0.5" id="settings-work-hours" class="w-full mt-1 p-2 border border-gray-300 rounded-lg bg-gray-50/50 premium-input dark:bg-gray-800/50 dark:border-gray-700" />
+                        </div>
+                    </div>
+                    <div class="mt-4 flex gap-3">
+                        <button id="save-preferences-btn" class="px-5 py-2 rounded-lg font-semibold text-sm shadow-sm transition-all bg-blue-600 text-white hover:bg-blue-700">Save Preferences</button>
+                        <p id="preferences-save-status" class="text-sm text-green-600 dark:text-green-400 flex items-center"></p>
+                    </div>
+                </div>
+                <!-- Data Management Card -->
+                <div class="widget-card">
+                    <h3 class="widget-title mb-6">Data Management</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <button id="force-sync-btn" class="w-full text-center p-3 rounded-lg font-semibold transition-colors bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700">Force Sync from Cloud</button>
+                        <button id="full-backup-btn" class="w-full text-center p-3 rounded-lg font-semibold transition-colors bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700">Backup All Data</button>
+                        <button id="full-csv-export-btn" class="w-full text-center p-3 rounded-lg font-semibold transition-colors bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700">Export All as CSV</button>
+                    </div>
+                    <p id="data-op-status" class="text-sm text-green-600 dark:text-green-400 mt-4 h-5"></p>
+                </div>
+            </div>
         </div>
 
         <!-- Scroll Buttons -->
@@ -874,6 +935,10 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentDate = new Date();
     let workData = {};
     let reminders = [];
+    let userSettings = {
+        baseAnnualLeave: 35,
+        normalWorkMinutes: 540, // 9 hours
+    };
     let isInitialLoad = true;
     
     // Chart and Map instances
@@ -890,6 +955,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const appWrapper = document.getElementById('app-wrapper');
     const reportPage = document.getElementById('report-page');
     const dashboardPage = document.getElementById('dashboard-page');
+    const settingsPage = document.getElementById('settings-page');
     const authArea = document.getElementById('auth-area');
     const pageTitle = document.getElementById('page-title');
     const headerContainer = document.getElementById('header-container');
@@ -903,10 +969,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const scrollDownButton = document.getElementById('scrollDownButton');
     const floatingDatePickerBtn = document.getElementById('floating-date-picker-btn');
 
-    // BACK BUTTON NAVIGATION START
-    const backToDashboardBtn = document.getElementById('back-to-dashboard-btn');
+    // Navigation Buttons
     const viewFullReportBtn = document.getElementById('view-full-report-btn');
-    // BACK BUTTON NAVIGATION END
+    const headerBackBtn = document.getElementById('header-back-btn');
 
     let floatingBtnListener = null;
 
@@ -917,7 +982,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // PAGE NAVIGATION
     const showPage = (pageId) => {
-        [reportPage, dashboardPage].forEach(page => {
+        [reportPage, dashboardPage, settingsPage].forEach(page => {
             if (page.id === pageId) {
                 page.style.display = 'block';
                 page.classList.add('fade-in');
@@ -926,6 +991,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
         
+        if (pageId === 'report-page' || pageId === 'settings-page') {
+            headerBackBtn.classList.remove('hidden');
+        } else {
+            headerBackBtn.classList.add('hidden');
+        }
+
         if (floatingBtnListener) {
             floatingDatePickerBtn.removeEventListener('click', floatingBtnListener);
         }
@@ -935,7 +1006,11 @@ document.addEventListener('DOMContentLoaded', () => {
              floatingDatePickerBtn.title = "Select Month";
              floatingBtnListener = showMonthPickerModal;
              renderDashboard();
-        } else {
+        } else if (pageId === 'settings-page') {
+             pageTitle.textContent = "Settings";
+             floatingDatePickerBtn.classList.add('hidden'); // Hide on settings page
+             renderSettingsPage();
+        } else { // Report page
              pageTitle.textContent = "Work Report";
              floatingDatePickerBtn.title = "Go to Date";
              floatingBtnListener = showDatePickerModal;
@@ -974,51 +1049,45 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     
     const calculateDayHoursAndOT = (dayData, year, month, day) => {
-    const { inTime, outTime, specialDays, leaveReason } = dayData;
+        const { inTime, outTime, specialDays, leaveReason } = dayData || {};
 
-    // If in-time or out-time missing, return 0
-    if (!inTime || !outTime) {
-        return { totalHours: 0, otHours: 0 };
-    }
+        if (!inTime || !outTime) {
+            return { totalHours: 0, otHours: 0 };
+        }
 
-    const [inH, inM] = inTime.split(':').map(Number);
-    const [outH, outM] = outTime.split(':').map(Number);
-    const inMinutes = inH * 60 + inM;
-    const outMinutes = outH * 60 + outM;
+        const [inH, inM] = inTime.split(':').map(Number);
+        const [outH, outM] = outTime.split(':').map(Number);
+        const inMinutes = inH * 60 + inM;
+        const outMinutes = outH * 60 + outM;
 
-    if (outMinutes <= inMinutes) return { totalHours: 0, otHours: 0 };
+        if (outMinutes <= inMinutes) return { totalHours: 0, otHours: 0 };
 
-    const isDayWeekend = isWeekend(year, month, day);
-    const isSpecialDay =
-        specialDays === "Poya Day" ||
-        specialDays === "Public Holiday" ||
-        leaveReason === "Custom Reason";
+        const isDayWeekend = isWeekend(year, month, day);
+        const isSpecialDay =
+            specialDays === "Poya Day" ||
+            specialDays === "Public Holiday" ||
+            leaveReason === "Custom Reason";
 
-    // 🟢 For weekends and special/public/custom days:
-    // Count full hours as OT (no 9-hour limit)
-    if (isDayWeekend || isSpecialDay) {
-        const totalMinutes = outMinutes - inMinutes;
-        const totalHours = totalMinutes / 60;
-        return { totalHours, otHours: totalHours };
-    }
+        if (isDayWeekend || isSpecialDay) {
+            const totalMinutes = outMinutes - inMinutes;
+            const totalHours = totalMinutes / 60;
+            return { totalHours, otHours: totalHours };
+        }
 
-    // 🟢 For normal weekdays:
-    const WORK_START_MINUTES = 8 * 60 + 30; // 8:30 AM
-    const NORMAL_WORK_MINUTES = 9 * 60;     // 9 hours
+        const WORK_START_MINUTES = 8 * 60 + 30; // 8:30 AM
+        const NORMAL_WORK_MINUTES = userSettings.normalWorkMinutes || 540; // Use settings, default to 9 hours
 
-    // Work counting starts from 8:30 AM even if earlier
-    const effectiveInMinutes = Math.max(inMinutes, WORK_START_MINUTES);
+        const effectiveInMinutes = Math.max(inMinutes, WORK_START_MINUTES);
 
-    if (outMinutes <= effectiveInMinutes) {
-        return { totalHours: 0, otHours: 0 };
-    }
+        if (outMinutes <= effectiveInMinutes) {
+            return { totalHours: 0, otHours: 0 };
+        }
 
-    const totalWorkedMinutes = outMinutes - effectiveInMinutes;
-    const otMinutes = Math.max(0, totalWorkedMinutes - NORMAL_WORK_MINUTES);
-
-    // ✅ Only OT hours matter — totalHours = OT only
-    return { totalHours: otMinutes / 60, otHours: otMinutes / 60 };
-};
+        const totalWorkedMinutes = outMinutes - effectiveInMinutes;
+        const otMinutes = Math.max(0, totalWorkedMinutes - NORMAL_WORK_MINUTES);
+        
+        return { totalHours: otMinutes / 60, otHours: otMinutes / 60 };
+    };
 
 
     const getMonthStats = (year, month) => {
@@ -1069,7 +1138,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        const balanceLeave = 35 - totalLeave;
+        const balanceLeave = (userSettings.baseAnnualLeave || 35) - totalLeave;
         return { totalLeave, balanceLeave };
     };
 
@@ -1106,25 +1175,29 @@ document.addEventListener('DOMContentLoaded', () => {
             ? `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>` 
             : `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>`;
         const themeText = isDarkMode ? 'Light Mode' : 'Dark Mode';
+        const chevronIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400"><polyline points="9 18 15 12 9 6"></polyline></svg>`;
 
         sidebarRoot.innerHTML = `
             <div class="sidebar-backdrop"></div>
             <div class="sidebar-menu">
                 <div class="sidebar-header flex justify-between items-center">
-                    <h2 class="text-xl font-bold text-gray-800 dark:text-white">Menu</h2>
+                    <h2 class="text-xl font-bold text-gray-800 dark:text-white">Features</h2>
                     <button id="sidebar-close-btn" class="p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                     </button>
                 </div>
                 <div class="sidebar-content">
                     <nav class="flex flex-col gap-2">
-                        <a id="sidebar-ai-btn" class="sidebar-item"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/></svg><span>AI Assistant</span></a>
-                        <a id="sidebar-month-picker-btn" class="sidebar-item"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line><path d="M8 14h.01"></path><path d="M12 14h.01"></path><path d="M16 14h.01"></path><path d="M8 18h.01"></path><path d="M12 18h.01"></path><path d="M16 18h.01"></path></svg><span>Select Month</span></a>
-                        <a id="sidebar-date-picker-btn" class="sidebar-item"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg><span>Go to Date</span></a>
-                        <a id="sidebar-reminder-btn" class="sidebar-item"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><span>Reminders</span></a>
-                        <a id="sidebar-share-btn" class="sidebar-item"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg><span>Share & Export</span></a>
+                         <a id="sidebar-dashboard-btn" class="sidebar-item font-semibold text-blue-600 dark:text-blue-400"><div class="sidebar-item-content"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg><span>Dashboard</span></div>${chevronIcon}</a>
+                         <div class="my-2 border-t border-gray-200 dark:border-gray-700"></div>
+                         <a id="sidebar-ai-btn" class="sidebar-item"><div class="sidebar-item-content"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/></svg><span>AI Assistant</span></div>${chevronIcon}</a>
+                        <a id="sidebar-month-picker-btn" class="sidebar-item"><div class="sidebar-item-content"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line><path d="M8 14h.01"></path><path d="M12 14h.01"></path><path d="M16 14h.01"></path><path d="M8 18h.01"></path><path d="M12 18h.01"></path><path d="M16 18h.01"></path></svg><span>Select Month</span></div>${chevronIcon}</a>
+                        <a id="sidebar-date-picker-btn" class="sidebar-item"><div class="sidebar-item-content"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg><span>Go to Date</span></div>${chevronIcon}</a>
+                        <a id="sidebar-reminder-btn" class="sidebar-item"><div class="sidebar-item-content"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><span>Reminders</span></div>${chevronIcon}</a>
+                        <a id="sidebar-share-btn" class="sidebar-item"><div class="sidebar-item-content"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg><span>Share & Export</span></div>${chevronIcon}</a>
                         <div class="my-2 border-t border-gray-200 dark:border-gray-700"></div>
-                        <a id="sidebar-theme-toggle-btn" class="sidebar-item">${themeIcon}<span>${themeText}</span></a>
+                        <a id="sidebar-settings-btn" class="sidebar-item"><div class="sidebar-item-content"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg><span>Settings</span></div>${chevronIcon}</a>
+                        <a id="sidebar-theme-toggle-btn" class="sidebar-item"><div class="sidebar-item-content">${themeIcon}<span>${themeText}</span></div></a>
                     </nav>
                 </div>
             </div>
@@ -1141,12 +1214,20 @@ document.addEventListener('DOMContentLoaded', () => {
             
             backdrop.addEventListener('click', closeSidebar);
             sidebarRoot.querySelector('#sidebar-close-btn').addEventListener('click', closeSidebar);
+            
+            const handleSidebarClick = (page) => {
+                if(typeof page === 'string') showPage(page);
+                else page();
+                closeSidebar();
+            };
 
-            sidebarRoot.querySelector('#sidebar-ai-btn').addEventListener('click', () => { showAiModal(); closeSidebar(); });
-            sidebarRoot.querySelector('#sidebar-month-picker-btn').addEventListener('click', () => { showMonthPickerModal(); closeSidebar(); });
-            sidebarRoot.querySelector('#sidebar-date-picker-btn').addEventListener('click', () => { showDatePickerModal(); closeSidebar(); });
-            sidebarRoot.querySelector('#sidebar-reminder-btn').addEventListener('click', () => { showReminderModal(); closeSidebar(); });
-            sidebarRoot.querySelector('#sidebar-share-btn').addEventListener('click', () => { showShareModal(); closeSidebar(); });
+            sidebarRoot.querySelector('#sidebar-dashboard-btn').addEventListener('click', () => handleSidebarClick('dashboard-page'));
+            sidebarRoot.querySelector('#sidebar-settings-btn').addEventListener('click', () => handleSidebarClick('settings-page'));
+            sidebarRoot.querySelector('#sidebar-ai-btn').addEventListener('click', () => handleSidebarClick(showAiModal));
+            sidebarRoot.querySelector('#sidebar-month-picker-btn').addEventListener('click', () => handleSidebarClick(showMonthPickerModal));
+            sidebarRoot.querySelector('#sidebar-date-picker-btn').addEventListener('click', () => handleSidebarClick(showDatePickerModal));
+            sidebarRoot.querySelector('#sidebar-reminder-btn').addEventListener('click', () => handleSidebarClick(showReminderModal));
+            sidebarRoot.querySelector('#sidebar-share-btn').addEventListener('click', () => handleSidebarClick(showShareModal));
             
             sidebarRoot.querySelector('#sidebar-theme-toggle-btn').addEventListener('click', () => {
                 handleThemeToggle();
@@ -1155,7 +1236,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     ? `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>` 
                     : `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>`;
                 const newText = newIsDarkMode ? 'Light Mode' : 'Dark Mode';
-                sidebarRoot.querySelector('#sidebar-theme-toggle-btn').innerHTML = `${newIcon}<span>${newText}</span>`;
+                sidebarRoot.querySelector('#sidebar-theme-toggle-btn .sidebar-item-content').innerHTML = `${newIcon}<span>${newText}</span>`;
             });
         }, 10);
     };
@@ -1232,6 +1313,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const leaveReasonOptions = weekend
             ? ["", "Poya Day", "Public Holiday", "Custom Reason", "Own Leave", "Normal Leave Day"]
             : ["", "Poya Day", "Public Holiday", "Custom Reason", "Own Leave"];
+        
+        const { totalHours } = calculateDayHoursAndOT(dayData, year, month, day);
+        let statusBadge = { text: 'Absent', class: 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300' };
+        if (dayData.leaveStatus === 'Yes') {
+            statusBadge = { text: 'Leave', class: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300' };
+        } else if (totalHours > 0) {
+            statusBadge = { text: 'Present', class: 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300' };
+        }
 
         const createInput = (label, field, type, placeholder = '', value = '') => {
             const valueAttr = value ? `value="${value}"` : '';
@@ -1261,7 +1350,10 @@ document.addEventListener('DOMContentLoaded', () => {
         return `
             <div data-day="${day}" class="day-box bg-white dark:bg-gray-900 rounded-2xl p-5 shadow-lg dark:shadow-black/20 border border-gray-200/50 dark:border-gray-800/50 border-b-4 border-b-blue-500 transition-all duration-300 hover:shadow-2xl hover:-translate-y-1">
                 <div class="flex justify-between items-center mb-4 pb-4 border-b border-gray-200 dark:border-gray-800">
-                    <h3 class="text-lg font-semibold ${weekend ? 'text-red-500 dark:text-red-400' : 'text-gray-900 dark:text-gray-100'}">${dayName}, ${months[month]} ${day}, ${year}</h3>
+                    <div class="flex items-center gap-3">
+                        <h3 class="text-lg font-semibold ${weekend ? 'text-red-500 dark:text-red-400' : 'text-gray-900 dark:text-gray-100'}">${dayName}, ${months[month]} ${day}, ${year}</h3>
+                         <div id="status-badge-${dateKey}" class="text-xs font-bold px-2 py-1 rounded-full ${statusBadge.class}">${statusBadge.text}</div>
+                    </div>
                     <div class="relative">
                         <button class="day-card-menu-btn p-1 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
@@ -1378,8 +1470,11 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             saveLocalData();
         }
+        
+        const shouldRerenderCard = field === 'leaveStatus' || field === 'leaveReason';
+        const shouldUpdateBadge = ['inTime', 'outTime', 'leaveStatus', 'specialDays'].includes(field);
 
-        if (field === 'leaveStatus' || field === 'leaveReason') {
+        if (shouldRerenderCard) {
             const day = dateKey.split('-')[2];
             const dayBox = daysContainer.querySelector(`.day-box[data-day="${day}"]`);
             if (dayBox) {
@@ -1388,6 +1483,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 const newDayBox = daysContainer.querySelector(`.day-box[data-day="${day}"]`);
                 addSingleDayCardEventListeners(newDayBox);
             }
+        } else if (shouldUpdateBadge) {
+             const day = parseInt(dateKey.split('-')[2]);
+             const badge = document.getElementById(`status-badge-${dateKey}`);
+             if (badge) {
+                const year = currentDate.getFullYear();
+                const month = currentDate.getMonth();
+                const dayData = workData[dateKey] || {};
+                const { totalHours } = calculateDayHoursAndOT(dayData, year, month, day);
+                let statusBadge = { text: 'Absent', class: 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300' };
+                if (dayData.leaveStatus === 'Yes') {
+                    statusBadge = { text: 'Leave', class: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300' };
+                } else if (totalHours > 0) {
+                    statusBadge = { text: 'Present', class: 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300' };
+                }
+                badge.textContent = statusBadge.text;
+                badge.className = `text-xs font-bold px-2 py-1 rounded-full ${statusBadge.class}`;
+             }
         }
         renderSummary();
     };
@@ -1489,14 +1601,36 @@ document.addEventListener('DOMContentLoaded', () => {
     const handleClearMonthData = () => {
         if (window.confirm("Are you sure you want to clear all data for this month? This action cannot be undone.")) {
             const monthPrefix = `${currentDate.getFullYear()}-${currentDate.getMonth()}`;
-            Object.keys(workData).forEach(key => {
-                if (key.startsWith(monthPrefix)) delete workData[key];
+            const keysToDelete = Object.keys(workData).filter(key => key.startsWith(monthPrefix));
+
+            if (keysToDelete.length === 0) return; // No data to delete
+
+            // Immediately update local state for UI responsiveness
+            keysToDelete.forEach(key => {
+                delete workData[key];
             });
-            if(user) {
-                syncToCloud();
+
+            // Prepare and execute Firestore update if the user is logged in
+            if (user) {
+                const userRef = db.collection("users").doc(user.uid);
+                const updatePayload = {};
+                keysToDelete.forEach(key => {
+                    // Use dot notation to specify the nested fields to delete
+                    updatePayload[`workData.${key}`] = firebase.firestore.FieldValue.delete();
+                });
+                
+                userRef.update(updatePayload).catch(err => {
+                    console.error("Firestore month clear error:", err);
+                    // Optionally, inform the user that the cloud sync failed.
+                });
             } else {
+                // Handle local-only storage if the user is not logged in
                 saveLocalData();
             }
+
+            // Re-render the UI from the modified local state.
+            // The onSnapshot listener will also receive this update from the server,
+            // but rendering immediately provides a better user experience.
             renderAll();
         }
     };
@@ -2219,7 +2353,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // FIREBASE-RELATED FUNCTIONS
     const syncToCloud = () => {
         if (user) {
-            db.collection("users").doc(user.uid).set({ workData, reminders }, { merge: true })
+            db.collection("users").doc(user.uid).set({ workData, reminders, settings: userSettings }, { merge: true })
                 .catch(err => console.error("Firestore write error:", err));
         }
     };
@@ -2242,6 +2376,8 @@ document.addEventListener('DOMContentLoaded', () => {
         addDashboardEventListeners();
 
         const annualLeaveStats = calculateAnnualLeaveStats();
+        document.getElementById('widget-annual-leave-value').textContent = annualLeaveStats.balanceLeave;
+
         const annualLeaveContainer = document.getElementById('annual-leave-summary-container');
         if (annualLeaveContainer) {
             annualLeaveContainer.innerHTML = `
@@ -2261,7 +2397,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const stats = getMonthStats(year, month);
         document.getElementById('widget-own-leaves-value').textContent = stats.ownLeaves;
         document.getElementById('widget-public-leaves-value').textContent = stats.publicHolidayLeaveDays;
-        document.getElementById('widget-total-present-value').textContent = stats.totalPresentDays;
         
         const totalHoursWidget = document.getElementById('widget-total-hours');
         totalHoursWidget.querySelector('.widget-title').textContent = 'Total OT Hours';
@@ -2609,9 +2744,169 @@ document.addEventListener('DOMContentLoaded', () => {
         
         document.getElementById('view-all-own-leaves').addEventListener('click', showOwnLeaveDetailsModal);
         document.getElementById('view-all-public-leaves').addEventListener('click', showPublicHolidayDetailsModal);
+        document.getElementById('edit-annual-leave-settings').addEventListener('click', () => showPage('settings-page'));
     }
 
     // DASHBOARD END
+
+    // ===================================================================================
+    //
+    //                          SETTINGS PAGE START
+    //
+    // ===================================================================================
+    
+    const renderSettingsPage = () => {
+        if (!user) return;
+
+        // Profile
+        document.getElementById('settings-user-initial').textContent = (user.displayName || user.email || 'U').charAt(0).toUpperCase();
+        document.getElementById('settings-display-name').value = user.displayName || '';
+        document.getElementById('settings-email').textContent = user.email;
+
+        // Preferences
+        document.getElementById('settings-leave-allowance').value = userSettings.baseAnnualLeave || 35;
+        document.getElementById('settings-work-hours').value = (userSettings.normalWorkMinutes || 540) / 60;
+        
+        addSettingsEventListeners();
+    };
+
+    const addSettingsEventListeners = () => {
+        // Use .onclick to avoid multiple listeners
+        document.getElementById('save-profile-btn').onclick = handleSaveProfile;
+        document.getElementById('save-preferences-btn').onclick = handleSavePreferences;
+        document.getElementById('force-sync-btn').onclick = handleForceSync;
+        document.getElementById('full-backup-btn').onclick = handleFullBackup;
+        document.getElementById('full-csv-export-btn').onclick = handleFullCSVExport;
+    };
+
+    const handleSaveProfile = async () => {
+        const newName = document.getElementById('settings-display-name').value.trim();
+        const statusEl = document.getElementById('profile-save-status');
+        if (!newName) {
+            statusEl.textContent = 'Name cannot be empty.';
+            statusEl.className = 'text-sm text-red-600 dark:text-red-400 flex items-center';
+            return;
+        }
+        
+        statusEl.textContent = 'Saving...';
+        statusEl.className = 'text-sm text-gray-500 dark:text-gray-400 flex items-center';
+
+        try {
+            await user.updateProfile({ displayName: newName });
+            const userRef = db.collection('users').doc(user.uid);
+            await userRef.set({ displayName: newName }, { merge: true });
+
+            statusEl.textContent = 'Profile Saved!';
+            statusEl.className = 'text-sm text-green-600 dark:text-green-400 flex items-center';
+            renderMainNav(user); // Update header
+            document.getElementById('settings-user-initial').textContent = newName.charAt(0).toUpperCase();
+        } catch (error) {
+            statusEl.textContent = 'Error saving profile.';
+            statusEl.className = 'text-sm text-red-600 dark:text-red-400 flex items-center';
+            console.error('Profile update error:', error);
+        }
+        setTimeout(() => statusEl.textContent = '', 3000);
+    };
+
+    const handleSavePreferences = async () => {
+        const statusEl = document.getElementById('preferences-save-status');
+        const newAllowance = parseInt(document.getElementById('settings-leave-allowance').value, 10);
+        const newHours = parseFloat(document.getElementById('settings-work-hours').value);
+
+        userSettings.baseAnnualLeave = newAllowance;
+        userSettings.normalWorkMinutes = newHours * 60;
+
+        statusEl.textContent = 'Saving...';
+        statusEl.className = 'text-sm text-gray-500 dark:text-gray-400 flex items-center';
+        
+        try {
+            const userRef = db.collection('users').doc(user.uid);
+            await userRef.set({ settings: userSettings }, { merge: true });
+            
+            statusEl.textContent = 'Preferences Saved!';
+            statusEl.className = 'text-sm text-green-600 dark:text-green-400 flex items-center';
+
+            renderDashboard(); // Re-render dashboard with new settings
+            if(reportPage.style.display === 'block') renderAll();
+
+        } catch (error) {
+            statusEl.textContent = 'Error saving preferences.';
+            statusEl.className = 'text-sm text-red-600 dark:text-red-400 flex items-center';
+            console.error('Preferences update error:', error);
+        }
+        setTimeout(() => statusEl.textContent = '', 3000);
+    };
+
+    const handleForceSync = async () => {
+        if (!user) return;
+        const statusEl = document.getElementById('data-op-status');
+        statusEl.textContent = 'Syncing...';
+        try {
+            const userRef = db.collection('users').doc(user.uid);
+            const doc = await userRef.get();
+            const data = doc.data();
+            workData = data?.workData || {};
+            reminders = data?.reminders || [];
+            userSettings = data?.settings || { baseAnnualLeave: 35, normalWorkMinutes: 540 };
+            statusEl.textContent = 'Sync complete!';
+            renderAll();
+            renderDashboard();
+        } catch(e) {
+            statusEl.textContent = 'Sync failed.';
+            console.error(e);
+        }
+        setTimeout(() => statusEl.textContent = '', 3000);
+    }
+    
+    const handleFullBackup = async () => {
+         if (!user) return;
+        const statusEl = document.getElementById('data-op-status');
+        statusEl.textContent = 'Backing up...';
+        try {
+            const backupRef = db.collection('backups').doc(user.uid);
+            const timestamp = new Date().toISOString();
+            await backupRef.set({
+                backups: {
+                    [timestamp]: workData
+                }
+            }, { merge: true });
+            statusEl.textContent = 'Backup successful!';
+        } catch(e) {
+            statusEl.textContent = 'Backup failed.';
+            console.error(e);
+        }
+        setTimeout(() => statusEl.textContent = '', 3000);
+    }
+    
+    const handleFullCSVExport = () => {
+        const headers = ['Date', 'InTime', 'OutTime', 'MovementOut', 'MovementIn', 'TeamMembers', 'WorkLocation', 'VehicleNumber', 'KM', 'SpecialDay', 'LeaveStatus', 'LeaveReason', 'LeaveReasonDetails'];
+        let csvContent = "data:text/csv;charset=utf-8," + headers.join(',') + '\r\n';
+
+        const sortedKeys = Object.keys(workData).sort();
+
+        for(const key of sortedKeys) {
+            const data = workData[key] || {};
+            const row = [
+                key, // Format is YYYY-M-D
+                data.inTime || '', data.outTime || '', data.movementOut || '', data.movementIn || '',
+                `"${data.teamMembers || ''}"`, `"${data.workLocation || ''}"`,
+                data.vehicleNumber || '', data.km || '', data.specialDays || '',
+                data.leaveStatus || 'No', data.leaveReason || '', `"${data.leaveReasonText || data.customReasonDetails || ''}"`
+            ];
+            csvContent += row.join(',') + '\r\n';
+        }
+        
+        const link = document.createElement("a");
+        link.setAttribute("href", encodeURI(csvContent));
+        link.setAttribute("download", `Work_Report_Full_Backup.csv`);
+        link.click();
+    };
+
+    // ===================================================================================
+    //
+    //                          SETTINGS PAGE END
+    //
+    // ===================================================================================
 
     const exportAsCSV = (year, month) => {
         const daysInMonth = getDaysInMonth(year, month);
@@ -2741,17 +3036,17 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('scroll', () => {
         const isAtTop = window.scrollY < 100;
         const isAtBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 100;
+        const onSettings = settingsPage.style.display === 'block';
+
         scrollUpButton.classList.toggle('hidden', isAtTop);
-        floatingDatePickerBtn.classList.toggle('hidden', isAtTop);
+        floatingDatePickerBtn.classList.toggle('hidden', isAtTop || onSettings);
         scrollDownButton.classList.toggle('hidden', isAtBottom);
     });
     scrollUpButton.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
     scrollDownButton.addEventListener('click', () => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'smooth' }));
 
-    // BACK BUTTON NAVIGATION START
-    backToDashboardBtn.addEventListener('click', () => showPage('dashboard-page'));
+    headerBackBtn.addEventListener('click', () => showPage('dashboard-page'));
     viewFullReportBtn.addEventListener('click', () => showPage('report-page'));
-    // BACK BUTTON NAVIGATION END
 
     const firebaseConfig = {
       apiKey: "AIzaSyDzaAqT7NRAyQhTNDh8GsMKlTKNmttzIWo",
@@ -2801,11 +3096,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = doc.data();
                 workData = data?.workData || {};
                 reminders = data?.reminders || [];
-                
+                userSettings = data?.settings || { baseAnnualLeave: 35, normalWorkMinutes: 540 };
+
                 if (isFirstSnapshot) {
                     isFirstSnapshot = false;
-                    showPage('report-page'); // Default to report page on login
+                    showPage('dashboard-page'); // Default to dashboard page on login
                     initializeAppForUser();
+                } else {
+                    // Subsequent updates from other devices, re-render current view
+                    if (dashboardPage.style.display === 'block') renderDashboard();
+                    if (reportPage.style.display === 'block') renderAll();
+                    if (settingsPage.style.display === 'block') renderSettingsPage();
                 }
             }, err => {
                 console.error("Firestore snapshot error: ", err);
@@ -2819,6 +3120,7 @@ document.addEventListener('DOMContentLoaded', () => {
             user = null;
             workData = JSON.parse(localStorage.getItem('workData') || '{}');
             reminders = JSON.parse(localStorage.getItem('reminders') || '[]');
+            userSettings = { baseAnnualLeave: 35, normalWorkMinutes: 540 };
             
             appWrapper.style.display = 'none';
             signupPage.style.display = 'none';
