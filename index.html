@@ -974,54 +974,52 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     
     const calculateDayHoursAndOT = (dayData, year, month, day) => {
-        const { inTime, outTime, specialDays, leaveReason } = dayData;
+    const { inTime, outTime, specialDays, leaveReason } = dayData;
 
-        // Rule: If in-time or out-time is missing, return 0 for all hours.
-        if (!inTime || !outTime) {
-            return { totalHours: 0, otHours: 0 };
-        }
+    // If in-time or out-time missing, return 0
+    if (!inTime || !outTime) {
+        return { totalHours: 0, otHours: 0 };
+    }
 
-        const [inH, inM] = inTime.split(':').map(Number);
-        const [outH, outM] = outTime.split(':').map(Number);
-        const inMinutes = inH * 60 + inM;
-        const outMinutes = outH * 60 + outM;
+    const [inH, inM] = inTime.split(':').map(Number);
+    const [outH, outM] = outTime.split(':').map(Number);
+    const inMinutes = inH * 60 + inM;
+    const outMinutes = outH * 60 + outM;
 
-        // If out time is before in time, return 0.
-        if (outMinutes <= inMinutes) {
-            return { totalHours: 0, otHours: 0 };
-        }
+    if (outMinutes <= inMinutes) return { totalHours: 0, otHours: 0 };
 
-        const isDayWeekend = isWeekend(year, month, day);
-        const isSpecialDay = specialDays === "Poya Day" || specialDays === "Public Holiday" || leaveReason === "Custom Reason";
+    const isDayWeekend = isWeekend(year, month, day);
+    const isSpecialDay =
+        specialDays === "Poya Day" ||
+        specialDays === "Public Holiday" ||
+        leaveReason === "Custom Reason";
 
-        // Rule: For weekends and special days, calculate total hours worked. OT is always 0.
-        if (isDayWeekend || isSpecialDay) {
-            const totalMinutes = outMinutes - inMinutes;
-            return { totalHours: totalMinutes / 60, otHours: 0 };
-        }
+    // 🟢 For weekends and special/public/custom days:
+    // Count full hours as OT (no 9-hour limit)
+    if (isDayWeekend || isSpecialDay) {
+        const totalMinutes = outMinutes - inMinutes;
+        const totalHours = totalMinutes / 60;
+        return { totalHours, otHours: totalHours };
+    }
 
-        // Rule: For normal weekdays.
-        const NINE_HOURS_IN_MINUTES = 9 * 60; // 540 minutes
-        const WORK_START_MINUTES = 8 * 60 + 30; // 8:30 AM = 510 minutes
+    // 🟢 For normal weekdays:
+    const WORK_START_MINUTES = 8 * 60 + 30; // 8:30 AM
+    const NORMAL_WORK_MINUTES = 9 * 60;     // 9 hours
 
-        // Work counting starts from 8:30 AM, even if user came in earlier.
-        const effectiveInMinutes = Math.max(inMinutes, WORK_START_MINUTES);
-        
-        // If out-time is before effective start, no work was done.
-        if (outMinutes <= effectiveInMinutes) {
-             return { totalHours: 0, otHours: 0 };
-        }
+    // Work counting starts from 8:30 AM even if earlier
+    const effectiveInMinutes = Math.max(inMinutes, WORK_START_MINUTES);
 
-        const totalMinutesWorked = outMinutes - effectiveInMinutes;
+    if (outMinutes <= effectiveInMinutes) {
+        return { totalHours: 0, otHours: 0 };
+    }
 
-        // Anything beyond the first 9 hours is considered OT.
-        const otMinutes = Math.max(0, totalMinutesWorked - NINE_HOURS_IN_MINUTES);
-        
-        return {
-            totalHours: totalMinutesWorked / 60,
-            otHours: otMinutes / 60
-        };
-    };
+    const totalWorkedMinutes = outMinutes - effectiveInMinutes;
+    const otMinutes = Math.max(0, totalWorkedMinutes - NORMAL_WORK_MINUTES);
+
+    // ✅ Only OT hours matter — totalHours = OT only
+    return { totalHours: otMinutes / 60, otHours: otMinutes / 60 };
+};
+
 
     const getMonthStats = (year, month) => {
         const monthPrefix = `${year}-${month}`;
