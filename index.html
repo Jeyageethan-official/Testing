@@ -591,6 +591,15 @@
         html.dark .heatmap-weekend { background-color: #374151; }
         
     </style>
+<script type="importmap">
+{
+  "imports": {
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/"
+  }
+}
+</script>
 </head>
 <body class="bg-gray-50 dark:bg-gray-950">
     <!-- Sign-In Page -->
@@ -965,39 +974,55 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     
     const calculateDayHoursAndOT = (dayData, year, month, day) => {
-        const { inTime, outTime, specialDays } = dayData;
-        if (!inTime || !outTime) return { regularHours: 0, otHours: 0 };
+        const { inTime, outTime, specialDays, leaveReason } = dayData;
 
-        const isDayWeekend = isWeekend(year, month, day);
-        const isSpecial = specialDays === "Poya Day" || specialDays === "Public Holiday" || dayData.leaveReason === "Custom Reason";
+        // Rule: If in-time or out-time is missing, the result is 0 hours.
+        if (!inTime || !outTime) {
+            return { regularHours: 0, otHours: 0 };
+        }
 
         const [inH, inM] = inTime.split(':').map(Number);
         const [outH, outM] = outTime.split(':').map(Number);
         const inMinutes = inH * 60 + inM;
         const outMinutes = outH * 60 + outM;
 
-        if (outMinutes <= inMinutes) return { regularHours: 0, otHours: 0 };
-
-        // For weekends and special days, all hours are regular.
-        if (isDayWeekend || isSpecial) {
-            return { regularHours: (outMinutes - inMinutes) / 60, otHours: 0 };
+        if (outMinutes <= inMinutes) {
+            return { regularHours: 0, otHours: 0 };
         }
 
-        // For normal weekdays (Monday to Friday)
-        const eightThirtyAMInMinutes = 8 * 60 + 30; // 510 minutes
-        const nineHoursInMinutes = 9 * 60; // 540 minutes
+        const isDayWeekend = isWeekend(year, month, day);
+        const isSpecialDay = specialDays === "Poya Day" || specialDays === "Public Holiday" || leaveReason === "Custom Reason";
 
-        // Start counting from 8:30 AM even if user came in earlier
-        const effectiveInMinutes = Math.max(inMinutes, eightThirtyAMInMinutes);
+        // Rule: For weekends and special/public/custom days, all hours are counted as normal hours with no OT.
+        if (isDayWeekend || isSpecialDay) {
+            const totalMinutes = outMinutes - inMinutes;
+            return { regularHours: totalMinutes / 60, otHours: 0 };
+        }
 
-        if (outMinutes <= effectiveInMinutes) return { regularHours: 0, otHours: 0 };
+        // Rule: For normal weekdays (Monday to Friday):
+        const NINE_HOURS_IN_MINUTES = 9 * 60; // 540 minutes
+        const WORK_START_MINUTES = 8 * 60 + 30; // 8:30 AM = 510 minutes
+
+        // Rule: Work counting starts from 8:30 AM, even if in-time is earlier.
+        const effectiveInMinutes = Math.max(inMinutes, WORK_START_MINUTES);
+
+        // If out-time is before the effective start time, no hours were worked.
+        if (outMinutes <= effectiveInMinutes) {
+            return { regularHours: 0, otHours: 0 };
+        }
 
         const totalMinutesWorked = outMinutes - effectiveInMinutes;
 
-        const regularMinutes = Math.min(totalMinutesWorked, nineHoursInMinutes);
-        const otMinutes = Math.max(0, totalMinutesWorked - nineHoursInMinutes);
+        // Rule: The first 9 hours are regular hours.
+        const regularMinutes = Math.min(totalMinutesWorked, NINE_HOURS_IN_MINUTES);
         
-        return { regularHours: regularMinutes / 60, otHours: otMinutes / 60 };
+        // Rule: Anything beyond 9 hours is OT.
+        const otMinutes = Math.max(0, totalMinutesWorked - regularMinutes);
+        
+        return {
+            regularHours: regularMinutes / 60,
+            otHours: otMinutes / 60
+        };
     };
 
     const getMonthStats = (year, month) => {
