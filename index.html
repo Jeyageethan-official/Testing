@@ -5,8 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Work Report</title>
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cg stroke='%233b82f6' stroke-width='8' stroke-linecap='round' stroke-linejoin='round' fill='none'%3E%3Cpath d='M25,15 h50 a5,5 0 0 1 5,5 v60 a5,5 0 0 1 -5,5 h-50 a5,5 0 0 1 -5,-5 v-60 a5,5 0 0 1 5,-5 z'/%3E%3Cpath d='M35 35 H 75'/%3E%3Cpath d='M35 50 H 75'/%3E%3Cpath d='M35 65 H 60'/%3E%3C/g%3E%3C/svg%3E" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cg stroke='%233b82f6' stroke-width='8' stroke-linecap='round' stroke-linejoin='round' fill='none'%3E%3Cpath d='M25,15 h50 a5,5 0 0 1 5,5 v60 a5,5 0 0 1 -5,5 h-50 a5,5 0 0 1 -5,-5 v-60 a5,5 0 0 1 5,-5 z'/%3E%3Cpath d='M35 35 H 75'/%3E%3Cpath d='M35 50 H 75'/%3E%3Cpath d='M35 65 H 60'/%3E%3C/g%3E%3C/svg%3E">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cg stroke='%233b82f6' stroke-width='8' stroke-linecap='round' stroke-linejoin='round' fill='none'%3E%3Cpath d='M25,15 h50 a5,5 0 0 1 5,5 v60 a5,5 0 0 1 -5,5 h-50 a5,5 0 0 1 -5,-5 v-60 a5,5 0 0 1 5,-5 z'/%3E%3Cpath d='M35 35 H 75'/%3E%3Cpath d='M35 50 H 75'/%3E%3Cpath d='M35 65 H 60'/%3E%3C/g%3E%3C/svg%3E">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -735,11 +734,12 @@
                 </div>
                  <!-- Right Widgets -->
                 <div class="flex flex-col gap-4">
-                    <div id="widget-total-present" class="iphone-widget flex flex-col justify-between">
+                    <div id="widget-annual-leave" class="iphone-widget flex flex-col justify-between">
                         <div>
-                            <h3 class="widget-title">Total Present This Month</h3>
-                            <p id="widget-total-present-value" class="text-4xl font-bold mt-2 text-gray-800 dark:text-white">0</p>
+                            <h3 class="widget-title">Annual Leave Balance</h3>
+                            <p id="widget-annual-leave-value" class="text-4xl font-bold mt-2 text-gray-800 dark:text-white">0</p>
                         </div>
+                        <a id="edit-annual-leave-settings" class="widget-view-all">Edit Settings</a>
                     </div>
                     <div id="widget-total-hours" class="iphone-widget flex flex-col justify-between">
                         <div>
@@ -806,10 +806,10 @@
                 <div class="widget-card">
                      <h3 class="widget-title mb-6">Profile Settings</h3>
                      <div class="flex flex-col sm:flex-row items-center gap-6">
-                         <div class="w-24 h-24 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center text-gray-400 dark:text-gray-500 text-4xl font-bold shrink-0" id="settings-user-initial">
+                         <div class="w-24 h-24 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center text-gray-400 dark:text-gray-500 text-4xl font-bold" id="settings-user-initial">
                              U
                          </div>
-                         <div class="flex-grow w-full text-left">
+                         <div class="flex-grow w-full text-center sm:text-left">
                              <div class="space-y-3">
                                  <div>
                                      <label for="settings-display-name" class="font-medium text-sm text-gray-700 dark:text-gray-300">Display Name</label>
@@ -848,8 +848,8 @@
                 <!-- Data Management Card -->
                 <div class="widget-card">
                     <h3 class="widget-title mb-6">Data Management</h3>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4">
-                        <button id="force-sync-btn" class="w-full text-center p-3 rounded-lg font-semibold transition-colors bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700">Force Sync</button>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <button id="force-sync-btn" class="w-full text-center p-3 rounded-lg font-semibold transition-colors bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700">Force Sync from Cloud</button>
                         <button id="full-backup-btn" class="w-full text-center p-3 rounded-lg font-semibold transition-colors bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700">Backup All Data</button>
                         <button id="restore-backup-btn" class="w-full text-center p-3 rounded-lg font-semibold transition-colors bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700">Restore from Backup</button>
                         <button id="full-csv-export-btn" class="w-full text-center p-3 rounded-lg font-semibold transition-colors bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700">Export All as CSV</button>
@@ -1102,7 +1102,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const { totalHours, otHours } = calculateDayHoursAndOT(data, year, month, day);
                 const isSpecial = data.specialDays === "Poya Day" || data.specialDays === "Public Holiday";
 
-                if (totalHours > 0 || (data && data.inTime && data.outTime)) {
+                if (totalHours > 0) {
                     totalPresentDays++;
                     totalMonthOtHours += otHours;
                 }
@@ -1112,7 +1112,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (isSpecial || data.leaveReason === "Poya Day" || data.leaveReason === "Public Holiday") {
                         publicHolidayLeaveDays++;
                     }
-                } else if (isSpecial && totalHours === 0 && !(data && data.inTime && data.outTime)) {
+                } else if (isSpecial && totalHours === 0) {
                     publicHolidayLeaveDays++;
                 }
             }
@@ -1315,12 +1315,20 @@ document.addEventListener('DOMContentLoaded', () => {
             ? ["", "Poya Day", "Public Holiday", "Custom Reason", "Own Leave", "Normal Leave Day"]
             : ["", "Poya Day", "Public Holiday", "Custom Reason", "Own Leave"];
         
-        const { totalHours } = calculateDayHoursAndOT(dayData, year, month, day);
-        let statusBadge = { text: 'Absent', class: 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300' };
-        if (dayData.leaveStatus === 'Yes') {
-            statusBadge = { text: 'Leave', class: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300' };
-        } else if (dayData.inTime && dayData.outTime) {
-            statusBadge = { text: 'Present', class: 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300' };
+        const today = new Date();
+        today.setHours(23, 59, 59, 999);
+        const cardDate = new Date(year, month, day);
+        
+        let statusBadgeHTML = '';
+        if (cardDate <= today) {
+            const { totalHours } = calculateDayHoursAndOT(dayData, year, month, day);
+            let statusBadge = { text: 'Absent', class: 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300' };
+            if (dayData.leaveStatus === 'Yes') {
+                statusBadge = { text: 'Leave', class: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300' };
+            } else if (totalHours > 0) {
+                statusBadge = { text: 'Present', class: 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300' };
+            }
+            statusBadgeHTML = `<div id="status-badge-${dateKey}" class="text-xs font-bold px-2 py-1 rounded-full ${statusBadge.class}">${statusBadge.text}</div>`;
         }
 
         const createInput = (label, field, type, placeholder = '', value = '') => {
@@ -1353,7 +1361,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="flex justify-between items-center mb-4 pb-4 border-b border-gray-200 dark:border-gray-800">
                     <div class="flex items-center gap-3">
                         <h3 class="text-lg font-semibold ${weekend ? 'text-red-500 dark:text-red-400' : 'text-gray-900 dark:text-gray-100'}">${dayName}, ${months[month]} ${day}, ${year}</h3>
-                         <div id="status-badge-${dateKey}" class="text-xs font-bold px-2 py-1 rounded-full ${statusBadge.class}">${statusBadge.text}</div>
+                         ${statusBadgeHTML}
                     </div>
                     <div class="relative">
                         <button class="day-card-menu-btn p-1 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full">
@@ -1491,10 +1499,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 const year = currentDate.getFullYear();
                 const month = currentDate.getMonth();
                 const dayData = workData[dateKey] || {};
+                const { totalHours } = calculateDayHoursAndOT(dayData, year, month, day);
                 let statusBadge = { text: 'Absent', class: 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300' };
                 if (dayData.leaveStatus === 'Yes') {
                     statusBadge = { text: 'Leave', class: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300' };
-                } else if (dayData.inTime && dayData.outTime) {
+                } else if (totalHours > 0) {
                     statusBadge = { text: 'Present', class: 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300' };
                 }
                 badge.textContent = statusBadge.text;
@@ -2307,7 +2316,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div id="export-content" class="p-4 bg-white text-black" style="font-size: 18px;">
                         <div class="text-center mb-4" style="font-size: 20px;">
                             <h2 class="text-xl font-bold">Work Data Sheet</h2>
-                            <p class="text-md font-semibold">Name: ${user.displayName || 'N/A'}</p>
+                            <p class="text-md font-semibold">Name: T.Jeyaraman | Service No: 016696</p>
                             <h3 class="text-lg font-semibold">${months[month]} ${year}</h3>
                         </div>
                         <div class="overflow-x-auto">
@@ -2376,12 +2385,13 @@ document.addEventListener('DOMContentLoaded', () => {
         addDashboardEventListeners();
 
         const annualLeaveStats = calculateAnnualLeaveStats();
-        
+        document.getElementById('widget-annual-leave-value').textContent = annualLeaveStats.balanceLeave;
+
         const annualLeaveContainer = document.getElementById('annual-leave-summary-container');
         if (annualLeaveContainer) {
             annualLeaveContainer.innerHTML = `
                 <div class="flex justify-between items-center text-sm">
-                    <span class="font-medium text-gray-600 dark:text-gray-400">Annual Total Leaves Taken:</span>
+                    <span class="font-medium text-gray-600 dark:text-gray-400">Annual Total Leave Count:</span>
                     <span class="font-bold text-lg text-gray-800 dark:text-white">${annualLeaveStats.totalLeave}</span>
                 </div>
                 <div class="flex justify-between items-center text-sm">
@@ -2396,7 +2406,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const stats = getMonthStats(year, month);
         document.getElementById('widget-own-leaves-value').textContent = stats.ownLeaves;
         document.getElementById('widget-public-leaves-value').textContent = stats.publicHolidayLeaveDays;
-        document.getElementById('widget-total-present-value').textContent = stats.totalPresentDays;
         
         const totalHoursWidget = document.getElementById('widget-total-hours');
         totalHoursWidget.querySelector('.widget-title').textContent = 'Total OT Hours';
@@ -2415,16 +2424,19 @@ document.addEventListener('DOMContentLoaded', () => {
         for (let day = 1; day <= daysInMonth; day++) {
             const dateKey = `${year}-${month}-${day}`;
             const dayData = workData[dateKey] || {};
-            
+            const { totalHours } = calculateDayHoursAndOT(dayData, year, month, day);
+
             let statusClass = 'bg-gray-100 dark:bg-gray-800/50';
             const isDayWeekend = isWeekend(year, month, day);
             const isSpecial = dayData.specialDays === "Poya Day" || dayData.specialDays === "Public Holiday";
 
             if (dayData.leaveReason === 'Own Leave') {
                 statusClass = 'heatmap-leave-own';
-            } else if (isSpecial || (dayData.leaveStatus === 'Yes' && dayData.leaveReason !== 'Own Leave')) {
+            } else if (isSpecial) {
                 statusClass = 'heatmap-public-holiday';
-            } else if (dayData.inTime && dayData.outTime) {
+            } else if (dayData.leaveStatus === 'Yes') {
+                 statusClass = 'heatmap-public-holiday'; // Using same color for other leaves for now
+            } else if (totalHours > 0) {
                 statusClass = 'heatmap-present';
             } else if (isDayWeekend) {
                 statusClass = 'heatmap-weekend';
@@ -2453,17 +2465,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const dayName = new Date(year, month, day).toLocaleDateString("en-US", { weekday: "long" });
         const title = `${dayName}, ${months[month]} ${day}, ${year}`;
         
-        let statusText = 'Absent';
-        if (dayData.leaveStatus === 'Yes') {
-            statusText = `Leave (${dayData.leaveReason || 'N/A'})`;
-        } else if (dayData.inTime && dayData.outTime) {
-            statusText = 'Present';
-        }
-
         let content = '<div class="space-y-2 text-sm">';
         const details = {
-            "Status": statusText,
-            "Total OT Hours": (dayData.inTime && dayData.outTime) ? otHours.toFixed(2) : null,
+            "Status": dayData.leaveStatus === 'Yes' ? `Leave (${dayData.leaveReason || 'N/A'})` : (totalHours > 0 ? 'Present' : 'No Data'),
+            "Total Hours": totalHours > 0 ? totalHours.toFixed(2) : null,
+            "OT Hours": otHours > 0 ? otHours.toFixed(2) : null,
             "In Time": dayData.inTime,
             "Out Time": dayData.outTime,
             "Work Location": dayData.workLocation,
@@ -2471,7 +2477,7 @@ document.addEventListener('DOMContentLoaded', () => {
             "Vehicle": dayData.vehicleNumber,
             "KM": dayData.km,
             "Special Day": dayData.specialDays,
-            "Leave Reason Details": dayData.leaveReasonText || dayData.customReasonDetails
+            "Leave Reason": dayData.leaveReasonText || dayData.customReasonDetails
         };
         
         for (const [key, value] of Object.entries(details)) {
@@ -2747,6 +2753,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         document.getElementById('view-all-own-leaves').addEventListener('click', showOwnLeaveDetailsModal);
         document.getElementById('view-all-public-leaves').addEventListener('click', showPublicHolidayDetailsModal);
+        document.getElementById('edit-annual-leave-settings').addEventListener('click', () => showPage('settings-page'));
     }
 
     // DASHBOARD END
@@ -2866,11 +2873,29 @@ document.addEventListener('DOMContentLoaded', () => {
         const statusEl = document.getElementById('data-op-status');
         statusEl.textContent = 'Backing up...';
         try {
+            const today = new Date();
+            today.setHours(23, 59, 59, 999);
+
+            const dataToBackup = Object.keys(workData).reduce((acc, key) => {
+                const [year, month, day] = key.split('-').map(Number);
+                const entryDate = new Date(year, month, day);
+                if (entryDate <= today) {
+                    acc[key] = workData[key];
+                }
+                return acc;
+            }, {});
+
+            if (Object.keys(dataToBackup).length === 0) {
+                statusEl.textContent = 'No data to backup.';
+                setTimeout(() => statusEl.textContent = '', 3000);
+                return;
+            }
+
             const backupRef = db.collection('backups').doc(user.uid);
             const timestamp = new Date().toISOString();
             await backupRef.set({
                 backups: {
-                    [timestamp]: workData
+                    [timestamp]: dataToBackup
                 }
             }, { merge: true });
             statusEl.textContent = 'Backup successful!';
@@ -2880,60 +2905,92 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         setTimeout(() => statusEl.textContent = '', 3000);
     }
-
+    
     const showRestoreModal = async () => {
-        const content = `<div id="restore-list-container" class="text-center p-4">Fetching backups...</div>`;
-        openModal(createModal('Restore from Cloud Backup', content, 'restore-modal'));
+        if (!user) return;
+        
+        let content = `<div class="text-center p-4"><div class="loader-small inline-block"></div><p class="mt-2 text-gray-500">Loading backups...</p></div>`;
+        openModal(createModal('Restore from Backup', content, 'restore-modal', 'max-w-lg'));
 
-        const container = document.getElementById('restore-list-container');
         try {
-            const backupDoc = await db.collection('backups').doc(user.uid).get();
-            if (!backupDoc.exists || !backupDoc.data().backups) {
-                container.innerHTML = '<p class="text-gray-500">No cloud backups found.</p>';
+            const backupRef = db.collection('backups').doc(user.uid);
+            const doc = await backupRef.get();
+            const backupData = doc.data();
+
+            if (!doc.exists || !backupData || !backupData.backups || Object.keys(backupData.backups).length === 0) {
+                document.querySelector('#restore-modal .p-6').innerHTML = '<p class="text-center text-gray-500">No backups found.</p>';
                 return;
             }
-            
-            const backups = backupDoc.data().backups;
-            const timestamps = Object.keys(backups).sort((a, b) => new Date(b) - new Date(a));
 
-            if (timestamps.length === 0) {
-                 container.innerHTML = '<p class="text-gray-500">No cloud backups found.</p>';
-                 return;
+            const backups = backupData.backups;
+            const sortedTimestamps = Object.keys(backups).sort((a, b) => new Date(b) - new Date(a)); // Newest first
+
+            const listHTML = sortedTimestamps.map(ts => {
+                const date = new Date(ts);
+                const formattedDate = date.toLocaleString();
+                const entryCount = Object.keys(backups[ts]).length;
+                return `
+                    <div class="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg border dark:border-gray-700">
+                        <div>
+                            <p class="font-semibold text-gray-800 dark:text-gray-200">${formattedDate}</p>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">${entryCount} records</p>
+                        </div>
+                        <button class="restore-btn px-4 py-1.5 rounded-lg font-semibold text-sm transition-all bg-blue-600 text-white hover:bg-blue-700" data-timestamp="${ts}">Restore</button>
+                    </div>
+                `;
+            }).join('');
+
+            document.querySelector('#restore-modal .p-6').innerHTML = `<div class="space-y-3">${listHTML}</div>`;
+            
+            document.querySelectorAll('.restore-btn').forEach(btn => {
+                btn.addEventListener('click', handleRestoreFromBackup);
+            });
+
+        } catch (error) {
+            console.error("Error fetching backups:", error);
+            document.querySelector('#restore-modal .p-6').innerHTML = '<p class="text-center text-red-500">Failed to load backups.</p>';
+        }
+    };
+
+    const handleRestoreFromBackup = async (e) => {
+        const timestamp = e.target.dataset.timestamp;
+        if (!timestamp) return;
+
+        if (!confirm(`Are you sure you want to restore the backup from ${new Date(timestamp).toLocaleString()}? This will overwrite your current work data.`)) {
+            return;
+        }
+
+        closeModal();
+        const statusEl = document.getElementById('data-op-status');
+        statusEl.textContent = 'Restoring...';
+
+        try {
+            const backupRef = db.collection('backups').doc(user.uid);
+            const doc = await backupRef.get();
+            const backups = doc.data().backups;
+            const dataToRestore = backups[timestamp];
+            
+            if (!dataToRestore) {
+                throw new Error("Backup data not found for the selected timestamp.");
             }
 
-            let listHTML = '<ul class="space-y-2 text-left">';
-            timestamps.forEach(ts => {
-                listHTML += `
-                    <li class="flex justify-between items-center p-2 bg-gray-100 dark:bg-gray-800 rounded-md">
-                        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">${new Date(ts).toLocaleString()}</span>
-                        <button data-timestamp="${ts}" class="restore-item-btn text-sm font-semibold bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600 transition-colors">Restore</button>
-                    </li>
-                `;
-            });
-            listHTML += '</ul>';
-            container.innerHTML = listHTML;
+            workData = dataToRestore;
 
-            container.querySelectorAll('.restore-item-btn').forEach(btn => {
-                btn.onclick = () => {
-                    if (confirm('Are you sure you want to restore this backup? This will overwrite your current work data.')) {
-                        const ts = btn.dataset.timestamp;
-                        workData = backups[ts];
-                        syncToCloud();
-                        closeModal();
-                        const statusEl = document.getElementById('data-op-status');
-                        statusEl.textContent = 'Restore successful!';
-                        setTimeout(() => statusEl.textContent = '', 3000);
-                        renderAll();
-                        renderDashboard();
-                    }
-                };
-            });
-        } catch (e) {
-            container.innerHTML = '<p class="text-red-500">Error fetching backups. Please try again.</p>';
-            console.error(e);
+            const userRef = db.collection('users').doc(user.uid);
+            await userRef.set({ workData: dataToRestore }, { merge: true });
+
+            statusEl.textContent = 'Restore successful!';
+            renderAll(); 
+            renderDashboard();
+
+        } catch (error) {
+            console.error("Restore failed:", error);
+            statusEl.textContent = 'Restore failed.';
         }
-    }
-    
+
+        setTimeout(() => statusEl.textContent = '', 4000);
+    };
+
     const handleFullCSVExport = () => {
         const headers = ['Date', 'InTime', 'OutTime', 'MovementOut', 'MovementIn', 'TeamMembers', 'WorkLocation', 'VehicleNumber', 'KM', 'SpecialDay', 'LeaveStatus', 'LeaveReason', 'LeaveReasonDetails'];
         let csvContent = "data:text/csv;charset=utf-8," + headers.join(',') + '\r\n';
