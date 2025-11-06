@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1092,30 +1093,31 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // UTILITY & HELPER FUNCTIONS
+    const isToday = (year, month, day) => {
+        const today = new Date();
+        return today.getFullYear() === year && today.getMonth() === month && today.getDate() === day;
+    };
+
     const isDayEditable = (year, month, day) => {
         const dateKey = `${year}-${month}-${day}`;
-        const today = new Date();
-        const checkDate = new Date(year, month, day);
-        const isToday = today.toDateString() === checkDate.toDateString();
-
-        // A day is editable if it's today OR it has been explicitly unlocked.
-        // `workDataLocks[dateKey] === false` means unlocked.
-        return isToday || workDataLocks[dateKey] === false;
+        // Today is editable by default unless explicitly locked.
+        if (isToday(year, month, day)) {
+            return workDataLocks[dateKey] !== true;
+        }
+        // Other days are locked by default unless explicitly unlocked.
+        return workDataLocks[dateKey] === false;
     };
 
     const isDayVisuallyLocked = (dateKey) => {
-        const today = new Date();
         const [year, month, day] = dateKey.split('-').map(Number);
-        const checkDate = new Date(year, month, day);
-        const isToday = today.toDateString() === checkDate.toDateString();
-        
-        // Today is visually unlocked by default. Other days are visually locked unless explicitly unlocked.
-        if (isToday) {
-            return workDataLocks[dateKey] === true; // Today is only locked if explicitly set to true.
+        // Today is visually unlocked by default unless explicitly locked.
+        if (isToday(year, month, day)) {
+            return workDataLocks[dateKey] === true;
         }
-        return workDataLocks[dateKey] !== false; // Other days are locked unless explicitly set to false.
+        // Other days are visually locked by default unless explicitly unlocked.
+        return workDataLocks[dateKey] !== false;
     };
-
+    
     const isFutureDate = (year, month, day) => {
         const today = new Date();
         today.setHours(23, 59, 59, 999);
@@ -1317,7 +1319,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <a id="sidebar-reminder-btn" class="sidebar-item"><div class="sidebar-item-content"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><span>Reminders</span></div>${chevronIcon}</a>
                         <a id="sidebar-share-btn" class="sidebar-item"><div class="sidebar-item-content"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg><span>Share & Export</span></div>${chevronIcon}</a>
                         <div class="my-2 border-t border-gray-200 dark:border-gray-700"></div>
-                        <a id="sidebar-settings-btn" class="sidebar-item"><div class="sidebar-item-content"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg><span>Settings</span></div>${chevronIcon}</a>
+                        <a id="sidebar-settings-btn" class="sidebar-item"><div class="sidebar-item-content"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06-.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg><span>Settings</span></div>${chevronIcon}</a>
                         <a id="sidebar-theme-toggle-btn" class="sidebar-item"><div class="sidebar-item-content">${themeIcon}<span>${themeText}</span></div></a>
                     </nav>
                 </div>
@@ -1484,7 +1486,7 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>`;
 
         return `
-            <div data-day="${day}" class="day-box bg-white dark:bg-gray-900 rounded-2xl p-5 shadow-lg dark:shadow-black/20 border border-gray-200/50 dark:border-gray-800/50 ${editable ? 'border-b-4 border-b-blue-500' : ''} transition-all duration-300 hover:shadow-2xl hover:-translate-y-1">
+            <div data-day="${day}" class="day-box bg-white dark:bg-gray-900 rounded-2xl p-5 shadow-lg dark:shadow-black/20 border ${editable ? 'border-blue-500 dark:border-blue-400' : 'border-gray-200/50 dark:border-gray-800/50'} transition-all duration-300 hover:shadow-2xl hover:-translate-y-1">
                 <div class="flex justify-between items-center mb-4 pb-4 border-b border-gray-200 dark:border-gray-800">
                     <div class="flex items-center gap-3">
                         <h3 class="text-lg font-semibold ${weekend ? 'text-red-500 dark:text-red-400' : 'text-gray-900 dark:text-gray-100'}">${dayName}, ${months[month]} ${day}, ${year}</h3>
@@ -3396,7 +3398,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 
                 workData = data?.workData || {};
-                workDataLocks = data?.workDataLocks || {};
+                
+                // On page load, reset lock states in memory: only today can be unlocked.
+                const cloudLocks = data?.workDataLocks || {};
+                const today = new Date();
+                const todayKey = `${today.getFullYear()}-${today.getMonth()}-${today.getDate()}`;
+                const sessionLocks = {};
+                if (cloudLocks[todayKey] !== undefined) {
+                    sessionLocks[todayKey] = cloudLocks[todayKey];
+                }
+                workDataLocks = sessionLocks;
+
                 reminders = data?.reminders || [];
                 userSettings = data?.settings || { baseAnnualLeave: 35, normalWorkMinutes: 540 };
 
@@ -3420,7 +3432,17 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             user = null;
             workData = JSON.parse(localStorage.getItem('workData') || '{}');
-            workDataLocks = JSON.parse(localStorage.getItem('workDataLocks') || '{}');
+            
+            // On page load for guest, reset lock states in memory.
+            const localLocks = JSON.parse(localStorage.getItem('workDataLocks') || '{}');
+            const today = new Date();
+            const todayKey = `${today.getFullYear()}-${today.getMonth()}-${today.getDate()}`;
+            const sessionLocks = {};
+            if (localLocks[todayKey] !== undefined) {
+                sessionLocks[todayKey] = localLocks[todayKey];
+            }
+            workDataLocks = sessionLocks;
+            
             reminders = JSON.parse(localStorage.getItem('reminders') || '[]');
             userSettings = { baseAnnualLeave: 35, normalWorkMinutes: 540 };
             
