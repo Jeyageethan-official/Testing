@@ -1,0 +1,374 @@
+:root {
+    --bg-light: #F5F5F7;
+    --bg-dark: #000000;
+    --text-light: #1D1D1F;
+    --text-dark: #F5F5F7;
+    --apple-blue: #0071e3;
+    --apple-blue-hover: #0077ED;
+    --card-light: rgba(255, 255, 255, 0.72);
+    --card-dark: rgba(28, 28, 30, 0.72);
+    --glass-border-light: rgba(255, 255, 255, 0.4);
+    --glass-border-dark: rgba(255, 255, 255, 0.1);
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--bg-light);
+    color: var(--text-light);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transition: background-color 0.4s cubic-bezier(0.25, 0.1, 0.25, 1), color 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
+    overflow-x: hidden;
+    letter-spacing: -0.01em;
+}
+
+html.dark body {
+    background-color: var(--bg-dark);
+    color: var(--text-dark);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+}
+
+html.dark ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.3);
+}
+
+html.dark ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.fade-in,
+.animate-fade-up {
+    animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.reveal-on-scroll {
+    opacity: 0;
+    transform: translateY(30px) scale(0.98);
+    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal-on-scroll.visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+/* Glassmorphism Cards */
+.widget-card,
+.signin-card,
+.day-box,
+.iphone-widget,
+.glass-card,
+.widget-apple,
+.day-card-apple {
+    background: var(--card-light);
+    backdrop-filter: saturate(180%) blur(24px);
+    -webkit-backdrop-filter: saturate(180%) blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.04);
+    border-radius: 24px;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+}
+
+html.dark .widget-card,
+html.dark .signin-card,
+html.dark .day-box,
+html.dark .iphone-widget,
+html.dark .glass-card,
+html.dark .widget-apple,
+html.dark .day-card-apple {
+    background: var(--card-dark);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.widget-card:hover,
+.day-box:hover,
+.iphone-widget:hover,
+.widget-apple:hover,
+.day-card-apple:hover {
+    transform: scale(1.015);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+    z-index: 10;
+}
+
+html.dark .widget-card:hover,
+html.dark .day-box:hover,
+html.dark .iphone-widget:hover,
+html.dark .widget-apple:hover,
+html.dark .day-card-apple:hover {
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+}
+
+/* Typography */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-weight: 600;
+    letter-spacing: -0.02em;
+}
+
+.widget-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #86868b;
+    margin-bottom: 1rem;
+}
+
+html.dark .widget-title {
+    color: #98989d;
+}
+
+/* Inputs */
+.premium-input,
+.signin-input,
+.premium-select,
+.input-apple {
+    background: rgba(0, 0, 0, 0.03);
+    border: 1px solid transparent;
+    border-radius: 12px;
+    padding: 10px 14px;
+    font-size: 15px;
+    transition: all 0.2s ease;
+    color: var(--text-light);
+}
+
+html.dark .premium-input,
+html.dark .signin-input,
+html.dark .premium-select,
+html.dark .input-apple {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-dark);
+}
+
+.premium-input:focus,
+.signin-input:focus,
+.premium-select:focus,
+.input-apple:focus {
+    background: #fff;
+    border-color: var(--apple-blue);
+    box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.15);
+    outline: none;
+}
+
+html.dark .premium-input:focus,
+html.dark .signin-input:focus,
+html.dark .premium-select:focus,
+html.dark .input-apple:focus {
+    background: #1c1c1e;
+    border-color: var(--apple-blue);
+    box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.25);
+}
+
+/* Buttons */
+button {
+    font-weight: 500;
+    letter-spacing: -0.01em;
+}
+
+.btn-primary {
+    background-color: var(--apple-blue);
+    color: white;
+    border-radius: 980px;
+    /* Pill shape */
+    padding: 10px 24px;
+    transition: all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+.btn-primary:hover {
+    background-color: var(--apple-blue-hover);
+    transform: scale(1.02);
+    box-shadow: 0 4px 12px rgba(0, 113, 227, 0.3);
+}
+
+.btn-primary:active {
+    transform: scale(0.98);
+}
+
+/* Navigation */
+#main-nav,
+.nav-blur {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    transition: background 0.3s ease;
+}
+
+html.dark #main-nav,
+html.dark .nav-blur {
+    background: rgba(0, 0, 0, 0.8);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Sign In Page */
+#signin-page,
+#signup-page {
+    background: var(--bg-light);
+}
+
+html.dark #signin-page,
+html.dark #signup-page {
+    background: #000;
+}
+
+/* Loader */
+.loader-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.animated-logo-svg {
+    width: 64px;
+    height: 64px;
+}
+
+.animated-logo-svg .draw-stroke {
+    stroke-dasharray: 500;
+    stroke-dashoffset: 500;
+    animation: draw 1.2s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+}
+
+@keyframes draw {
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+/* Custom Select Arrow */
+.premium-select,
+.input-apple {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2386868b' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.75rem center;
+    background-repeat: no-repeat;
+    background-size: 1.25em 1.25em;
+    padding-right: 2.5rem;
+}
+
+/* Sidebar */
+.sidebar-menu {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: saturate(180%) blur(20px);
+    border-left: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+html.dark .sidebar-menu {
+    background: rgba(28, 28, 30, 0.9);
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Heatmap */
+.heatmap-day {
+    border-radius: 4px;
+    transition: transform 0.2s ease;
+}
+
+.heatmap-day:hover {
+    transform: scale(1.2);
+    z-index: 5;
+}
+
+/* Utilities */
+.hidden {
+    display: none !important;
+}
+
+/* Modal Animation */
+.modal-content-animate {
+    animation: modalPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes modalPop {
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* Badge Styles */
+.badge-apple {
+    padding: 4px 12px;
+    border-radius: 99px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.badge-present {
+    background: rgba(52, 199, 89, 0.15);
+    color: #248a3d;
+}
+
+html.dark .badge-present {
+    background: rgba(48, 209, 88, 0.2);
+    color: #30d158;
+}
+
+.badge-leave {
+    background: rgba(255, 149, 0, 0.15);
+    color: #cc7a00;
+}
+
+html.dark .badge-leave {
+    background: rgba(255, 159, 10, 0.2);
+    color: #ff9f0a;
+}
